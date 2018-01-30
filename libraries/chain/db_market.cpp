@@ -236,6 +236,44 @@ bool maybe_cull_small_order( database& db, const limit_order_object& order )
    return false;
 }
 
+
+bool database::is_match_possible( const limit_order_object& bid, const limit_order_object& ask)
+{
+  if( bid.request_id.valid() || ask.request_id.valid() ){
+    bool b_match_possible = false;
+    if( bid.request_id.valid() && ask.request_id.valid() ){
+      b_match_possible = ( *(bid.request_id) == *(ask.request_id) );
+    }
+    if( !b_match_possible)
+      return false;
+  }
+  
+  if( bid.user_id.valid() || ask.user_id.valid() ){
+    bool b_match_possible = false;
+    if( bid.user_id.valid() && ask.user_id.valid() ){
+      b_match_possible = ( *(bid.user_id) == *(ask.user_id) );
+    }
+    if( !b_match_possible)
+      return false;
+  }
+
+  if( bid.counterparty_id.valid()){
+    const account_object& ask_seller = ask.seller(*this);
+    bool b_match_possible = ( *(bid.counterparty_id) == ask_seller.get_id() );
+    if( !b_match_possible)
+      return false;
+  }
+
+  if( ask.counterparty_id.valid()){
+    const account_object& bid_seller = bid.seller(*this);
+    bool b_match_possible = ( *(ask.counterparty_id) == bid_seller.get_id() );
+    if( !b_match_possible)
+      return false;
+  }
+
+  return true;
+}
+
 bool database::apply_order(const limit_order_object& new_order_object, bool allow_black_swan)
 {
    auto order_id = new_order_object.id;
@@ -267,7 +305,9 @@ bool database::apply_order(const limit_order_object& new_order_object, bool allo
       auto old_limit_itr = limit_itr;
       ++limit_itr;
       // match returns 2 when only the old order was fully filled. In this case, we keep matching; otherwise, we stop.
-      finished = (match(new_order_object, *old_limit_itr, old_limit_itr->sell_price) != 2);
+      if( is_match_possible( new_order_object, *old_limit_itr) ){
+        finished = (match(new_order_object, *old_limit_itr, old_limit_itr->sell_price) != 2);
+      }
    }
 
    //Possible optimization: only check calls if the new order completely filled some old order
@@ -329,13 +369,24 @@ int database::match( const limit_order_object& usd, const OrderType& core, const
 
    assert( usd_pays == usd.amount_for_sale() ||
            core_pays == core.amount_for_sale() );
+   
+   counterparty_info  usd_info;
+   counterparty_info  core_info;
+
+   usd_info.request_id = usd.request_id;
+   usd_info.user_id = usd.user_id;
+   usd_info.memo = usd.memo;
+
+   core_info.request_id = core.request_id;
+   core_info.user_id = core.user_id;
+   core_info.memo = core.memo;
 
    int result = 0;
-   result |= fill_order( usd, usd_pays, usd_receives, false, match_price, false ); // although this function is a template,
+   result |= fill_order( usd, usd_pays, usd_receives, false, match_price, false, &core_info ); // although this function is a template,
                                                                                    // right now it only matches one limit order
                                                                                    // with another limit order,
                                                                                    // the first param is a new order, thus taker
-   result |= fill_order( core, core_pays, core_receives, true, match_price, true ) << 1; // the second param is maker
+   result |= fill_order( core, core_pays, core_receives, true, match_price, true, &usd_info ) << 1; // the second param is maker
    assert( result != 0 );
    return result;
 }
@@ -380,7 +431,7 @@ asset database::match( const call_order_object& call,
 } FC_CAPTURE_AND_RETHROW( (call)(settle)(match_price)(max_settlement) ) }
 
 bool database::fill_order( const limit_order_object& order, const asset& pays, const asset& receives, bool cull_if_small,
-                           const price& fill_price, const bool is_maker )
+                           const price& fill_price, const bool is_maker, const counterparty_info* cparty_info )
 { try {
    cull_if_small |= (head_block_time() < HARDFORK_555_TIME);
 
@@ -394,7 +445,7 @@ bool database::fill_order( const limit_order_object& order, const asset& pays, c
    pay_order( seller, receives - issuer_fees, pays );
 
    assert( pays.asset_id != receives.asset_id );
-   push_applied_operation( fill_order_operation( order.id, order.seller, pays, receives, issuer_fees, fill_price, is_maker ) );
+   push_applied_operation( fill_order_operation( order.id, order.seller, pays, receives, issuer_fees, fill_price, is_maker, cparty_info ));
 
    // conditional because cheap integer comparison may allow us to avoid two expensive modify() and object lookups
    if( order.deferred_fee > 0 )

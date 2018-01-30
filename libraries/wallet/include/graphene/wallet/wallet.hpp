@@ -282,6 +282,13 @@ struct operation_detail {
    operation_history_object op;
 };
 
+struct offer_request_detail {
+      uint64_t request_id;
+      uint64_t user_id;
+      optional< string > counterparty_id;
+      optional< string > memo;
+};
+
 /**
  * This wallet assumes it is connected to the database server with a high-bandwidth, low-latency connection and
  * performs minimal caching. This API could be provided locally to be used by a web interface.
@@ -917,10 +924,11 @@ class wallet_api
        * @returns the signed transaction selling the funds
        */
       signed_transaction sell_asset(string seller_account,
-                                    string amount_to_sell,
+                                    string  amount_to_sell,
                                     string   symbol_to_sell,
                                     string min_to_receive,
                                     string   symbol_to_receive,
+                                    fc::optional<offer_request_detail> offer_request,
                                     uint32_t timeout_sec = 0,
                                     bool     fill_or_kill = false,
                                     bool     broadcast = false);
@@ -1631,6 +1639,9 @@ FC_REFLECT_DERIVED( graphene::wallet::vesting_balance_object_with_info, (graphen
 
 FC_REFLECT( graphene::wallet::operation_detail, 
             (memo)(description)(op) )
+
+FC_REFLECT( graphene::wallet::offer_request_detail, 
+            (request_id)(user_id)(counterparty_id)(memo) )
 
 FC_API( graphene::wallet::wallet_api,
         (help)

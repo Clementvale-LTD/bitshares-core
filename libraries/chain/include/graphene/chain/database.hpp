@@ -354,6 +354,11 @@ namespace graphene { namespace chain {
          bool apply_order(const limit_order_object& new_order_object, bool allow_black_swan = true);
 
          /**
+          * Additional validation to serve telecom providers: for offers and requests matching   
+          */
+         bool is_match_possible( const limit_order_object& bid, const limit_order_object& ask);
+
+         /**
           * Matches the two orders,
           *
           * @return a bit field indicating which orders were filled (and thus removed)
@@ -378,7 +383,7 @@ namespace graphene { namespace chain {
           * @return true if the order was completely filled and thus freed.
           */
          bool fill_order( const limit_order_object& order, const asset& pays, const asset& receives, bool cull_if_small,
-                          const price& fill_price, const bool is_maker );
+                          const price& fill_price, const bool is_maker, const counterparty_info* cparty_info = NULL );
          bool fill_order( const call_order_object& order, const asset& pays, const asset& receives,
                           const price& fill_price, const bool is_maker );
          bool fill_order( const force_settlement_object& settle, const asset& pays, const asset& receives,

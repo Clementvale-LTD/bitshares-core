@@ -87,6 +87,12 @@ object_id_type limit_order_create_evaluator::do_apply(const limit_order_create_o
        obj.for_sale = op.amount_to_sell.amount;
        obj.sell_price = op.get_price();
        obj.expiration = op.expiration;
+
+       obj.request_id =  op.request_id;
+       obj.user_id = op.user_id;
+       obj.counterparty_id = op.counterparty_id;
+       obj.memo = op.memo;
+
        obj.deferred_fee = _deferred_fee;
    });
    limit_order_id_type order_id = new_order_object.id; // save this because we may remove the object by filling it

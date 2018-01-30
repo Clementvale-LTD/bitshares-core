@@ -1932,6 +1932,7 @@ public:
                                  string symbol_to_sell,
                                  string min_to_receive,
                                  string symbol_to_receive,
+                                 fc::optional<offer_request_detail> offer_request,
                                  uint32_t timeout_sec = 0,
                                  bool   fill_or_kill = false,
                                  bool   broadcast = false)
@@ -1945,6 +1946,16 @@ public:
       if( timeout_sec )
          op.expiration = fc::time_point::now() + fc::seconds(timeout_sec);
       op.fill_or_kill = fill_or_kill;
+
+      if( offer_request.valid() ){
+        op.request_id = offer_request->request_id;
+        op.user_id = offer_request->user_id;
+        if( offer_request->counterparty_id.valid()){
+          account_object counterparty = get_account( *(offer_request->counterparty_id) );
+          op.counterparty_id = counterparty.get_id();
+        }
+        op.memo = offer_request->memo;
+      }
 
       signed_transaction tx;
       tx.operations.push_back(op);
@@ -3790,12 +3801,13 @@ signed_transaction wallet_api::sell_asset(string seller_account,
                                           string symbol_to_sell,
                                           string min_to_receive,
                                           string symbol_to_receive,
+                                          fc::optional<offer_request_detail> offer_request,
                                           uint32_t expiration,
                                           bool   fill_or_kill,
                                           bool   broadcast)
 {
    return my->sell_asset(seller_account, amount_to_sell, symbol_to_sell, min_to_receive,
-                         symbol_to_receive, expiration, fill_or_kill, broadcast);
+                         symbol_to_receive, offer_request, expiration, fill_or_kill, broadcast);
 }
 
 signed_transaction wallet_api::sell( string seller_account,
@@ -3805,8 +3817,9 @@ signed_transaction wallet_api::sell( string seller_account,
                                      double amount,
                                      bool broadcast )
 {
+   fc::optional<offer_request_detail> offer_request;
    return my->sell_asset( seller_account, std::to_string( amount ), base,
-                          std::to_string( rate * amount ), quote, 0, false, broadcast );
+                          std::to_string( rate * amount ), quote, offer_request, 0, false, broadcast );
 }
 
 signed_transaction wallet_api::buy( string buyer_account,
@@ -3816,8 +3829,9 @@ signed_transaction wallet_api::buy( string buyer_account,
                                     double amount,
                                     bool broadcast )
 {
+   fc::optional<offer_request_detail> offer_request;
    return my->sell_asset( buyer_account, std::to_string( rate * amount ), quote,
-                          std::to_string( amount ), base, 0, false, broadcast );
+                          std::to_string( amount ), base, offer_request, 0, false, broadcast );
 }
 
 signed_transaction wallet_api::borrow_asset(string seller_name, string amount_to_sell,

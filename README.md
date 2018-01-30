@@ -1,4 +1,4 @@
-BitShares Core
+BitShares Core for Blockchain-Telecom
 ==============
 * [Getting Started](#getting-started)
 * [Support](#support)

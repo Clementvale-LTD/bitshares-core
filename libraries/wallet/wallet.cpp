@@ -565,8 +565,10 @@ public:
    }
    account_object get_account(account_id_type id) const
    {
+#if false  //SM>>>: fixing cli_wallet caching issues  #151
       if( _wallet.my_accounts.get<by_id>().count(id) )
          return *_wallet.my_accounts.get<by_id>().find(id);
+#endif         
       auto rec = _remote_db->get_accounts({id}).front();
       FC_ASSERT(rec);
       return *rec;
@@ -581,6 +583,7 @@ public:
          return get_account(*id);
       } else {
          // It's a name
+#if false  //SM>>>: fixing cli_wallet caching issues  #151
          if( _wallet.my_accounts.get<by_name>().count(account_name_or_id) )
          {
             auto local_account = *_wallet.my_accounts.get<by_name>().find(account_name_or_id);
@@ -593,6 +596,7 @@ public:
 
             return *_wallet.my_accounts.get<by_name>().find(account_name_or_id);
          }
+#endif         
          auto rec = _remote_db->lookup_account_names({account_name_or_id}).front();
          FC_ASSERT( rec && rec->name == account_name_or_id );
          return *rec;

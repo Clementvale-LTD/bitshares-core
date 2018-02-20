@@ -28,6 +28,7 @@
 
 #include <graphene/chain/pts_address.hpp>
 #include <graphene/chain/protocol/address.hpp>
+#include <graphene/chain/protocol/types.hpp>
 
 #include <iostream>
 #include <string>
@@ -40,7 +41,8 @@ int main(int argc, char** argv)
    std::string s;
    while( std::cin >> s )
    {
-      std::cout << std::string( address( pts_address( s ) ) ) << std::endl;
+//      std::cout << std::string( address( pts_address( s ) ) ) << std::endl;
+      std::cout << std::string( address( public_key_type( s ) ) ) << std::endl;       
    }
    return 0;
 }

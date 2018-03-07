@@ -169,3 +169,13 @@
 ///@}
 
 #define GRAPHENE_FBA_STEALTH_DESIGNATED_ASSET (asset_id_type(743))
+
+#define GRAPHENE_UMT_SYMBOL              "UMT"
+#define GRAPHENE_UMT_PRECISION_DIGITS    8
+#define GRAPHENE_UMT_MAX_SUPPLY          int64_t(100000000000000000ll)
+#define GRAPHENE_UMT_ASSET_ID            (graphene::chain::asset_id_type(1))
+#define GRAPHENE_UMT_FEE_POOL_ACCOUNT    (graphene::chain::account_id_type(6))
+
+#define GRAPHENE_SDR_SYMBOL              "SDR"
+#define GRAPHENE_SDR_PRECISION_DIGITS    4
+#define GRAPHENE_SDR_ASSET_ID            (graphene::chain::asset_id_type(2))

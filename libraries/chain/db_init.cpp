@@ -309,6 +309,16 @@ void database::init_genesis(const genesis_state_type& genesis_state)
        a.network_fee_percentage = 0;
        a.lifetime_referrer_fee_percentage = GRAPHENE_100_PERCENT;
    }).get_id() == GRAPHENE_PROXY_TO_SELF_ACCOUNT);
+   FC_ASSERT(create<account_object>([this](account_object& a) {
+       a.name = "umt-fee-pool";
+       a.statistics = create<account_statistics_object>([&](account_statistics_object& s){s.owner = a.id;}).id;
+       a.owner.weight_threshold = 1;
+       a.active.weight_threshold = 1;
+       a.registrar = a.lifetime_referrer = a.referrer = GRAPHENE_NULL_ACCOUNT;
+       a.membership_expiration_date = time_point_sec::maximum();
+       a.network_fee_percentage = 0;
+       a.lifetime_referrer_fee_percentage = GRAPHENE_100_PERCENT;
+   }).get_id() == GRAPHENE_UMT_FEE_POOL_ACCOUNT);
 
    // Create more special accounts
    while( true )
@@ -335,6 +345,7 @@ void database::init_genesis(const genesis_state_type& genesis_state)
       create<asset_dynamic_data_object>([&](asset_dynamic_data_object& a) {
          a.current_supply = GRAPHENE_MAX_SHARE_SUPPLY;
       });
+
    const asset_object& core_asset =
      create<asset_object>( [&]( asset_object& a ) {
          a.symbol = GRAPHENE_SYMBOL;
@@ -351,6 +362,30 @@ void database::init_genesis(const genesis_state_type& genesis_state)
       });
    assert( asset_id_type(core_asset.id) == asset().asset_id );
    assert( get_balance(account_id_type(), asset_id_type()) == asset(dyn_asset.current_supply) );
+
+   {
+   const asset_dynamic_data_object& dyn_asset_umt =
+      create<asset_dynamic_data_object>([&](asset_dynamic_data_object& a) {
+         a.current_supply = GRAPHENE_UMT_MAX_SUPPLY;
+      });
+ 
+   const asset_object& core_assetUMT =
+     create<asset_object>( [&]( asset_object& a ) {
+         a.symbol = GRAPHENE_UMT_SYMBOL;
+         a.options.max_supply = GRAPHENE_UMT_MAX_SUPPLY;
+         a.precision = GRAPHENE_UMT_PRECISION_DIGITS;
+         a.options.flags = 0;
+         a.options.issuer_permissions = 0;
+         a.issuer = GRAPHENE_NULL_ACCOUNT;
+         a.options.core_exchange_rate.base.amount = 1;
+         a.options.core_exchange_rate.base.asset_id = asset_id_type(0);
+         a.options.core_exchange_rate.quote.amount = 1;
+         a.options.core_exchange_rate.quote.asset_id = asset_id_type(0);
+         a.dynamic_asset_data_id = dyn_asset_umt.id;
+      });
+   assert( asset_id_type(core_assetUMT.id) == asset(0,GRAPHENE_UMT_ASSET_ID).asset_id );
+   }
+
    // Create more special assets
    while( true )
    {

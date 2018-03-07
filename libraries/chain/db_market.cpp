@@ -194,6 +194,7 @@ void database::cancel_order(const force_settlement_object& order, bool create_vi
 void database::cancel_order( const limit_order_object& order, bool create_virtual_op  )
 {
    auto refunded = order.amount_for_sale();
+   auto refunded_umt = order.umt_fee;
 
    modify( order.seller(*this).statistics(*this),[&]( account_statistics_object& obj ){
       if( refunded.asset_id == asset_id_type() )
@@ -202,6 +203,7 @@ void database::cancel_order( const limit_order_object& order, bool create_virtua
       }
    });
    adjust_balance(order.seller, refunded);
+   adjust_balance(order.seller, refunded_umt);
    adjust_balance(order.seller, order.deferred_fee);
 
    if( create_virtual_op )
@@ -430,6 +432,46 @@ asset database::match( const call_order_object& call,
    return call_receives;
 } FC_CAPTURE_AND_RETHROW( (call)(settle)(match_price)(max_settlement) ) }
 
+static share_type shift_pow10_64( share_type v, int n)
+{
+    static int64_t l_pow10[] = {
+        1ll, 
+        10ll, 
+        100ll, 
+        1000ll, 
+        10000ll, 
+        100000ll, 
+        1000000ll, 
+        10000000ll, 
+        100000000ll, 
+        1000000000ll,
+        10000000000ll, 
+        100000000000ll, 
+        1000000000000ll, 
+        10000000000000ll,
+        100000000000000ll, 
+        1000000000000000ll, 
+        10000000000000000ll, 
+        100000000000000000ll,
+        1000000000000000000ll
+    };
+
+    FC_ASSERT( abs(n) <= ( sizeof(l_pow10)/sizeof(l_pow10[0]) - 1) );
+
+    if( n >=0 )
+      return v * share_type( l_pow10[n]);
+    else
+      return v / share_type( l_pow10[abs(n)]);
+}
+
+asset database::sdr_amount_to_umt_fee( share_type sdr_amount)
+{
+  asset umt_fee( shift_pow10_64( sdr_amount, GRAPHENE_UMT_PRECISION_DIGITS - GRAPHENE_SDR_PRECISION_DIGITS)
+               , GRAPHENE_UMT_ASSET_ID 
+               );
+  return umt_fee;
+}
+
 bool database::fill_order( const limit_order_object& order, const asset& pays, const asset& receives, bool cull_if_small,
                            const price& fill_price, const bool is_maker, const counterparty_info* cparty_info )
 { try {
@@ -440,6 +482,16 @@ bool database::fill_order( const limit_order_object& order, const asset& pays, c
 
    const account_object& seller = order.seller(*this);
    const asset_object& recv_asset = receives.asset_id(*this);
+
+   asset umt_fee( 0, GRAPHENE_UMT_ASSET_ID );
+
+   if( pays.asset_id == GRAPHENE_SDR_ASSET_ID) //SDR
+    if( receives.asset_id != GRAPHENE_UMT_ASSET_ID) //not UMT
+      if( receives.asset_id != asset_id_type(0)) //not BTS
+      {
+        umt_fee = sdr_amount_to_umt_fee(pays.amount);
+        adjust_balance(GRAPHENE_UMT_FEE_POOL_ACCOUNT, umt_fee);
+      }
 
    auto issuer_fees = pay_market_fees( recv_asset, receives );
    pay_order( seller, receives - issuer_fees, pays );
@@ -465,6 +517,7 @@ bool database::fill_order( const limit_order_object& order, const asset& pays, c
    {
       modify( order, [&]( limit_order_object& b ) {
                              b.for_sale -= pays.amount;
+                             b.umt_fee -= umt_fee;
                              b.deferred_fee = 0;
                           });
       if( cull_if_small )

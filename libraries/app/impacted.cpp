@@ -211,6 +211,10 @@ struct get_impacted_account_visitor
       _impacted.insert( op.account_id );
    }
 
+   void operator()( const umt_fee_distribute_operation& op )
+   {
+      _impacted.insert( op.account_id );
+   }
 };
 
 void operation_get_impacted_accounts( const operation& op, flat_set<account_id_type>& result )

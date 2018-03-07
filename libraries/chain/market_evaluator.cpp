@@ -82,11 +82,24 @@ object_id_type limit_order_create_evaluator::do_apply(const limit_order_create_o
 
    db().adjust_balance(op.seller, -op.amount_to_sell);
 
+   asset umt_fee( 0, GRAPHENE_UMT_ASSET_ID );
+
+   if( op.amount_to_sell.asset_id == GRAPHENE_SDR_ASSET_ID) //SDR
+    if( op.min_to_receive.asset_id != GRAPHENE_UMT_ASSET_ID) //not UMT
+      if( op.min_to_receive.asset_id != asset_id_type(0)) //not BTS
+      {
+        umt_fee = db().sdr_amount_to_umt_fee( op.amount_to_sell.amount );
+        db().adjust_balance(op.seller, -umt_fee);
+      }
+   
+
    const auto& new_order_object = db().create<limit_order_object>([&](limit_order_object& obj){
        obj.seller   = _seller->id;
        obj.for_sale = op.amount_to_sell.amount;
        obj.sell_price = op.get_price();
        obj.expiration = op.expiration;
+
+       obj.umt_fee = umt_fee;
 
        obj.request_id =  op.request_id;
        obj.user_id = op.user_id;

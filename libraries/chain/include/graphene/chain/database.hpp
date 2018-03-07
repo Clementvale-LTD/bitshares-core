@@ -379,6 +379,8 @@ namespace graphene { namespace chain {
                    asset max_settlement);
          ///@}
 
+         asset sdr_amount_to_umt_fee( share_type sdr_amount);
+
          /**
           * @return true if the order was completely filled and thus freed.
           */

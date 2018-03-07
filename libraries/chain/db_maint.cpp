@@ -630,6 +630,68 @@ void distribute_fba_balances( database& db )
    split_fba_balance( db, fba_accumulator_id_transfer_from_blind, 20*GRAPHENE_1_PERCENT, 60*GRAPHENE_1_PERCENT, 20*GRAPHENE_1_PERCENT );
 }
 
+static int64_t muldiv64(const int64_t a, const int64_t b, const int64_t d)
+{
+    __int128 aa = a;
+    __int128 bb = b;
+    __int128 dd = d;
+
+    return (int64_t)((aa * bb) / dd);
+}
+
+void distribute_umt_fee( database& db )
+{
+  asset_id_type umt_asset_id(1);
+  account_id_type umt_fee_pool_id (6);
+
+  const auto& bal_idx = db.get_index_type< account_balance_index >().indices().get< by_asset_balance >();
+  auto range = bal_idx.equal_range( boost::make_tuple( umt_asset_id ) );
+
+  struct account_umt_balance
+  {
+    account_id_type account_id;
+    share_type      amount;
+  };
+  
+  vector<account_umt_balance> allumt;
+  share_type umt_fee_to_distribute = 0;
+  share_type umt_sum_amount = 0;
+  
+  for( const account_balance_object& bal : boost::make_iterator_range( range.first, range.second ) )
+  {
+    if( bal.balance.value == 0 )
+        continue;
+
+    // don't count umt fee pool
+    if( bal.owner == umt_fee_pool_id){
+      umt_fee_to_distribute = bal.balance.value;
+      continue;
+    }
+
+    account_umt_balance aumt;
+    aumt.account_id = bal.owner;
+    aumt.amount     = bal.balance.value;
+    allumt.push_back(aumt);
+    
+    umt_sum_amount += aumt.amount;
+  }
+
+  for( unsigned int  i = 0; i < allumt.size(); ++i  )
+  {
+    umt_fee_distribute_operation uop;
+    uop.account_id = allumt[i].account_id;
+    int64_t rcv_amount = muldiv64( umt_fee_to_distribute.value, allumt[i].amount.value, umt_sum_amount.value );
+    asset rcv_asset( share_type( rcv_amount), umt_asset_id);
+    uop.umt_fee_share = rcv_asset;
+    if( uop.umt_fee_share.amount != 0 )
+    {
+      db.adjust_balance( allumt[i].account_id, rcv_asset );
+      db.adjust_balance( umt_fee_pool_id, -rcv_asset );
+      db.push_applied_operation(uop);
+    }
+  }
+}
+
 void create_buyback_orders( database& db )
 {
    const auto& bbo_idx = db.get_index_type< buyback_index >().indices().get<by_id>();
@@ -792,6 +854,7 @@ void database::perform_chain_maintenance(const signed_block& next_block, const g
 {
    const auto& gpo = get_global_properties();
 
+   distribute_umt_fee(*this);
    distribute_fba_balances(*this);
    create_buyback_orders(*this);
 

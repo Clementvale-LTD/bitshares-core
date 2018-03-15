@@ -456,7 +456,7 @@ static share_type shift_pow10_64( share_type v, int n)
         1000000000000000000ll
     };
 
-    FC_ASSERT( abs(n) <= ( sizeof(l_pow10)/sizeof(l_pow10[0]) - 1) );
+    FC_ASSERT( (unsigned int)abs(n) <= ( sizeof(l_pow10)/sizeof(l_pow10[0]) - 1) );
 
     if( n >=0 )
       return v * share_type( l_pow10[n]);

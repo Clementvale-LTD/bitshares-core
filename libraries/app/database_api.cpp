@@ -100,7 +100,7 @@ class database_api_impl : public std::enable_shared_from_this<database_api_impl>
 
       // Assets
       vector<optional<asset_object>> get_assets(const vector<asset_id_type>& asset_ids)const;
-      vector<asset_object>           list_assets(const string& lower_bound_symbol, uint32_t limit)const;
+      vector<asset_object>           list_assets(const string& lower_bound_symbol, uint32_t last_seconds, uint32_t limit)const;
       vector<optional<asset_object>> lookup_asset_symbols(const vector<string>& symbols_or_ids)const;
 
       // Markets / feeds
@@ -944,25 +944,35 @@ vector<optional<asset_object>> database_api_impl::get_assets(const vector<asset_
    return result;
 }
 
-vector<asset_object> database_api::list_assets(const string& lower_bound_symbol, uint32_t limit)const
+vector<asset_object> database_api::list_assets(const string& lower_bound_symbol, uint32_t last_seconds, uint32_t limit)const
 {
-   return my->list_assets( lower_bound_symbol, limit );
+   return my->list_assets( lower_bound_symbol, last_seconds, limit );
 }
 
-vector<asset_object> database_api_impl::list_assets(const string& lower_bound_symbol, uint32_t limit)const
+vector<asset_object> database_api_impl::list_assets(const string& lower_bound_symbol, uint32_t last_seconds, uint32_t limit)const
 {
    FC_ASSERT( limit <= 1000 );
    const auto& assets_by_symbol = _db.get_index_type<asset_index>().indices().get<by_symbol>();
    vector<asset_object> result;
    result.reserve(limit);
 
+   fc::time_point_sec cur_time_limit( fc::time_point::now() );
+   if( last_seconds > cur_time_limit.sec_since_epoch() )
+      last_seconds = cur_time_limit.sec_since_epoch();
+   cur_time_limit -= last_seconds;
+
    auto itr = assets_by_symbol.lower_bound(lower_bound_symbol);
 
    if( lower_bound_symbol == "" )
       itr = assets_by_symbol.begin();
 
-   while(limit-- && itr != assets_by_symbol.end())
-      result.emplace_back(*itr++);
+   for( ; limit && itr != assets_by_symbol.end(); itr++ ){
+      if( 0 != last_seconds)
+        if( (*itr).modification_timestamp < cur_time_limit)
+          continue;
+      result.emplace_back(*itr);
+      limit--;
+   }
 
    return result;
 }

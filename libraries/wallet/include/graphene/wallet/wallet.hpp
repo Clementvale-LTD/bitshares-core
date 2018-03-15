@@ -349,7 +349,7 @@ class wallet_api
        * @param limit the maximum number of assets to return (max: 100)
        * @returns the list of asset objects, ordered by symbol
        */
-      vector<asset_object>              list_assets(const string& lowerbound, uint32_t limit)const;
+      vector<asset_object>              list_assets(const string& lowerbound, uint32_t last_seconds, uint32_t limit)const;
       
       /** Returns the most recent operations on the named account.
        *

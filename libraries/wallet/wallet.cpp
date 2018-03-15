@@ -2815,9 +2815,9 @@ vector<asset> wallet_api::list_account_balances(const string& id)
    return my->_remote_db->get_account_balances(get_account(id).id, flat_set<asset_id_type>());
 }
 
-vector<asset_object> wallet_api::list_assets(const string& lowerbound, uint32_t limit)const
+vector<asset_object> wallet_api::list_assets(const string& lowerbound, uint32_t last_seconds, uint32_t limit)const
 {
-   return my->_remote_db->list_assets( lowerbound, limit );
+   return my->_remote_db->list_assets( lowerbound, last_seconds, limit);
 }
 
 vector<operation_detail> wallet_api::get_account_history(string name, int limit)const

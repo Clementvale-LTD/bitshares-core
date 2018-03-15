@@ -330,7 +330,7 @@ class database_api
        * @param limit Maximum number of assets to fetch (must not exceed 100)
        * @return The assets found
        */
-      vector<asset_object> list_assets(const string& lower_bound_symbol, uint32_t limit)const;
+      vector<asset_object> list_assets(const string& lower_bound_symbol, uint32_t last_seconds, uint32_t limit)const;
 
       /**
        * @brief Get a list of assets by symbol

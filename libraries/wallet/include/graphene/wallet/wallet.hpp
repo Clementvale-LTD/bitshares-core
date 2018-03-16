@@ -361,6 +361,17 @@ class wallet_api
        */
       vector<operation_detail>  get_account_history(string name, int limit)const;
 
+      /** Get only asked most recent operations relevant to the specified account
+       *
+       * This returns a list of operation history objects, which describe activity on the account.
+       *
+       * @param name the name or id of the account
+       * @param operation_id The ID of the operation we want to get operations in the account( 0 = transfer , 1 = limit order create, ...)
+       * @param limit the number of entries to return (starting from the most recent)
+       * @returns a list of \c operation_history_objects
+       */
+      vector<operation_detail>  get_account_history_operations( string name, int operation_id, int limit)const;
+
       /** Returns the relative operations on the named account from start number.
        *
        * @param name the name or id of the account
@@ -1716,6 +1727,7 @@ FC_API( graphene::wallet::wallet_api,
         (get_block)
         (get_account_count)
         (get_account_history)
+        (get_account_history_operations)
         (get_relative_account_history)
         (get_collateral_bids)
         (is_public_key_registered)

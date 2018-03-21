@@ -15,6 +15,7 @@ jsonrpc_call["method"] = "about"
 jsonrpc_call["params"] = []
 call_cli_wallet( jsonrpc_call )
 
+
 jsonrpc_call["method"] = "info"
 jsonrpc_call["params"] = []
 call_cli_wallet( jsonrpc_call )
@@ -95,28 +96,9 @@ jsonrpc_call["method"] = "issue_asset"
 jsonrpc_call["params"] = ["bank", "1000000000", "SDR", "first issue", True]
 cli_response = call_cli_wallet( jsonrpc_call )
 
-
-jsonrpc_call["method"] = "transfer"
-jsonrpc_call["params"] = ["ptolemy", "bank", 10000000, "UMT", "here is some umt", "true"]
-cli_response = call_cli_wallet( jsonrpc_call )
-
-jsonrpc_call["method"] = "transfer"
-jsonrpc_call["params"] = ["ptolemy", "t1node", 5000000, "UMT", "here is some umt", "true"]
-cli_response = call_cli_wallet( jsonrpc_call )
-
-jsonrpc_call["method"] = "transfer"
-jsonrpc_call["params"] = ["ptolemy", "t2node", 2000000, "UMT", "here is some umt", "true"]
-cli_response = call_cli_wallet( jsonrpc_call )
-
-jsonrpc_call["method"] = "transfer"
-jsonrpc_call["params"] = ["ptolemy", "t3node", 1500000, "UMT", "here is some umt", "true"]
-cli_response = call_cli_wallet( jsonrpc_call )
-
-
 jsonrpc_call["method"] = "transfer"
 jsonrpc_call["params"] = ["bank", "t1node", 10000, "SDR", "here is some umt", "true"]
 cli_response = call_cli_wallet( jsonrpc_call )
-
 
 jsonrpc_call["method"] = "transfer"
 jsonrpc_call["params"] = ["bank", "t2node", 15000, "SDR", "here is some umt", "true"]
@@ -125,4 +107,20 @@ cli_response = call_cli_wallet( jsonrpc_call )
 jsonrpc_call["method"] = "transfer"
 jsonrpc_call["params"] = ["bank", "t3node", 50000, "SDR", "here is some umt", "true"]
 cli_response = call_cli_wallet( jsonrpc_call )
+
+# jsonrpc_call["method"] = "transfer"
+# jsonrpc_call["params"] = ["ptolemy", "bank", 10000000, "UMT", "here is some umt", "true"]
+# cli_response = call_cli_wallet( jsonrpc_call )
+
+# jsonrpc_call["method"] = "transfer"
+# jsonrpc_call["params"] = ["ptolemy", "t1node", 5000000, "UMT", "here is some umt", "true"]
+# cli_response = call_cli_wallet( jsonrpc_call )
+
+# jsonrpc_call["method"] = "transfer"
+# jsonrpc_call["params"] = ["ptolemy", "t2node", 2000000, "UMT", "here is some umt", "true"]
+# cli_response = call_cli_wallet( jsonrpc_call )
+
+# jsonrpc_call["method"] = "transfer"
+# jsonrpc_call["params"] = ["ptolemy", "t3node", 1500000, "UMT", "here is some umt", "true"]
+# cli_response = call_cli_wallet( jsonrpc_call )
 

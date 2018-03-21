@@ -639,9 +639,10 @@ static int64_t muldiv64(const int64_t a, const int64_t b, const int64_t d)
     return (int64_t)((aa * bb) / dd);
 }
 
+/*
 void distribute_umt_fee( database& db )
 {
-  asset_id_type umt_asset_id(1);
+  asset_id_type umt_asset_id = GRAPHENE_UMT_ASSET_ID;
   account_id_type umt_fee_pool_id (6);
 
   const auto& bal_idx = db.get_index_type< account_balance_index >().indices().get< by_asset_balance >();
@@ -691,6 +692,7 @@ void distribute_umt_fee( database& db )
     }
   }
 }
+*/
 
 void create_buyback_orders( database& db )
 {
@@ -854,7 +856,7 @@ void database::perform_chain_maintenance(const signed_block& next_block, const g
 {
    const auto& gpo = get_global_properties();
 
-   distribute_umt_fee(*this);
+//   distribute_umt_fee(*this);
    distribute_fba_balances(*this);
    create_buyback_orders(*this);
 

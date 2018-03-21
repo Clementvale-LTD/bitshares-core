@@ -432,43 +432,36 @@ asset database::match( const call_order_object& call,
    return call_receives;
 } FC_CAPTURE_AND_RETHROW( (call)(settle)(match_price)(max_settlement) ) }
 
-static share_type shift_pow10_64( share_type v, int n)
+asset database::sdr_amount_to_umt_fee_to_reserve( share_type sdr_amount )
 {
-    static int64_t l_pow10[] = {
-        1ll, 
-        10ll, 
-        100ll, 
-        1000ll, 
-        10000ll, 
-        100000ll, 
-        1000000ll, 
-        10000000ll, 
-        100000000ll, 
-        1000000000ll,
-        10000000000ll, 
-        100000000000ll, 
-        1000000000000ll, 
-        10000000000000ll,
-        100000000000000ll, 
-        1000000000000000ll, 
-        10000000000000000ll, 
-        100000000000000000ll,
-        1000000000000000000ll
-    };
+  const auto& gpo = get_global_properties();
+  const auto& chain_params = gpo.parameters;
 
-    FC_ASSERT( (unsigned int)abs(n) <= ( sizeof(l_pow10)/sizeof(l_pow10[0]) - 1) );
+  uint16_t umt_stakeholder_percent_fee = chain_params.umt_stakeholder_percent_fee;
 
-    if( n >=0 )
-      return v * share_type( l_pow10[n]);
-    else
-      return v / share_type( l_pow10[abs(n)]);
+  fc::uint128 r(sdr_amount.value);
+  r *= umt_stakeholder_percent_fee;
+  r /= GRAPHENE_100_PERCENT;
+
+  asset umt_fee( share_type( r.to_uint64()), GRAPHENE_SDR_ASSET_ID );
+
+  return umt_fee;
 }
 
-asset database::sdr_amount_to_umt_fee( share_type sdr_amount)
+asset database::sdr_amount_to_umt_fee_to_pay( share_type sdr_amount_to_pay, share_type sdr_amount_in_order, asset sdr_amount_fee_reserved )
 {
-  asset umt_fee( shift_pow10_64( sdr_amount, GRAPHENE_UMT_PRECISION_DIGITS - GRAPHENE_SDR_PRECISION_DIGITS)
-               , GRAPHENE_UMT_ASSET_ID 
-               );
+  FC_ASSERT( sdr_amount_to_pay <= sdr_amount_in_order );
+
+  if( sdr_amount_to_pay == sdr_amount_in_order){
+    return sdr_amount_fee_reserved; 
+  }
+
+  fc::uint128 r(sdr_amount_fee_reserved.amount.value);
+  r *= sdr_amount_to_pay.value;
+  r /= sdr_amount_in_order.value;
+
+  asset umt_fee( share_type( r.to_uint64()), sdr_amount_fee_reserved.asset_id );
+
   return umt_fee;
 }
 
@@ -483,15 +476,14 @@ bool database::fill_order( const limit_order_object& order, const asset& pays, c
    const account_object& seller = order.seller(*this);
    const asset_object& recv_asset = receives.asset_id(*this);
 
-   asset umt_fee( 0, GRAPHENE_UMT_ASSET_ID );
+   asset umt_fee( 0, GRAPHENE_SDR_ASSET_ID );
 
    if( pays.asset_id == GRAPHENE_SDR_ASSET_ID) //SDR
-    if( receives.asset_id != GRAPHENE_UMT_ASSET_ID) //not UMT
-      if( receives.asset_id != asset_id_type(0)) //not BTS
-      {
-        umt_fee = sdr_amount_to_umt_fee(pays.amount);
-        adjust_balance(GRAPHENE_UMT_FEE_POOL_ACCOUNT, umt_fee);
-      }
+    if( receives.asset_id != asset_id_type(0)) //not BTS
+    {
+      umt_fee = sdr_amount_to_umt_fee_to_pay( pays.amount, order.for_sale, order.umt_fee );
+      adjust_balance(GRAPHENE_UMT_FEE_POOL_ACCOUNT, umt_fee);
+    }
 
    auto issuer_fees = pay_market_fees( recv_asset, receives );
    pay_order( seller, receives - issuer_fees, pays );

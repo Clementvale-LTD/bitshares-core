@@ -363,29 +363,6 @@ void database::init_genesis(const genesis_state_type& genesis_state)
    assert( asset_id_type(core_asset.id) == asset().asset_id );
    assert( get_balance(account_id_type(), asset_id_type()) == asset(dyn_asset.current_supply) );
 
-   {
-   const asset_dynamic_data_object& dyn_asset_umt =
-      create<asset_dynamic_data_object>([&](asset_dynamic_data_object& a) {
-         a.current_supply = GRAPHENE_UMT_MAX_SUPPLY;
-      });
- 
-   const asset_object& core_assetUMT =
-     create<asset_object>( [&]( asset_object& a ) {
-         a.symbol = GRAPHENE_UMT_SYMBOL;
-         a.options.max_supply = GRAPHENE_UMT_MAX_SUPPLY;
-         a.precision = GRAPHENE_UMT_PRECISION_DIGITS;
-         a.options.flags = 0;
-         a.options.issuer_permissions = 0;
-         a.issuer = GRAPHENE_NULL_ACCOUNT;
-         a.options.core_exchange_rate.base.amount = 1;
-         a.options.core_exchange_rate.base.asset_id = asset_id_type(0);
-         a.options.core_exchange_rate.quote.amount = 1;
-         a.options.core_exchange_rate.quote.asset_id = asset_id_type(0);
-         a.dynamic_asset_data_id = dyn_asset_umt.id;
-      });
-   assert( asset_id_type(core_assetUMT.id) == asset(0,GRAPHENE_UMT_ASSET_ID).asset_id );
-   }
-
    // Create more special assets
    while( true )
    {

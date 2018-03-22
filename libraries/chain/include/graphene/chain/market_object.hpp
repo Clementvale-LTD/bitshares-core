@@ -60,6 +60,7 @@ class limit_order_object : public abstract_object<limit_order_object>
       optional< uint64_t > user_id;
       optional< account_id_type > counterparty_id;
       optional< string > memo;
+      optional< string > accepted_memo;
 
       pair<asset_id_type,asset_id_type> get_market()const
       {
@@ -258,7 +259,7 @@ typedef generic_index<collateral_bid_object, collateral_bid_object_multi_index_t
 
 FC_REFLECT_DERIVED( graphene::chain::limit_order_object,
                     (graphene::db::object),
-                    (expiration)(seller)(for_sale)(sell_price)(deferred_fee)(umt_fee)(request_id)(user_id)(counterparty_id)(memo)
+                    (expiration)(seller)(for_sale)(sell_price)(deferred_fee)(umt_fee)(request_id)(user_id)(counterparty_id)(memo)(accepted_memo)
                   )
 
 FC_REFLECT_DERIVED( graphene::chain::call_order_object, (graphene::db::object),

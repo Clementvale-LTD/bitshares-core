@@ -35,6 +35,7 @@ namespace graphene { namespace chain {
    struct call_order_update_operation;
    struct limit_order_cancel_operation;
    struct limit_order_create_operation;
+   struct limit_order_accept_operation;
 
    class limit_order_create_evaluator : public evaluator<limit_order_create_evaluator>
    {
@@ -56,6 +57,15 @@ namespace graphene { namespace chain {
          const account_object*               _seller        = nullptr;
          const asset_object*                 _sell_asset    = nullptr;
          const asset_object*                 _receive_asset = nullptr;
+   };
+
+   class limit_order_accept_evaluator : public evaluator<limit_order_accept_evaluator>
+   {
+      public:
+         typedef limit_order_accept_operation operation_type;
+
+         void_result do_evaluate( const limit_order_accept_operation& o );
+         void_result do_apply( const limit_order_accept_operation& o );
    };
 
    class limit_order_cancel_evaluator : public evaluator<limit_order_cancel_evaluator>

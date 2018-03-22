@@ -79,7 +79,59 @@ namespace graphene { namespace chain {
       price           get_price()const { return amount_to_sell / min_to_receive; }
    };
 
+   struct limit_order_accept_operation : public base_operation
+   {
+      struct fee_parameters_type { uint64_t fee = 5 * GRAPHENE_BLOCKCHAIN_PRECISION; };
 
+      asset           fee;
+      account_id_type seller;
+      asset_id_type asset_id_to_sell;
+      asset_id_type asset_id_to_receive;
+
+      /// SM: introduced to hold provider and operator specific information
+      uint64_t request_id;
+      uint64_t user_id;
+      account_id_type counterparty_id;
+      string memo;
+
+      extensions_type   extensions;
+
+      pair<asset_id_type,asset_id_type> get_market()const
+      {
+         return asset_id_to_sell < asset_id_to_receive ?
+                std::make_pair(asset_id_to_sell, asset_id_to_receive) :
+                std::make_pair(asset_id_to_receive, asset_id_to_sell);
+      }
+      account_id_type fee_payer()const { return seller; }
+      void            validate() const;
+   };
+
+   struct limit_order_accepted_operation : public base_operation
+   {
+      struct fee_parameters_type {};
+
+      limit_order_accepted_operation() {}
+
+      asset          fee;
+
+      object_id_type      order_id;
+      account_id_type     order_creator_account_id;
+      asset_id_type       asset_id_to_sell;
+      asset_id_type       asset_id_to_receive;
+
+      uint64_t request_id;
+      uint64_t user_id;
+
+      account_id_type     accepted_by_account_id;
+      string accepted_memo;
+
+      account_id_type fee_payer()const { return order_creator_account_id; }
+      void            validate()const { FC_ASSERT( !"virtual operation" ); }
+
+      /// This is a virtual operation; there is no fee
+      share_type      calculate_fee(const fee_parameters_type& k)const { return 0; }
+   };
+   
    /**
     *  @ingroup operations
     *  Used to cancel an existing limit order. Both fee_pay_account and the
@@ -237,6 +289,8 @@ FC_REFLECT( graphene::chain::call_order_update_operation::fee_parameters_type, (
 FC_REFLECT( graphene::chain::bid_collateral_operation::fee_parameters_type, (fee) )
 FC_REFLECT( graphene::chain::fill_order_operation::fee_parameters_type,  ) // VIRTUAL
 FC_REFLECT( graphene::chain::execute_bid_operation::fee_parameters_type,  ) // VIRTUAL
+FC_REFLECT( graphene::chain::limit_order_accept_operation::fee_parameters_type, (fee) )
+FC_REFLECT( graphene::chain::limit_order_accepted_operation::fee_parameters_type, ) // VIRTUAL
 
 FC_REFLECT( graphene::chain::limit_order_create_operation,(fee)(seller)(amount_to_sell)(min_to_receive)(expiration)(fill_or_kill)(request_id)(user_id)(counterparty_id)(memo)(extensions))
 FC_REFLECT( graphene::chain::limit_order_cancel_operation,(fee)(fee_paying_account)(order)(extensions) )
@@ -244,3 +298,5 @@ FC_REFLECT( graphene::chain::call_order_update_operation, (fee)(funding_account)
 FC_REFLECT( graphene::chain::fill_order_operation, (fee)(order_id)(account_id)(pays)(receives)(fill_price)(is_maker)(request_id)(user_id)(memo) )
 FC_REFLECT( graphene::chain::bid_collateral_operation, (fee)(bidder)(additional_collateral)(debt_covered)(extensions) )
 FC_REFLECT( graphene::chain::execute_bid_operation, (fee)(bidder)(debt)(collateral) )
+FC_REFLECT( graphene::chain::limit_order_accept_operation,(fee)(seller)(asset_id_to_sell)(asset_id_to_receive)(request_id)(user_id)(counterparty_id)(memo)(extensions))
+FC_REFLECT( graphene::chain::limit_order_accepted_operation,(fee)(order_id)(order_creator_account_id)(asset_id_to_sell)(asset_id_to_receive)(request_id)(user_id)(accepted_by_account_id)(accepted_memo))

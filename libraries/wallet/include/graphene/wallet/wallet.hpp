@@ -944,6 +944,23 @@ class wallet_api
                                     bool     fill_or_kill = false,
                                     bool     broadcast = false);
                                     
+      /** Accepts limit order created as a request on account’s offer and transfers profile data nessasary to start service.
+       *
+       * @param seller_account the account providing the asset being sold, and which will 
+       *                       receive the proceeds of the sale.
+       * @param symbol_to_sell the name or id of the asset to sell
+       * @param symbol_to_receive the name or id of the asset you wish to receive
+       * @offer_request_detail offer-request matching data and auxiliary data
+       * @param broadcast true to broadcast the transaction on the network
+       * @returns the signed transaction selling the funds
+       */
+      signed_transaction accept_limit_order( string seller_account,
+                                    string   symbol_to_sell,
+                                    string   symbol_to_receive,
+                                    offer_request_detail offer_request,
+                                    bool     broadcast = false);
+
+
       /** Place a limit order attempting to sell one asset for another.
        * 
        * This API call abstracts away some of the details of the sell_asset call to be more
@@ -1686,6 +1703,7 @@ FC_API( graphene::wallet::wallet_api,
         (upgrade_account)
         (create_account_with_brain_key)
         (sell_asset)
+        (accept_limit_order)
         (sell)
         (buy)
         (borrow_asset)

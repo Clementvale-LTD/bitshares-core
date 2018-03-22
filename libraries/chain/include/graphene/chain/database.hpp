@@ -357,6 +357,7 @@ namespace graphene { namespace chain {
           * Additional validation to serve telecom providers: for offers and requests matching   
           */
          bool is_match_possible( const limit_order_object& bid, const limit_order_object& ask);
+         bool is_match_possible( const limit_order_object& o, uint64_t request_id, uint64_t user_id, account_id_type accept_account_id, account_id_type request_account_id);
 
          /**
           * Matches the two orders,

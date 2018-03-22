@@ -630,6 +630,7 @@ void distribute_fba_balances( database& db )
    split_fba_balance( db, fba_accumulator_id_transfer_from_blind, 20*GRAPHENE_1_PERCENT, 60*GRAPHENE_1_PERCENT, 20*GRAPHENE_1_PERCENT );
 }
 
+/*
 static int64_t muldiv64(const int64_t a, const int64_t b, const int64_t d)
 {
     __int128 aa = a;
@@ -639,7 +640,6 @@ static int64_t muldiv64(const int64_t a, const int64_t b, const int64_t d)
     return (int64_t)((aa * bb) / dd);
 }
 
-/*
 void distribute_umt_fee( database& db )
 {
   asset_id_type umt_asset_id = GRAPHENE_UMT_ASSET_ID;

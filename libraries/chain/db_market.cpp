@@ -276,6 +276,43 @@ bool database::is_match_possible( const limit_order_object& bid, const limit_ord
   return true;
 }
 
+bool database::is_match_possible( const limit_order_object& o, uint64_t request_id, uint64_t user_id, account_id_type accept_account_id, account_id_type request_account_id)
+{
+  if( !o.request_id.valid())
+    return false;
+  if( !o.user_id.valid())
+    return false;
+  if( !o.counterparty_id.valid())
+    return false;
+
+  {
+    bool b_match_possible = ( *(o.request_id) == request_id );
+    if( !b_match_possible)
+      return false;
+  }
+  
+  {
+    bool b_match_possible = ( *(o.user_id) == user_id );
+    if( !b_match_possible)
+      return false;
+  }
+
+  {
+    bool b_match_possible = ( *(o.counterparty_id) == accept_account_id );
+    if( !b_match_possible)
+      return false;
+  }
+
+  {
+    const account_object& o_seller = o.seller(*this);
+    bool b_match_possible = ( request_account_id == o_seller.get_id() );
+    if( !b_match_possible)
+      return false;
+  }
+
+  return true;
+}
+
 bool database::apply_order(const limit_order_object& new_order_object, bool allow_black_swan)
 {
    auto order_id = new_order_object.id;
@@ -511,6 +548,11 @@ bool database::fill_order( const limit_order_object& order, const asset& pays, c
                              b.for_sale -= pays.amount;
                              b.umt_fee -= umt_fee;
                              b.deferred_fee = 0;
+                             if( NULL != cparty_info){
+                               if( !b.accepted_memo.valid()){
+                                 b.accepted_memo = cparty_info->memo;
+                               }
+                             }
                           });
       if( cull_if_small )
          return maybe_cull_small_order( *this, order );

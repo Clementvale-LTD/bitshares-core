@@ -115,6 +115,52 @@ object_id_type limit_order_create_evaluator::do_apply(const limit_order_create_o
    return order_id;
 } FC_CAPTURE_AND_RETHROW( (op) ) }
 
+void_result limit_order_accept_evaluator::do_evaluate(const limit_order_accept_operation& o)
+{ try {
+   database& d = db();
+
+   return void_result();
+} FC_CAPTURE_AND_RETHROW( (o) ) }
+
+void_result limit_order_accept_evaluator::do_apply(const limit_order_accept_operation& o)
+{ try {
+   database& d = db();
+
+   const auto& limit_price_idx = d.get_index_type<limit_order_index>().indices().get<by_price>();
+
+   auto limit_itr = limit_price_idx.lower_bound(price::max(o.asset_id_to_receive, o.asset_id_to_sell));
+   auto limit_end = limit_price_idx.upper_bound(price::min(o.asset_id_to_receive, o.asset_id_to_sell));
+   
+   while( limit_itr != limit_end )
+   {
+      const limit_order_object& order = *limit_itr;
+      ++limit_itr;
+      // match returns 2 when only the old order was fully filled. In this case, we keep matching; otherwise, we stop.
+      if( d.is_match_possible( order, o.request_id, o.user_id, o.seller, o.counterparty_id) ){
+        limit_order_accepted_operation op_accepted;
+        op_accepted.order_id = order.id;
+        op_accepted.order_creator_account_id = o.counterparty_id;
+        op_accepted.asset_id_to_sell = o.asset_id_to_sell;
+        op_accepted.asset_id_to_receive = o.asset_id_to_receive;
+
+        op_accepted.request_id = o.request_id;
+        op_accepted.user_id = o.user_id;
+
+        op_accepted.accepted_by_account_id = o.seller;
+        op_accepted.accepted_memo = o.memo;
+
+        d.push_applied_operation( op_accepted);
+
+        d.modify( order, [&]( limit_order_object& b ) {
+                                b.accepted_memo = o.memo;
+                              });
+        break;
+      }
+   }   
+
+   return void_result();
+} FC_CAPTURE_AND_RETHROW( (o) ) }
+
 void_result limit_order_cancel_evaluator::do_evaluate(const limit_order_cancel_operation& o)
 { try {
    database& d = db();

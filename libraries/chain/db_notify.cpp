@@ -27,6 +27,11 @@ struct get_impacted_account_visitor
 
    void operator()( const asset_claim_fees_operation& op ){}
    void operator()( const limit_order_create_operation& op ) {}
+   void operator()( const limit_order_accept_operation& op ) {}
+   void operator()( const limit_order_accepted_operation& op ) 
+   {
+      _impacted.insert( op.order_creator_account_id );
+   }
    void operator()( const limit_order_cancel_operation& op )
    {
       _impacted.insert( op.fee_paying_account );
@@ -190,11 +195,6 @@ struct get_impacted_account_visitor
    }
 
    void operator()( const fba_distribute_operation& op )
-   {
-      _impacted.insert( op.account_id );
-   }
-
-   void operator()( const umt_fee_distribute_operation& op )
    {
       _impacted.insert( op.account_id );
    }

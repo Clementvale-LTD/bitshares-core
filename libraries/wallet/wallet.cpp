@@ -1969,6 +1969,41 @@ public:
       return sign_transaction( tx, broadcast );
    }
 
+
+   signed_transaction accept_limit_order( string seller_account,
+                                  string   symbol_to_sell,
+                                  string   symbol_to_receive,
+                                  offer_request_detail offer_request,
+                                  bool     broadcast = false)
+   {
+      account_object seller   = get_account( seller_account );
+
+      limit_order_accept_operation op;
+      op.seller = seller.id;
+      op.asset_id_to_sell = get_asset(symbol_to_sell).get_id();
+      op.asset_id_to_receive = get_asset(symbol_to_receive).get_id();
+
+      FC_ASSERT( offer_request.counterparty_id.valid(), "must specify counterparty_id" );
+      FC_ASSERT( offer_request.memo.valid(), "must specify memo" );
+
+      {
+        op.request_id = offer_request.request_id;
+        op.user_id = offer_request.user_id;
+        if( offer_request.counterparty_id.valid()){
+          account_object counterparty = get_account( *(offer_request.counterparty_id) );
+          op.counterparty_id = counterparty.get_id();
+        }
+        op.memo = *(offer_request.memo);
+      }
+
+      signed_transaction tx;
+      tx.operations.push_back(op);
+      set_operation_fees( tx, _remote_db->get_global_properties().parameters.current_fees);
+      tx.validate();
+
+      return sign_transaction( tx, broadcast );
+   }
+
    signed_transaction borrow_asset(string seller_name, string amount_to_borrow, string asset_symbol,
                                        string amount_of_collateral, bool broadcast = false)
    {
@@ -3841,6 +3876,19 @@ signed_transaction wallet_api::sell_asset(string seller_account,
    return my->sell_asset(seller_account, amount_to_sell, symbol_to_sell, min_to_receive,
                          symbol_to_receive, offer_request, expiration, fill_or_kill, broadcast);
 }
+
+signed_transaction wallet_api::accept_limit_order( 
+                                    string seller_account,
+                                    string   symbol_to_sell,
+                                    string   symbol_to_receive,
+                                    offer_request_detail offer_request,
+                                    bool broadcast)
+{
+   return my->accept_limit_order( seller_account, symbol_to_sell, symbol_to_receive, 
+                                  offer_request, broadcast);
+}                                    
+
+
 
 signed_transaction wallet_api::sell( string seller_account,
                                      string base,

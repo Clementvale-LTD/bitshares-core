@@ -2952,6 +2952,11 @@ vector<limit_order_object> wallet_api::get_limit_orders(string a, string b, uint
    return my->_remote_db->get_limit_orders(get_asset(a).id, get_asset(b).id, limit);
 }
 
+vector<limit_order_object> wallet_api::get_account_limit_orders(string aname, uint32_t limit)const
+{
+   return my->_remote_db->get_account_limit_orders( get_account(aname).get_id(), limit);
+}
+
 vector<call_order_object> wallet_api::get_call_orders(string a, uint32_t limit)const
 {
    return my->_remote_db->get_call_orders(get_asset(a).id, limit);

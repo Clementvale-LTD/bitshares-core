@@ -355,6 +355,15 @@ class database_api
       vector<limit_order_object> get_limit_orders(asset_id_type a, asset_id_type b, uint32_t limit)const;
 
       /**
+       * @brief Get limit orders created by a given account
+       * @param account_id ID of account
+       * @param limit Maximum number of orders to retrieve
+       * @return The limit orders
+       */
+      vector<limit_order_object> get_account_limit_orders( account_id_type account_id, uint32_t limit)const;
+      
+
+      /**
        * @brief Get call orders in a given asset
        * @param a ID of asset being called
        * @param limit Maximum number of orders to retrieve
@@ -685,6 +694,7 @@ FC_API(graphene::app::database_api,
    // Markets / feeds
    (get_order_book)
    (get_limit_orders)
+   (get_account_limit_orders)
    (get_call_orders)
    (get_settle_orders)
    (get_margin_positions)

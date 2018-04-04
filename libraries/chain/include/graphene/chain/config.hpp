@@ -179,7 +179,7 @@
 
 #define GRAPHENE_UMT_FEE_POOL_ACCOUNT    (graphene::chain::account_id_type(6))
 
-#define GRAPHENE_SDR_SYMBOL              "SDR"
+#define GRAPHENE_SDR_SYMBOL              "SDRT"
 #define GRAPHENE_SDR_PRECISION_DIGITS    4
 #define GRAPHENE_SDR_ASSET_ID            (graphene::chain::asset_id_type(1))
 

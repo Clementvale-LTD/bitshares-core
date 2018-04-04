@@ -310,16 +310,6 @@ void database::init_genesis(const genesis_state_type& genesis_state)
        a.network_fee_percentage = 0;
        a.lifetime_referrer_fee_percentage = GRAPHENE_100_PERCENT;
    }).get_id() == GRAPHENE_PROXY_TO_SELF_ACCOUNT);
-   FC_ASSERT(create<account_object>([this](account_object& a) {
-       a.name = "umt-fee-pool";
-       a.statistics = create<account_statistics_object>([&](account_statistics_object& s){s.owner = a.id;}).id;
-       a.owner.weight_threshold = 1;
-       a.active.weight_threshold = 1;
-       a.registrar = a.lifetime_referrer = a.referrer = GRAPHENE_NULL_ACCOUNT;
-       a.membership_expiration_date = time_point_sec::maximum();
-       a.network_fee_percentage = 0;
-       a.lifetime_referrer_fee_percentage = GRAPHENE_100_PERCENT;
-   }).get_id() == GRAPHENE_UMT_FEE_POOL_ACCOUNT);
 
    // Create more special accounts
    while( true )
@@ -457,6 +447,10 @@ void database::init_genesis(const genesis_state_type& genesis_state)
       return itr->get_id();
    };
 
+  {
+    FC_ASSERT( get_account_id("umt-fee-pool") == GRAPHENE_UMT_FEE_POOL_ACCOUNT);
+  }
+
    // Helper function to get asset ID by symbol
    const auto& assets_by_symbol = get_index_type<asset_index>().indices().get<by_symbol>();
    const auto get_asset_id = [&assets_by_symbol](const string& symbol) {
@@ -534,12 +528,17 @@ void database::init_genesis(const genesis_state_type& genesis_state)
          string issuer_name = asset.issuer_name;
          a.issuer = get_account_id(issuer_name);
          a.options.max_supply = asset.max_supply;
-         a.options.flags = witness_fed_asset;
-         a.options.issuer_permissions = charge_market_fee | override_authority | white_list | transfer_restricted | disable_confidential |
-                                       ( asset.is_bitasset ? disable_force_settle | global_settle | witness_fed_asset | committee_fed_asset : 0 );
+         a.options.flags = asset.flags;
+         a.options.issuer_permissions = asset.issuer_permissions;
+//         a.options.issuer_permissions = charge_market_fee | override_authority | white_list | transfer_restricted | disable_confidential |
+//                                       ( asset.is_bitasset ? disable_force_settle | global_settle | witness_fed_asset | committee_fed_asset : 0 );
          a.dynamic_asset_data_id = dynamic_data_id;
          a.bitasset_data_id = bitasset_data_id;
       });
+   }
+   
+   {
+      FC_ASSERT( get_asset_id( GRAPHENE_SDR_SYMBOL ) == GRAPHENE_SDR_ASSET_ID);
    }
 
    // Create initial balances

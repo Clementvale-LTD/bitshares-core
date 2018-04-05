@@ -1,0 +1,11 @@
+[Unit]
+Description=witness_node
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/srv/bubbletone/programs/witness_node/witness_node --data-dir /srv/bubbletone/data/bubbletone
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

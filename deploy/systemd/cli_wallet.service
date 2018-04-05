@@ -1,0 +1,13 @@
+[Unit]
+Description=cli_wallet
+Requires=witness_node.service
+After=witness_node.service
+
+[Service]
+Type=simple
+ExecStartPre=/bin/sleep 30
+ExecStart=/srv/bubbletone/programs/cli_wallet/cli_wallet --daemon --wallet-file /srv/bubbletone/data/bubbletone-wallet/bubbletone-all.json --chain-id 87727043210d29965f7b24f8ff6a2be38bbc6e9f790382b769677f68ca74ece8 --server-rpc-endpoint=ws://127.0.0.1:7212 -r 127.0.0.1:1227 -H 127.0.0.1:7108
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

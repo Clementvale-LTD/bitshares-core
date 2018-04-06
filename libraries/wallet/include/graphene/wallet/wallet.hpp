@@ -731,6 +731,33 @@ class wallet_api
                                           uint32_t referrer_percent,
                                           bool broadcast = false);
 
+      /** Adds another account controlling key
+       *
+       * @param name the name or id of the account to update 
+       * @param owner the owner key to add for the account, null to not change owner key
+       * @param active the active key to add for the new account, null to not change active key
+       * @param broadcast true to broadcast the transaction on the network
+       * @returns the signed transaction registering the account
+       */
+      signed_transaction add_account_key( string name,
+                                          fc::optional<public_key_type> owner,
+                                          fc::optional<public_key_type> active,
+                                          bool broadcast = false);
+
+      /** Removes another account controlling key
+       *
+       * @param name the name or id of the account to update
+       * @param owner the owner key to remove for the account, null to not change owner key
+       * @param active the active key to remove for the new account, null to not change active key
+       * @param broadcast true to broadcast the transaction on the network
+       * @returns the signed transaction registering the account
+       */
+      signed_transaction remove_account_key( string name,
+                                             fc::optional<public_key_type> owner,
+                                             fc::optional<public_key_type> active,
+                                             bool broadcast = false);
+
+
       /**
        *  Upgrades an account to prime status.
        *  This makes the account holder a 'lifetime member'.
@@ -1701,6 +1728,8 @@ FC_API( graphene::wallet::wallet_api,
         (suggest_brain_key)
         (derive_owner_keys_from_brain_key)
         (register_account)
+        (add_account_key)
+        (remove_account_key)
         (upgrade_account)
         (create_account_with_brain_key)
         (sell_asset)

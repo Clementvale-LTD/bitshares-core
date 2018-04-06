@@ -985,6 +985,130 @@ public:
    } FC_CAPTURE_AND_RETHROW( (name)(owner)(active)(registrar_account)(referrer_account)(referrer_percent)(broadcast) ) }
 
 
+   signed_transaction add_account_key( string name,
+                                       fc::optional<public_key_type> owner,
+                                       fc::optional<public_key_type> active,
+                                       bool broadcast = false)
+   { try {
+
+      FC_ASSERT( !self.is_locked() );
+      FC_ASSERT( owner.valid() || active.valid() );
+      account_object account_obj = get_account(name);
+
+      account_update_operation account_update_op;
+      account_update_op.account = account_obj.get_id();
+
+      if(owner.valid()){
+        authority auth_owner = account_obj.owner;
+        auto key_itr = auth_owner.key_auths.find( *owner );
+        FC_ASSERT( key_itr == auth_owner.key_auths.end() );
+        auth_owner.add_authority( *owner, 1);
+        auth_owner.weight_threshold = 1;
+        account_update_op.owner = auth_owner;
+      }
+
+      if(active.valid()){
+        authority auth_active = account_obj.active;
+        auto key_itr = auth_active.key_auths.find( *active );
+        FC_ASSERT( key_itr == auth_active.key_auths.end() );
+        auth_active.add_authority( *active, 1);
+        auth_active.weight_threshold = 1;
+        account_update_op.active = auth_active;
+      }
+
+      signed_transaction tx;
+      tx.operations.push_back( account_update_op );
+      set_operation_fees( tx, _remote_db->get_global_properties().parameters.current_fees);
+      tx.validate();
+
+      return sign_transaction( tx, broadcast );
+   } FC_CAPTURE_AND_RETHROW( (name)(owner)(active)(broadcast) ) }
+   
+   signed_transaction remove_account_key( string name,
+                                          fc::optional<public_key_type> owner,
+                                          fc::optional<public_key_type> active,
+                                          bool broadcast = false)
+   { try {
+
+      FC_ASSERT( !self.is_locked() );
+      FC_ASSERT( owner.valid() || active.valid() );
+      account_object account_obj = get_account(name);
+
+      account_update_operation account_update_op;
+      account_update_op.account = account_obj.get_id();
+
+      if(owner.valid()){
+        authority auth_owner = account_obj.owner;
+        auto key_itr = auth_owner.key_auths.find( *owner );
+        FC_ASSERT( key_itr != auth_owner.key_auths.end() );
+        auth_owner.key_auths.erase( *owner);
+        
+        //Ensure that there are still keys exist to control account
+        FC_ASSERT( !auth_owner.key_auths.empty() );
+        
+        //Verify that we still able to control this account with other keys of our wallet
+        bool bHaveAccountPrivateKey = false;
+        for( const auto& k : auth_owner.key_auths ){
+          auto it = _keys.find( k.first);
+          if( it != _keys.end() ){
+            fc::optional< fc::ecc::private_key > privkey = wif_to_key( it->second );
+            if( privkey.valid() && k.first == privkey->get_public_key()){
+              bHaveAccountPrivateKey = true;
+              break;
+            }
+          }
+        }
+        if( !bHaveAccountPrivateKey){
+          FC_ASSERT( false, "Operation is not possible because you have no other private keys for this account. To remove this key you must import another actual private key for this account." );
+        }
+
+        auth_owner.weight_threshold = 1;
+        account_update_op.owner = auth_owner;
+      }
+
+      if(active.valid()){
+        authority auth_active = account_obj.active;
+        auto key_itr = auth_active.key_auths.find( *active );
+        FC_ASSERT( key_itr != auth_active.key_auths.end() );
+        auth_active.key_auths.erase( *active);
+        
+        //Ensure that there are still keys exist to control account
+        FC_ASSERT( !auth_active.key_auths.empty() );
+
+        //Verify that we still able to control this account with other keys of our wallet
+        bool bHaveAccountPrivateKey = false;
+        for( const auto& k : auth_active.key_auths ){
+          auto it = _keys.find( k.first);
+          if( it != _keys.end() ){
+            fc::optional< fc::ecc::private_key > privkey = wif_to_key( it->second );
+            if( privkey.valid() && k.first == privkey->get_public_key()){
+              bHaveAccountPrivateKey = true;
+
+              //update account memo key if necessary 
+              if( account_obj.options.memo_key == *active){
+                account_update_op.new_options =  account_obj.options;
+                account_update_op.new_options->memo_key = k.first;
+              }
+              break;
+            }
+          }
+        }
+        if( !bHaveAccountPrivateKey){
+          FC_ASSERT( false, "Operation is not possible because you have no other private keys for this account. To remove this key you must import another actual private key for this account." );
+        }
+
+        auth_active.weight_threshold = 1;
+        account_update_op.active = auth_active;
+      }
+
+      signed_transaction tx;
+      tx.operations.push_back( account_update_op );
+      set_operation_fees( tx, _remote_db->get_global_properties().parameters.current_fees);
+      tx.validate();
+
+      return sign_transaction( tx, broadcast );
+   } FC_CAPTURE_AND_RETHROW( (name)(owner)(active)(broadcast) ) }
+
    signed_transaction upgrade_account(string name, bool broadcast)
    { try {
       FC_ASSERT( !self.is_locked() );
@@ -3278,6 +3402,23 @@ signed_transaction wallet_api::register_account(string name,
 {
    return my->register_account( name, owner_pubkey, active_pubkey, registrar_account, referrer_account, referrer_percent, broadcast );
 }
+
+signed_transaction wallet_api::add_account_key( string name,
+                                                fc::optional<public_key_type> owner_pubkey,
+                                                fc::optional<public_key_type> active_pubkey,
+                                                bool broadcast)
+{
+   return my->add_account_key( name, owner_pubkey, active_pubkey, broadcast );
+}
+
+signed_transaction wallet_api::remove_account_key( string name,
+                                                   fc::optional<public_key_type> owner_pubkey,
+                                                   fc::optional<public_key_type> active_pubkey,
+                                                   bool broadcast)
+{
+   return my->remove_account_key( name, owner_pubkey, active_pubkey, broadcast );
+}
+
 signed_transaction wallet_api::create_account_with_brain_key(string brain_key, string account_name,
                                                              string registrar_account, string referrer_account,
                                                              bool broadcast /* = false */)

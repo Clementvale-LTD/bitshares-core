@@ -1,3 +1,4 @@
+Here is an instruction how to configure witness_node and cli_waller as services using Linux systemd daemon
 
 1. 
 copy 

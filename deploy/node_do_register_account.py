@@ -23,7 +23,7 @@ def do_register_account():
 
   print( "cli_wallet is present and running")
   print( "")
-  print( "This tool will register a new account in the blockchain in favor of other user")
+  print( "This tool will register a new account in the blockchain in favor of another user")
   print( "Follow instruction and supply necessary information")
   print( "")
 
@@ -71,8 +71,8 @@ def do_register_account():
   print( json.dumps( node_json, indent=2) )
   print( "Do you wish to continue? [Y/N]" )
   user_confirm = raw_input(">>>")
-  if ('Y'==user_confirm[0] or 'y'==user_confirm[0]):
-    node_pub = ""
+  if ('Y'!=user_confirm[0] and 'y'!=user_confirm[0]):
+    exit(0)
 
   # template for JSON call
   jsonrpc_call_s = '{"jsonrpc": "2.0", "method": "", "params": [], "id": 1}'

@@ -1,15 +1,38 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 from node_lib import *
 import json
 import getpass
+import os.path
+
+NODE_FILE_PRIVATE = "node_private_keep_in_secret.json"
 
 def finish_account_configuration():
 
+  node_private = NODE_FILE_PRIVATE
+
+  if os.path.isfile( node_private):
+    print( "\'", node_private,  "\' file is found", sep="")
+    print( "Do you want to use another file?[Y/N]")
+    user_confirm = raw_input(">>>")
+    if ('Y'==user_confirm[0] or 'y'==user_confirm[0]):
+      node_private = ""
+  else:
+    print( "Cannot find \'", node_private, "\' file", sep="")
+    node_private = ""
+
+  if node_private == "":
+    print( "Specify path to the file containing registration data and private key of new account:")
+    node_private = raw_input(">>>")
+    if not os.path.isfile( node_private):
+      print( "Cannot find \'", node_private, "\' file", sep="")
+      exit(-1)
+
   try:
-    with open(NODE_FILE_PRIVATE, 'r') as f:
+    with open(node_private, 'r') as f:
       node_data = f.read()
   except Exception as e:
-    print( "Cannot read from \'{0}\' file:".format( NODE_FILE_PRIVATE) )
+    print( "Cannot read from \'{0}\' file:".format( node_private) )
     print( e)
     exit(-1)
 
@@ -28,6 +51,15 @@ def finish_account_configuration():
   checknode(node_json, "witness_key", "wif_priv_key" )
   checknode(node_json, "witness_key", "pub_key" )
 
+  print( "" )
+  print( "You are about to register the following new account:" )
+  print( node_json["name"] )
+  print( node_json["url"] )
+  print( "Do you wish to continue? [Y/N]" )
+  user_confirm = raw_input(">>>")
+  if ('Y'!=user_confirm[0] and 'y'!=user_confirm[0]):
+    exit(0)
+  
   # template for JSON call
   jsonrpc_call_s = '{"jsonrpc": "2.0", "method": "", "params": [], "id": 1}'
 
@@ -123,3 +155,13 @@ def finish_account_configuration():
   jsonrpc_call["method"] = "vote_for_committee_member"
   jsonrpc_call["params"] = [node_json["name"], node_json["name"], True, True]
   cli_response = call_cli_wallet( jsonrpc_call )
+
+  print( "" )
+  print( "Congratulations!" )
+  print( "Your new account \'{0}\' have been successfully registered and is ready to use.".format( node_json["name"]) )
+
+  jsonrpc_call["method"] = "lock"
+  jsonrpc_call["params"] = []
+  is_cli_wallet_succeeded(jsonrpc_call)
+  
+

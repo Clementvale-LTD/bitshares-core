@@ -42,7 +42,7 @@ jsonrpc_call["params"] = ["ptolemy", True]
 cli_response = call_cli_wallet( jsonrpc_call )
 
 jsonrpc_call["method"] = "register_account"
-jsonrpc_call["params"] = ["bubbletone", "BTS7vEhUJxJE8WKC4GVEdee114WeHcfBfRA5B7NbheMNMqnAuHUwm", "BTS7vEhUJxJE8WKC4GVEdee114WeHcfBfRA5B7NbheMNMqnAuHUwm", "ptolemy", "ptolemy", 0, True]
+jsonrpc_call["params"] = ["bubbletone", "BTE7vEhUJxJE8WKC4GVEdee114WeHcfBfRA5B7NbheMNMqnAuHUwm", "BTE7vEhUJxJE8WKC4GVEdee114WeHcfBfRA5B7NbheMNMqnAuHUwm", "ptolemy", "ptolemy", 0, True]
 cli_response = call_cli_wallet( jsonrpc_call )
 
 jsonrpc_call["method"] = "import_key"
@@ -54,20 +54,20 @@ jsonrpc_call["params"] = ["bubbletone", True]
 cli_response = call_cli_wallet( jsonrpc_call )
 
 jsonrpc_call["method"] = "register_account"
-jsonrpc_call["params"] = ["bank", "BTS73hk1bKb4JaNPmBqMWKHWMxF1FiBdq3DyeNpH4gaM1mxY13Lez", "BTS73hk1bKb4JaNPmBqMWKHWMxF1FiBdq3DyeNpH4gaM1mxY13Lez", "bubbletone", "bubbletone", 0, True]
+jsonrpc_call["params"] = ["bank", "BTE73hk1bKb4JaNPmBqMWKHWMxF1FiBdq3DyeNpH4gaM1mxY13Lez", "BTE73hk1bKb4JaNPmBqMWKHWMxF1FiBdq3DyeNpH4gaM1mxY13Lez", "bubbletone", "bubbletone", 0, True]
 cli_response = call_cli_wallet( jsonrpc_call )
 
 
 jsonrpc_call["method"] = "register_account"
-jsonrpc_call["params"] = ["t1node", "BTS6jdewg5KQ24T8tBCRnCtgbapEkJ2hBwXE1nXQR23VxLYbMo2cL", "BTS6jdewg5KQ24T8tBCRnCtgbapEkJ2hBwXE1nXQR23VxLYbMo2cL", "bubbletone", "bubbletone", 0, True]
+jsonrpc_call["params"] = ["t1node", "BTE6jdewg5KQ24T8tBCRnCtgbapEkJ2hBwXE1nXQR23VxLYbMo2cL", "BTE6jdewg5KQ24T8tBCRnCtgbapEkJ2hBwXE1nXQR23VxLYbMo2cL", "bubbletone", "bubbletone", 0, True]
 cli_response = call_cli_wallet( jsonrpc_call )
 
 jsonrpc_call["method"] = "register_account"
-jsonrpc_call["params"] = ["t2node", "BTS8JsK7hGpPSyaNgHhKQLQGwwFACyvksUUgyKZfKP1kCySEL6oLt", "BTS8JsK7hGpPSyaNgHhKQLQGwwFACyvksUUgyKZfKP1kCySEL6oLt", "bubbletone", "bubbletone", 0, True]
+jsonrpc_call["params"] = ["t2node", "BTE8JsK7hGpPSyaNgHhKQLQGwwFACyvksUUgyKZfKP1kCySEL6oLt", "BTE8JsK7hGpPSyaNgHhKQLQGwwFACyvksUUgyKZfKP1kCySEL6oLt", "bubbletone", "bubbletone", 0, True]
 cli_response = call_cli_wallet( jsonrpc_call )
 
 jsonrpc_call["method"] = "register_account"
-jsonrpc_call["params"] = ["t3node", "BTS7EJpNzzCJts1EJWfrzkzrWwB65TL7WA51BirngPiKEyqkkPj5q", "BTS7EJpNzzCJts1EJWfrzkzrWwB65TL7WA51BirngPiKEyqkkPj5q", "bubbletone", "bubbletone", 0, True]
+jsonrpc_call["params"] = ["t3node", "BTE7EJpNzzCJts1EJWfrzkzrWwB65TL7WA51BirngPiKEyqkkPj5q", "BTE7EJpNzzCJts1EJWfrzkzrWwB65TL7WA51BirngPiKEyqkkPj5q", "bubbletone", "bubbletone", 0, True]
 cli_response = call_cli_wallet( jsonrpc_call )
 
 jsonrpc_call["method"] = "import_key"

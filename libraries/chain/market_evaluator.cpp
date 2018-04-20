@@ -85,7 +85,7 @@ object_id_type limit_order_create_evaluator::do_apply(const limit_order_create_o
    asset umt_fee( 0, GRAPHENE_SDR_ASSET_ID );
 
    if( op.amount_to_sell.asset_id == GRAPHENE_SDR_ASSET_ID) //SDR
-    if( op.min_to_receive.asset_id != asset_id_type(0)) //not BTS
+    if( op.min_to_receive.asset_id != asset_id_type(0)) //not BTE
     {
       umt_fee = db().sdr_amount_to_umt_fee_to_reserve( op.amount_to_sell.amount );
       db().adjust_balance(op.seller, -umt_fee);

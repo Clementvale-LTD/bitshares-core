@@ -516,7 +516,7 @@ bool database::fill_order( const limit_order_object& order, const asset& pays, c
    asset umt_fee( 0, GRAPHENE_SDR_ASSET_ID );
 
    if( pays.asset_id == GRAPHENE_SDR_ASSET_ID) //SDR
-    if( receives.asset_id != asset_id_type(0)) //not BTS
+    if( receives.asset_id != asset_id_type(0)) //not BTE
     {
       umt_fee = sdr_amount_to_umt_fee_to_pay( pays.amount, order.for_sale, order.umt_fee );
       adjust_balance(GRAPHENE_UMT_FEE_POOL_ACCOUNT, umt_fee);

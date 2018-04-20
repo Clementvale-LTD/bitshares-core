@@ -165,7 +165,7 @@ namespace graphene { namespace chain {
             }
 
             void operator()( const graphene::chain::asset_create_operation& v )const {
-               FC_ASSERT( v.fee.asset_id == asset_id_type(), "Can only pay fee in BTS since block #21040000" );
+               FC_ASSERT( v.fee.asset_id == asset_id_type(), "Can only pay fee in BTE since block #21040000" );
             }
 
             void operator()( const graphene::chain::proposal_create_operation& v )const {

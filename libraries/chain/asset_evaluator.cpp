@@ -53,23 +53,6 @@ void_result asset_create_evaluator::do_evaluate( const asset_create_operation& o
    auto asset_symbol_itr = asset_indx.find( op.symbol );
    FC_ASSERT( asset_symbol_itr == asset_indx.end() );
 
-   if( d.head_block_time() > HARDFORK_385_TIME )
-   {
-
-   if( d.head_block_time() <= HARDFORK_409_TIME )
-   {
-      auto dotpos = op.symbol.find( '.' );
-      if( dotpos != std::string::npos )
-      {
-         auto prefix = op.symbol.substr( 0, dotpos );
-         auto asset_symbol_itr = asset_indx.find( op.symbol );
-         FC_ASSERT( asset_symbol_itr != asset_indx.end(), "Asset ${s} may only be created by issuer of ${p}, but ${p} has not been registered",
-                    ("s",op.symbol)("p",prefix) );
-         FC_ASSERT( asset_symbol_itr->issuer == op.issuer, "Asset ${s} may only be created by issuer of ${p}, ${i}",
-                    ("s",op.symbol)("p",prefix)("i", op.issuer(d).name) );
-      }
-   }
-   else
    {
       auto dotpos = op.symbol.rfind( '.' );
       if( dotpos != std::string::npos )
@@ -81,14 +64,6 @@ void_result asset_create_evaluator::do_evaluate( const asset_create_operation& o
          FC_ASSERT( asset_symbol_itr->issuer == op.issuer, "Asset ${s} may only be created by issuer of ${p}, ${i}",
                     ("s",op.symbol)("p",prefix)("i", op.issuer(d).name) );
       }
-   }
-
-   }
-   else
-   {
-      auto dotpos = op.symbol.find( '.' );
-      if( dotpos != std::string::npos )
-          wlog( "Asset ${s} has a name which requires hardfork 385", ("s",op.symbol) );
    }
 
    if( op.bitasset_opts )
@@ -114,12 +89,6 @@ void_result asset_create_evaluator::do_evaluate( const asset_create_operation& o
       FC_ASSERT( op.precision == op.bitasset_opts->short_backing_asset(d).precision );
    }
 
-   if( d.head_block_time() <= HARDFORK_CORE_429_TIME )
-   { // TODO: remove after HARDFORK_CORE_429_TIME has passed
-      graphene::chain::impl::hf_429_visitor hf_429;
-      hf_429( op );
-   }
-
    return void_result();
 } FC_CAPTURE_AND_RETHROW( (op) ) }
 
@@ -132,7 +101,7 @@ void asset_create_evaluator::pay_fee()
 
 object_id_type asset_create_evaluator::do_apply( const asset_create_operation& op )
 { try {
-   bool hf_429 = fee_is_odd && db().head_block_time() > HARDFORK_CORE_429_TIME;
+   bool hf_429 = fee_is_odd;
 
    const asset_dynamic_data_object& dyn_asset =
       db().create<asset_dynamic_data_object>( [&]( asset_dynamic_data_object& a ) {
@@ -284,7 +253,7 @@ void_result asset_update_evaluator::do_evaluate(const asset_update_operation& o)
       }
    }
 
-   if( (d.head_block_time() < HARDFORK_572_TIME) || (a.dynamic_asset_data_id(d).current_supply != 0) )
+   if( (a.dynamic_asset_data_id(d).current_supply != 0) )
    {
       // new issuer_permissions must be subset of old issuer permissions
       FC_ASSERT(!(o.new_options.issuer_permissions & ~a.options.issuer_permissions),
@@ -470,8 +439,7 @@ void_result asset_settle_evaluator::do_evaluate(const asset_settle_evaluator::op
    if( bitasset.is_prediction_market )
       FC_ASSERT( bitasset.has_settlement(), "global settlement must occur before force settling a prediction market"  );
    else if( bitasset.current_feed.settlement_price.is_null()
-            && ( d.head_block_time() <= HARDFORK_CORE_216_TIME
-                 || !bitasset.has_settlement() ) )
+            && ( !bitasset.has_settlement() ) )
       FC_THROW_EXCEPTION(insufficient_feeds, "Cannot force settle with no price feed.");
    FC_ASSERT(d.get_balance(d.get(op.account), *asset_to_settle) >= op.amount);
 
@@ -525,24 +493,17 @@ void_result asset_publish_feeds_evaluator::do_evaluate(const asset_publish_feed_
    FC_ASSERT(base.is_market_issued());
 
    const asset_bitasset_data_object& bitasset = base.bitasset_data(d);
-   if( bitasset.is_prediction_market || d.head_block_time() <= HARDFORK_CORE_216_TIME )
+   if( bitasset.is_prediction_market )
    {
       FC_ASSERT( !bitasset.has_settlement(), "No further feeds may be published after a settlement event" );
    }
 
    FC_ASSERT( o.feed.settlement_price.quote.asset_id == bitasset.options.short_backing_asset );
-   if( d.head_block_time() > HARDFORK_480_TIME )
+
    {
       if( !o.feed.core_exchange_rate.is_null() )
       {
          FC_ASSERT( o.feed.core_exchange_rate.quote.asset_id == asset_id_type() );
-      }
-   }
-   else
-   {
-      if( (!o.feed.settlement_price.is_null()) && (!o.feed.core_exchange_rate.is_null()) )
-      {
-         FC_ASSERT( o.feed.settlement_price.quote.asset_id == o.feed.core_exchange_rate.quote.asset_id );
       }
    }
 
@@ -580,7 +541,7 @@ void_result asset_publish_feeds_evaluator::do_apply(const asset_publish_feed_ope
 
    if( !(old_feed == bad.current_feed) )
    {
-      if( bad.has_settlement() ) // implies head_block_time > HARDFORK_CORE_216_TIME
+      if( bad.has_settlement() ) // implies head_block_time > HARDFORK CORE 216 TIME
       {
          const auto& mia_dyn = base.dynamic_asset_data_id(d);
          if( !bad.current_feed.settlement_price.is_null()
@@ -600,7 +561,7 @@ void_result asset_publish_feeds_evaluator::do_apply(const asset_publish_feed_ope
 
 void_result asset_claim_fees_evaluator::do_evaluate( const asset_claim_fees_operation& o )
 { try {
-   FC_ASSERT( db().head_block_time() > HARDFORK_413_TIME );
+
    FC_ASSERT( o.amount_to_claim.asset_id(db()).issuer == o.issuer, "Asset fees may only be claimed by the issuer" );
    return void_result();
 } FC_CAPTURE_AND_RETHROW( (o) ) }

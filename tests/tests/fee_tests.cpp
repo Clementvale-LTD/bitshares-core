@@ -174,17 +174,6 @@ BOOST_AUTO_TEST_CASE(asset_claim_fees_test)
 
       }
 
-      if( db.head_block_time() <= HARDFORK_413_TIME )
-      {
-         // can't claim before hardfork
-         GRAPHENE_REQUIRE_THROW( claim_fees( izzy_id, _izzy(1) ), fc::exception );
-         generate_blocks( HARDFORK_413_TIME );
-         while( db.head_block_time() <= HARDFORK_413_TIME )
-         {
-            generate_block();
-         }
-      }
-
       {
          const asset_object& izzycoin = izzycoin_id(db);
          const asset_object& jillcoin = jillcoin_id(db);
@@ -603,6 +592,8 @@ BOOST_AUTO_TEST_CASE( account_create_fee_scaling )
    BOOST_CHECK_EQUAL(db.get_global_properties().parameters.current_fees->get<account_create_operation>().basic_fee, 1);
 } FC_LOG_AND_RETHROW() }
 
+#define ITWAS_HARDFORK_445_TIME (fc::time_point_sec( 1450288800 ))
+
 BOOST_AUTO_TEST_CASE( fee_refund_test )
 {
    try
@@ -637,7 +628,7 @@ BOOST_AUTO_TEST_CASE( fee_refund_test )
       {
          if( i == 1 )
          {
-            generate_blocks( HARDFORK_445_TIME, true, skip );
+            generate_blocks( ITWAS_HARDFORK_445_TIME, true, skip );
             generate_block( skip );
          }
 
@@ -687,7 +678,7 @@ BOOST_AUTO_TEST_CASE( fee_refund_test )
          cancel_limit_order( bo1_id(db) );
 
          int64_t cancel_net_fee;
-         if( db.head_block_time() >= HARDFORK_445_TIME )
+         if( db.head_block_time() >= ITWAS_HARDFORK_445_TIME )
             cancel_net_fee = order_cancel_fee;
          else
             cancel_net_fee = order_create_fee + order_cancel_fee;
@@ -737,6 +728,12 @@ BOOST_AUTO_TEST_CASE( fee_refund_test )
    FC_LOG_AND_RETHROW()
 }
 
+#define ITWAS_HARDFORK_538_TIME (fc::time_point_sec( 1456250400 ))
+#define ITWAS_HARDFORK_555_TIME (fc::time_point_sec( 1456250400 ))
+#define ITWAS_HARDFORK_563_TIME (fc::time_point_sec( 1456250400 ))
+#define ITWAS_HARDFORK_572_TIME (fc::time_point_sec( 1456250400 ))
+#define ITWAS_HARDFORK_599_TIME (fc::time_point_sec( 1459789200 ))
+
 BOOST_AUTO_TEST_CASE( stealth_fba_test )
 {
    try
@@ -744,11 +741,11 @@ BOOST_AUTO_TEST_CASE( stealth_fba_test )
       ACTORS( (alice)(bob)(chloe)(dan)(izzy)(philbin)(tom) );
       upgrade_to_lifetime_member(philbin_id);
 
-      generate_blocks( HARDFORK_538_TIME );
-      generate_blocks( HARDFORK_555_TIME );
-      generate_blocks( HARDFORK_563_TIME );
-      generate_blocks( HARDFORK_572_TIME );
-      generate_blocks( HARDFORK_599_TIME );
+      generate_blocks( ITWAS_HARDFORK_538_TIME );
+      generate_blocks( ITWAS_HARDFORK_555_TIME );
+      generate_blocks( ITWAS_HARDFORK_563_TIME );
+      generate_blocks( ITWAS_HARDFORK_572_TIME );
+      generate_blocks( ITWAS_HARDFORK_599_TIME );
 
       // Philbin (registrar who registers Rex)
 
@@ -984,6 +981,8 @@ BOOST_AUTO_TEST_CASE( defaults_test )
   }
 }
 
+#define ITWAS_HARDFORK_CORE_429_TIME (fc::time_point_sec( 1512747600 ))
+
 BOOST_AUTO_TEST_CASE( issue_429_test )
 {
    try
@@ -1027,7 +1026,7 @@ BOOST_AUTO_TEST_CASE( issue_429_test )
 
       verify_asset_supplies( db );
 
-      generate_blocks( HARDFORK_CORE_429_TIME + 10 );
+      generate_blocks( ITWAS_HARDFORK_CORE_429_TIME + 10 );
 
       {
          signed_transaction tx;

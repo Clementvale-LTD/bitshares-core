@@ -70,6 +70,8 @@ struct swan_fixture : database_fixture {
         update_feed_producers(swan(), {_feedproducer});
     }
 
+    #define ITWAS_HARDFORK_CORE_216_TIME (fc::time_point_sec( 1512747600 ))
+
     limit_order_id_type trigger_swan(share_type amount1, share_type amount2) {
         set_expiration( db, trx );
         // starting out with price 1:1
@@ -111,7 +113,7 @@ struct swan_fixture : database_fixture {
     }
 
     void wait_for_hf_core_216() {
-      generate_blocks( HARDFORK_CORE_216_TIME );
+      generate_blocks( ITWAS_HARDFORK_CORE_216_TIME );
       generate_block();
     }
 
@@ -500,7 +502,7 @@ BOOST_AUTO_TEST_CASE( premature_revival )
        // Set maintenance to 1 hour to prevent price feed expiry
        p.parameters.maintenance_interval = 60*60;
    });
-   generate_blocks( HARDFORK_CORE_216_TIME - db.get_global_properties().parameters.maintenance_interval - 1 );
+   generate_blocks( ITWAS_HARDFORK_CORE_216_TIME - db.get_global_properties().parameters.maintenance_interval - 1 );
 
    limit_order_id_type oid = init_standard_swan( 1000 );
    cancel_limit_order( oid(db) );

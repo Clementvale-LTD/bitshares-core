@@ -151,6 +151,7 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_create_before_hardfork_23 )
  * That issue is concerned with ensuring that the first claim
  * can occur before the first withdrawal period.
  */
+#define ITWAS_HARDFORK_23_TIME (fc::time_point_sec( 1512747600 ))
 BOOST_AUTO_TEST_CASE( withdraw_permission_create_after_hardfork_23 )
 { try {
    auto nathan_private_key = generate_private_key("nathan");
@@ -169,7 +170,7 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_create_after_hardfork_23 )
       op.withdrawal_limit = asset(5);
       op.withdrawal_period_sec = fc::hours(1).to_seconds();
       op.periods_until_expiration = 5;
-      op.period_start_time = HARDFORK_23_TIME + db.get_global_properties().parameters.block_interval*5; // 5 blocks after fork time
+      op.period_start_time = ITWAS_HARDFORK_23_TIME + db.get_global_properties().parameters.block_interval*5; // 5 blocks after fork time
       trx.operations.push_back(op);
       REQUIRE_OP_VALIDATION_FAILURE(op, withdrawal_limit, asset());
       REQUIRE_OP_VALIDATION_FAILURE(op, periods_until_expiration, 0);
@@ -383,7 +384,7 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_test_after_hardfork_23 )
       BOOST_CHECK(permit_object.expiration == first_start_time + permit_object.withdrawal_period_sec*5 );
    }
 
-   generate_blocks(HARDFORK_23_TIME); // Still before the first period, but DURING the real time during which "early" claims are checked
+   generate_blocks( ITWAS_HARDFORK_23_TIME); // Still before the first period, but DURING the real time during which "early" claims are checked
 
    {
       withdraw_permission_claim_operation op;
@@ -569,7 +570,7 @@ BOOST_AUTO_TEST_CASE( withdraw_permission_nominal_case )
 BOOST_AUTO_TEST_CASE( withdraw_permission_incremental_case )
 { try {
     INVOKE(withdraw_permission_create_after_hardfork_23);
-    time_point_sec expected_first_period_start_time = HARDFORK_23_TIME + db.get_global_properties().parameters.block_interval*5; // Hard-coded to synchronize with withdraw_permission_create_after_hardfork_23()
+    time_point_sec expected_first_period_start_time = ITWAS_HARDFORK_23_TIME + db.get_global_properties().parameters.block_interval*5; // Hard-coded to synchronize with withdraw_permission_create_after_hardfork_23()
     uint64_t expected_period_duration_seconds = fc::hours(1).to_seconds(); // Hard-coded to synchronize with withdraw_permission_create_after_hardfork_23()
 
     auto nathan_private_key = generate_private_key("nathan");
@@ -1915,14 +1916,17 @@ BOOST_AUTO_TEST_CASE( vbo_withdraw_different )
    FC_LOG_AND_RETHROW()
 }
 
+#define ITWAS_HARDFORK_516_TIME (fc::time_point_sec( 1456250400 ))
+#define ITWAS_HARDFORK_599_TIME (fc::time_point_sec( 1459789200 ))
+
 // TODO:  Write linear VBO tests
 
 BOOST_AUTO_TEST_CASE( top_n_special )
 {
    ACTORS( (alice)(bob)(chloe)(dan)(izzy)(stan) );
 
-   generate_blocks( HARDFORK_516_TIME );
-   generate_blocks( HARDFORK_599_TIME );
+   generate_blocks( ITWAS_HARDFORK_516_TIME );
+   generate_blocks( ITWAS_HARDFORK_599_TIME );
 
    try
    {
@@ -2068,14 +2072,17 @@ BOOST_AUTO_TEST_CASE( top_n_special )
    } FC_LOG_AND_RETHROW()
 }
 
+#define ITWAS_HARDFORK_538_TIME (fc::time_point_sec( 1456250400 ))
+#define ITWAS_HARDFORK_555_TIME (fc::time_point_sec( 1456250400 ))
+
 BOOST_AUTO_TEST_CASE( buyback )
 {
    ACTORS( (alice)(bob)(chloe)(dan)(izzy)(philbin) );
    upgrade_to_lifetime_member(philbin_id);
 
-   generate_blocks( HARDFORK_538_TIME );
-   generate_blocks( HARDFORK_555_TIME );
-   generate_blocks( HARDFORK_599_TIME );
+   generate_blocks( ITWAS_HARDFORK_538_TIME );
+   generate_blocks( ITWAS_HARDFORK_555_TIME );
+   generate_blocks( ITWAS_HARDFORK_599_TIME );
 
    try
    {

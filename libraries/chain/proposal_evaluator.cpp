@@ -77,12 +77,6 @@ void_result proposal_create_evaluator::do_evaluate(const proposal_create_operati
       _proposed_trx.operations.push_back(op.op);
    _proposed_trx.validate();
 
-   if( d.head_block_time() <= HARDFORK_CORE_429_TIME )
-   { // TODO: remove after HARDFORK_CORE_429_TIME has passed
-      graphene::chain::impl::hf_429_visitor hf_429;
-      hf_429( o );
-   }
-
    return void_result();
 } FC_CAPTURE_AND_RETHROW( (o) ) }
 

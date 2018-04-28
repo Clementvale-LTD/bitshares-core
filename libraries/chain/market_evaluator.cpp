@@ -64,10 +64,7 @@ void_result limit_order_create_evaluator::do_evaluate(const limit_order_create_o
 
 void limit_order_create_evaluator::pay_fee()
 {
-   if( db().head_block_time() <= HARDFORK_445_TIME )
-      generic_evaluator::pay_fee();
-   else
-      _deferred_fee = core_fee_paid;
+   _deferred_fee = core_fee_paid;
 }
 
 object_id_type limit_order_create_evaluator::do_apply(const limit_order_create_operation& op)
@@ -342,8 +339,6 @@ void_result call_order_update_evaluator::do_apply(const call_order_update_operat
 void_result bid_collateral_evaluator::do_evaluate(const bid_collateral_operation& o)
 { try {
    database& d = db();
-
-   FC_ASSERT( d.head_block_time() > HARDFORK_CORE_216_TIME, "Not yet!" );
 
    _paying_account = &o.bidder(d);
    _debt_asset     = &o.debt_covered.asset_id(d);

@@ -79,7 +79,7 @@ void verify_account_votes( const database& db, const account_options& options )
       has_worker_votes |= (id.type() == vote_id_type::worker);
    }
 
-   if( has_worker_votes && (db.head_block_time() >= HARDFORK_607_TIME) )
+   if( has_worker_votes )
    {
       const auto& against_worker_idx = db.get_index_type<worker_index>().indices().get<by_vote_against>();
       for( auto id : options.votes )
@@ -90,7 +90,7 @@ void verify_account_votes( const database& db, const account_options& options )
          }
       }
    }
-   if ( db.head_block_time() >= HARDFORK_CORE_143_TIME ) {
+   {
       const auto& approve_worker_idx = db.get_index_type<worker_index>().indices().get<by_vote_for>();
       const auto& committee_idx = db.get_index_type<committee_member_index>().indices().get<by_vote_id>();
       const auto& witness_idx = db.get_index_type<witness_index>().indices().get<by_vote_id>();
@@ -117,18 +117,6 @@ void verify_account_votes( const database& db, const account_options& options )
 void_result account_create_evaluator::do_evaluate( const account_create_operation& op )
 { try {
    database& d = db();
-   if( d.head_block_time() < HARDFORK_516_TIME )
-   {
-      FC_ASSERT( !op.extensions.value.owner_special_authority.valid() );
-      FC_ASSERT( !op.extensions.value.active_special_authority.valid() );
-   }
-   if( d.head_block_time() < HARDFORK_599_TIME )
-   {
-      FC_ASSERT( !op.extensions.value.null_ext.valid() );
-      FC_ASSERT( !op.extensions.value.owner_special_authority.valid() );
-      FC_ASSERT( !op.extensions.value.active_special_authority.valid() );
-      FC_ASSERT( !op.extensions.value.buyback_options.valid() );
-   }
 
    FC_ASSERT( d.find_object(op.options.voting_account), "Invalid proxy account specified." );
    FC_ASSERT( fee_paying_account->is_lifetime_member(), "Only Lifetime members may register an account." );
@@ -165,23 +153,6 @@ object_id_type account_create_evaluator::do_apply( const account_create_operatio
 
    database& d = db();
    uint16_t referrer_percent = o.referrer_percent;
-   bool has_small_percent = (
-         (db().head_block_time() <= HARDFORK_453_TIME)
-      && (o.referrer != o.registrar  )
-      && (o.referrer_percent != 0    )
-      && (o.referrer_percent <= 0x100)
-      );
-
-   if( has_small_percent )
-   {
-      if( referrer_percent >= 100 )
-      {
-         wlog( "between 100% and 0x100%:  ${o}", ("o", o) );
-      }
-      referrer_percent = referrer_percent*100;
-      if( referrer_percent > GRAPHENE_100_PERCENT )
-         referrer_percent = GRAPHENE_100_PERCENT;
-   }
 
    const auto& new_acnt_object = db().create<account_object>( [&]( account_object& obj ){
          obj.registrar = o.registrar;
@@ -264,17 +235,6 @@ object_id_type account_create_evaluator::do_apply( const account_create_operatio
 void_result account_update_evaluator::do_evaluate( const account_update_operation& o )
 { try {
    database& d = db();
-   if( d.head_block_time() < HARDFORK_516_TIME )
-   {
-      FC_ASSERT( !o.extensions.value.owner_special_authority.valid() );
-      FC_ASSERT( !o.extensions.value.active_special_authority.valid() );
-   }
-   if( d.head_block_time() < HARDFORK_599_TIME )
-   {
-      FC_ASSERT( !o.extensions.value.null_ext.valid() );
-      FC_ASSERT( !o.extensions.value.owner_special_authority.valid() );
-      FC_ASSERT( !o.extensions.value.active_special_authority.valid() );
-   }
 
    try
    {
@@ -413,13 +373,13 @@ void_result account_upgrade_evaluator::do_apply(const account_upgrade_evaluator:
          a.lifetime_referrer_fee_percentage = GRAPHENE_100_PERCENT - a.network_fee_percentage;
       } else if( a.is_annual_member(d.head_block_time()) ) {
          // Renew an annual subscription that's still in effect.
-         FC_ASSERT( d.head_block_time() <= HARDFORK_613_TIME );
+         FC_ASSERT( false, "Deprecated" );
          FC_ASSERT(a.membership_expiration_date - d.head_block_time() < fc::days(3650),
                    "May not extend annual membership more than a decade into the future.");
          a.membership_expiration_date += fc::days(365);
       } else {
          // Upgrade from basic account.
-         FC_ASSERT( d.head_block_time() <= HARDFORK_613_TIME );
+         FC_ASSERT( false, "Deprecated" );
          a.statistics(d).process_fees(a, d);
          assert(a.is_basic_account(d.head_block_time()));
          a.referrer = a.get_id();

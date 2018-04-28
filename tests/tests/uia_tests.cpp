@@ -136,6 +136,8 @@ BOOST_AUTO_TEST_CASE( override_transfer_test2 )
    BOOST_REQUIRE_EQUAL( get_balance( eric, advanced ), 0 );
 } FC_LOG_AND_RETHROW() }
 
+#define ITWAS_HARDFORK_415_TIME (fc::time_point_sec( 1446652800 ))
+
 BOOST_AUTO_TEST_CASE( issue_whitelist_uia )
 {
    try {
@@ -153,10 +155,10 @@ BOOST_AUTO_TEST_CASE( issue_whitelist_uia )
       trx.operations.emplace_back(op);
       set_expiration( db, trx );
       //Fail because nathan is not whitelisted, but only before hardfork time
-      if( db.head_block_time() <= HARDFORK_415_TIME )
+      if( db.head_block_time() <= ITWAS_HARDFORK_415_TIME )
       {
          GRAPHENE_REQUIRE_THROW(PUSH_TX( db, trx, ~0 ), fc::exception);
-         generate_blocks( HARDFORK_415_TIME );
+         generate_blocks( ITWAS_HARDFORK_415_TIME );
          generate_block();
          set_expiration( db, trx );
       }
@@ -213,6 +215,8 @@ BOOST_AUTO_TEST_CASE( issue_whitelist_uia )
       throw;
    }
 }
+
+#define ITWAS_HARDFORK_419_TIME (fc::time_point_sec( 1446652800 ))
 
 BOOST_AUTO_TEST_CASE( transfer_whitelist_uia )
 {
@@ -272,7 +276,7 @@ BOOST_AUTO_TEST_CASE( transfer_whitelist_uia )
       op.amount = advanced.amount(50);
       trx.operations.back() = op;
       //Fail because nathan is blacklisted
-      if( db.head_block_time() <= HARDFORK_419_TIME )
+      if( db.head_block_time() <= ITWAS_HARDFORK_419_TIME )
       {
          // before the hardfork time, it fails because the whitelist check fails
          GRAPHENE_REQUIRE_THROW(PUSH_TX( db, trx, ~0 ), transfer_from_account_not_whitelisted );
@@ -426,6 +430,9 @@ BOOST_AUTO_TEST_CASE( transfer_restricted_test )
    }
 }
 
+#define ITWAS_HARDFORK_385_TIME (fc::time_point_sec( 1445558400 ))
+#define ITWAS_HARDFORK_409_TIME (fc::time_point_sec( 1446652800 ))
+
 BOOST_AUTO_TEST_CASE( asset_name_test )
 {
    try
@@ -449,18 +456,18 @@ BOOST_AUTO_TEST_CASE( asset_name_test )
       GRAPHENE_REQUIRE_THROW( create_user_issued_asset( "ALPHA", alice_id(db), 0 ), fc::exception );
       BOOST_CHECK(  has_asset("ALPHA") );    BOOST_CHECK( !has_asset("ALPHA.ONE") );
 
-      generate_blocks( HARDFORK_385_TIME );
+      generate_blocks( ITWAS_HARDFORK_385_TIME );
       generate_block();
 
       // Bob can't create ALPHA.ONE
       GRAPHENE_REQUIRE_THROW( create_user_issued_asset( "ALPHA.ONE", bob_id(db), 0 ), fc::exception );
       BOOST_CHECK(  has_asset("ALPHA") );    BOOST_CHECK( !has_asset("ALPHA.ONE") );
-      if( db.head_block_time() <= HARDFORK_409_TIME )
+      if( db.head_block_time() <= ITWAS_HARDFORK_409_TIME )
       {
          // Alice can't create ALPHA.ONE before hardfork
          GRAPHENE_REQUIRE_THROW( create_user_issued_asset( "ALPHA.ONE", alice_id(db), 0 ), fc::exception );
          BOOST_CHECK(  has_asset("ALPHA") );    BOOST_CHECK( !has_asset("ALPHA.ONE") );
-         generate_blocks( HARDFORK_409_TIME );
+         generate_blocks( ITWAS_HARDFORK_409_TIME );
          generate_block();
          // Bob can't create ALPHA.ONE after hardfork
          GRAPHENE_REQUIRE_THROW( create_user_issued_asset( "ALPHA.ONE", bob_id(db), 0 ), fc::exception );

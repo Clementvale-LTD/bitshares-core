@@ -154,6 +154,8 @@ BOOST_AUTO_TEST_CASE( call_order_update_test )
    }
 }
 
+#define ITWAS_HARDFORK_436_TIME (fc::time_point_sec( 1450288800 ))
+
 /**
  *  This test sets up a situation where a margin call will be executed and ensures that
  *  it is properly filled.
@@ -203,7 +205,7 @@ BOOST_AUTO_TEST_CASE( margin_call_limit_test )
       // protection threshold.
       BOOST_TEST_MESSAGE( "Creating a margin call that is NOT protected by the max short squeeze price" );
       auto order = create_sell_order( borrower2, bitusd.amount(1000), core.amount(1400) );
-      if( db.head_block_time() <= HARDFORK_436_TIME )
+      if( db.head_block_time() <= ITWAS_HARDFORK_436_TIME )
       {
          BOOST_CHECK( order == nullptr );
 
@@ -328,10 +330,12 @@ BOOST_AUTO_TEST_CASE( prediction_market_resolves_to_0 )
    }
 }
 
+#define ITWAS_HARDFORK_CORE_143_TIME (fc::time_point_sec( 1512747600 ))
+
 BOOST_AUTO_TEST_CASE( create_account_test )
 {
    try {
-      generate_blocks( HARDFORK_CORE_143_TIME );
+      generate_blocks( ITWAS_HARDFORK_CORE_143_TIME );
       set_expiration( db, trx );
       trx.operations.push_back(make_account());
       account_create_operation op = trx.operations.back().get<account_create_operation>();
@@ -1101,6 +1105,7 @@ BOOST_AUTO_TEST_CASE( witness_feeds )
    }
 }
 
+#define ITWAS_HARDFORK_555_TIME (fc::time_point_sec( 1456250400 ))
 
 /**
  *  Create an order such that when the trade executes at the
@@ -1110,7 +1115,7 @@ BOOST_AUTO_TEST_CASE( trade_amount_equals_zero )
 {
    try {
       INVOKE(issue_uia);
-      generate_blocks( HARDFORK_555_TIME );
+      generate_blocks( ITWAS_HARDFORK_555_TIME );
       set_expiration( db, trx );
 
       const asset_object& test = get_asset( UIA_TEST_SYMBOL );

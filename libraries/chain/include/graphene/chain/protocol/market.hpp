@@ -23,6 +23,7 @@
  */
 #pragma once
 #include <graphene/chain/protocol/base.hpp>
+#include <graphene/chain/protocol/memo.hpp>
 
 namespace graphene { namespace chain { 
 
@@ -64,7 +65,7 @@ namespace graphene { namespace chain {
       optional< uint64_t > request_id;
       optional< uint64_t > user_id;
       optional< account_id_type > counterparty_id;
-      optional< string > memo;
+      optional< memo_data > p_memo;
 
       extensions_type   extensions;
 
@@ -92,7 +93,7 @@ namespace graphene { namespace chain {
       uint64_t request_id;
       uint64_t user_id;
       account_id_type counterparty_id;
-      string memo;
+      memo_data p_memo; //private encoded message
 
       extensions_type   extensions;
 
@@ -123,7 +124,7 @@ namespace graphene { namespace chain {
       uint64_t user_id;
 
       account_id_type     accepted_by_account_id;
-      string accepted_memo;
+      memo_data p_accepted_memo;  //private encoded message
 
       account_id_type fee_payer()const { return order_creator_account_id; }
       void            validate()const { FC_ASSERT( !"virtual operation" ); }
@@ -186,7 +187,7 @@ namespace graphene { namespace chain {
    {
      optional< uint64_t > request_id;
      optional< uint64_t > user_id;
-     optional< string > memo;
+     optional< memo_data > p_memo;
    };
 
    /**
@@ -206,7 +207,7 @@ namespace graphene { namespace chain {
            if( NULL != cparty_info){
              request_id = cparty_info->request_id;
              user_id = cparty_info->user_id;
-             memo = cparty_info->memo;
+             p_memo = cparty_info->p_memo;
            }
          }
 
@@ -220,7 +221,7 @@ namespace graphene { namespace chain {
 
       optional< uint64_t > request_id;
       optional< uint64_t > user_id;
-      optional< string > memo;
+      optional< memo_data > p_memo;
 
       pair<asset_id_type,asset_id_type> get_market()const
       {
@@ -292,11 +293,11 @@ FC_REFLECT( graphene::chain::execute_bid_operation::fee_parameters_type,  ) // V
 FC_REFLECT( graphene::chain::limit_order_accept_operation::fee_parameters_type, (fee) )
 FC_REFLECT( graphene::chain::limit_order_accepted_operation::fee_parameters_type, ) // VIRTUAL
 
-FC_REFLECT( graphene::chain::limit_order_create_operation,(fee)(seller)(amount_to_sell)(min_to_receive)(expiration)(fill_or_kill)(request_id)(user_id)(counterparty_id)(memo)(extensions))
+FC_REFLECT( graphene::chain::limit_order_create_operation,(fee)(seller)(amount_to_sell)(min_to_receive)(expiration)(fill_or_kill)(request_id)(user_id)(counterparty_id)(p_memo)(extensions))
 FC_REFLECT( graphene::chain::limit_order_cancel_operation,(fee)(fee_paying_account)(order)(extensions) )
 FC_REFLECT( graphene::chain::call_order_update_operation, (fee)(funding_account)(delta_collateral)(delta_debt)(extensions) )
-FC_REFLECT( graphene::chain::fill_order_operation, (fee)(order_id)(account_id)(pays)(receives)(fill_price)(is_maker)(request_id)(user_id)(memo) )
+FC_REFLECT( graphene::chain::fill_order_operation, (fee)(order_id)(account_id)(pays)(receives)(fill_price)(is_maker)(request_id)(user_id)(p_memo) )
 FC_REFLECT( graphene::chain::bid_collateral_operation, (fee)(bidder)(additional_collateral)(debt_covered)(extensions) )
 FC_REFLECT( graphene::chain::execute_bid_operation, (fee)(bidder)(debt)(collateral) )
-FC_REFLECT( graphene::chain::limit_order_accept_operation,(fee)(seller)(asset_id_to_sell)(asset_id_to_receive)(request_id)(user_id)(counterparty_id)(memo)(extensions))
-FC_REFLECT( graphene::chain::limit_order_accepted_operation,(fee)(order_id)(order_creator_account_id)(asset_id_to_sell)(asset_id_to_receive)(request_id)(user_id)(accepted_by_account_id)(accepted_memo))
+FC_REFLECT( graphene::chain::limit_order_accept_operation,(fee)(seller)(asset_id_to_sell)(asset_id_to_receive)(request_id)(user_id)(counterparty_id)(p_memo)(extensions))
+FC_REFLECT( graphene::chain::limit_order_accepted_operation,(fee)(order_id)(order_creator_account_id)(asset_id_to_sell)(asset_id_to_receive)(request_id)(user_id)(accepted_by_account_id)(p_accepted_memo))

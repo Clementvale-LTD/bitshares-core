@@ -285,8 +285,23 @@ struct operation_detail {
 struct offer_request_detail {
       uint64_t request_id;
       uint64_t user_id;
-      optional< string > counterparty_id;
+      string counterparty_id;
+      string memo;
+};
+
+class limit_order_objviewer : public graphene::chain::limit_order_object
+{
+   public:
+
+      limit_order_objviewer( const graphene::chain::limit_order_object& o, const detail::wallet_api_impl& wallet);
+
       optional< string > memo;
+      optional< string > memo_err;
+
+      optional< string > accepted_memo;
+      optional< string > accepted_memo_err;
+   private:
+      void decode_memo( const detail::wallet_api_impl& wallet, memo_data& encoded_memo, string& txt_memo, string& err_msg);
 };
 
 /**
@@ -383,8 +398,8 @@ class wallet_api
      vector<operation_detail>  get_relative_account_history(string name, uint32_t stop, int limit, uint32_t start)const;
 
       vector<bucket_object>             get_market_history(string symbol, string symbol2, uint32_t bucket, fc::time_point_sec start, fc::time_point_sec end)const;
-      vector<limit_order_object>        get_limit_orders(string a, string b, uint32_t limit)const;
-      vector<limit_order_object>        get_account_limit_orders(string aname, uint32_t limit)const;
+      vector<limit_order_objviewer>     get_limit_orders(string a, string b, uint32_t limit)const;
+      vector<limit_order_objviewer>     get_account_limit_orders(string aname, uint32_t limit)const;
       vector<call_order_object>         get_call_orders(string a, uint32_t limit)const;
       vector<force_settlement_object>   get_settle_orders(string a, uint32_t limit)const;
 
@@ -1699,6 +1714,11 @@ FC_REFLECT( graphene::wallet::operation_detail,
 FC_REFLECT( graphene::wallet::offer_request_detail, 
             (request_id)(user_id)(counterparty_id)(memo) )
 
+FC_REFLECT_DERIVED( graphene::wallet::limit_order_objviewer,
+                    (graphene::chain::limit_order_object),
+                    (memo)(memo_err)(accepted_memo)(accepted_memo_err)
+                  )
+            
 FC_API( graphene::wallet::wallet_api,
         (help)
         (gethelp)

@@ -100,7 +100,7 @@ object_id_type limit_order_create_evaluator::do_apply(const limit_order_create_o
        obj.request_id =  op.request_id;
        obj.user_id = op.user_id;
        obj.counterparty_id = op.counterparty_id;
-       obj.memo = op.memo;
+       obj.p_memo = op.p_memo;
 
        obj.deferred_fee = _deferred_fee;
    });
@@ -144,12 +144,12 @@ void_result limit_order_accept_evaluator::do_apply(const limit_order_accept_oper
         op_accepted.user_id = o.user_id;
 
         op_accepted.accepted_by_account_id = o.seller;
-        op_accepted.accepted_memo = o.memo;
+        op_accepted.p_accepted_memo = o.p_memo;
 
         d.push_applied_operation( op_accepted);
 
         d.modify( order, [&]( limit_order_object& b ) {
-                                b.accepted_memo = o.memo;
+                                b.p_accepted_memo = o.p_memo;
                               });
         break;
       }

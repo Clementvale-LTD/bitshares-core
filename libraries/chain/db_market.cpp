@@ -413,11 +413,11 @@ int database::match( const limit_order_object& usd, const OrderType& core, const
 
    usd_info.request_id = usd.request_id;
    usd_info.user_id = usd.user_id;
-   usd_info.memo = usd.memo;
+   usd_info.p_memo = usd.p_memo;
 
    core_info.request_id = core.request_id;
    core_info.user_id = core.user_id;
-   core_info.memo = core.memo;
+   core_info.p_memo = core.p_memo;
 
    int result = 0;
    result |= fill_order( usd, usd_pays, usd_receives, false, match_price, false, &core_info ); // although this function is a template,
@@ -547,8 +547,8 @@ bool database::fill_order( const limit_order_object& order, const asset& pays, c
                              b.umt_fee -= umt_fee;
                              b.deferred_fee = 0;
                              if( NULL != cparty_info){
-                               if( !b.accepted_memo.valid()){
-                                 b.accepted_memo = cparty_info->memo;
+                               if( !b.p_accepted_memo.valid()){
+                                 b.p_accepted_memo = cparty_info->p_memo;
                                }
                              }
                           });

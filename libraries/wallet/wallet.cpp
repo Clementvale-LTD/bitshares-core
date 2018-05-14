@@ -105,7 +105,7 @@ private:
    operation_result result;
 
    std::string fee(const asset& a) const;
-
+   std::string decode_memo( const memo_data& x_memo) const;
 public:
    operation_printer( ostream& out, const wallet_api_impl& wallet, const operation_result& r = operation_result() )
       : out(out),
@@ -123,6 +123,10 @@ public:
    std::string operator()(const account_create_operation& op)const;
    std::string operator()(const account_update_operation& op)const;
    std::string operator()(const asset_create_operation& op)const;
+   std::string operator()(const limit_order_create_operation& op) const;
+   std::string operator()(const fill_order_operation& op) const;
+   std::string operator()(const limit_order_accept_operation& op) const;
+   std::string operator()(const limit_order_accepted_operation& op) const;
 };
 
 template<class T>
@@ -2078,11 +2082,16 @@ public:
       if( offer_request.valid() ){
         op.request_id = offer_request->request_id;
         op.user_id = offer_request->user_id;
-        if( offer_request->counterparty_id.valid()){
-          account_object counterparty = get_account( *(offer_request->counterparty_id) );
-          op.counterparty_id = counterparty.get_id();
-        }
-        op.memo = offer_request->memo;
+
+        account_object counterparty = get_account( offer_request->counterparty_id );
+        op.counterparty_id = counterparty.get_id();
+
+        op.p_memo = memo_data();
+        op.p_memo->from = seller.options.memo_key;
+        op.p_memo->to = counterparty.options.memo_key;
+        op.p_memo->set_message(get_private_key(seller.options.memo_key),
+                                  counterparty.options.memo_key, offer_request->memo);
+        
       }
 
       signed_transaction tx;
@@ -2107,17 +2116,17 @@ public:
       op.asset_id_to_sell = get_asset(symbol_to_sell).get_id();
       op.asset_id_to_receive = get_asset(symbol_to_receive).get_id();
 
-      FC_ASSERT( offer_request.counterparty_id.valid(), "must specify counterparty_id" );
-      FC_ASSERT( offer_request.memo.valid(), "must specify memo" );
-
       {
         op.request_id = offer_request.request_id;
         op.user_id = offer_request.user_id;
-        if( offer_request.counterparty_id.valid()){
-          account_object counterparty = get_account( *(offer_request.counterparty_id) );
-          op.counterparty_id = counterparty.get_id();
-        }
-        op.memo = *(offer_request.memo);
+
+        account_object counterparty = get_account( offer_request.counterparty_id );
+        op.counterparty_id = counterparty.get_id();
+        
+        op.p_memo.from = seller.options.memo_key;
+        op.p_memo.to = counterparty.options.memo_key;
+        op.p_memo.set_message(get_private_key(seller.options.memo_key),
+                                  counterparty.options.memo_key, offer_request.memo);
       }
 
       signed_transaction tx;
@@ -2867,6 +2876,80 @@ string operation_printer::operator()(const transfer_operation& op) const
    return memo;
 }
 
+string operation_printer::decode_memo( const memo_data& x_memo) const
+{
+  std::string memo;
+  if( wallet.is_locked() )
+  {
+      out << " -- Unlock wallet to see memo.";
+  } else {
+      try {
+        FC_ASSERT(wallet._keys.count(x_memo.to) || wallet._keys.count(x_memo.from), "Memo is encrypted to a key ${to} or ${from} not in this wallet.", ("to", x_memo.to)("from",x_memo.from));
+        if( wallet._keys.count(x_memo.to) ) {
+            auto my_key = wif_to_key(wallet._keys.at(x_memo.to));
+            FC_ASSERT(my_key, "Unable to recover private key to decrypt memo. Wallet may be corrupted.");
+            memo = x_memo.get_message(*my_key, x_memo.from);
+        } else {
+            auto my_key = wif_to_key(wallet._keys.at(x_memo.from));
+            FC_ASSERT(my_key, "Unable to recover private key to decrypt memo. Wallet may be corrupted.");
+            memo = x_memo.get_message(*my_key, x_memo.to);
+        }
+      } catch (const fc::exception& e) {
+        out << " -- could not decrypt memo";
+        elog("Error when decrypting memo: ${e}", ("e", e.to_detail_string()));
+      }
+  }
+  return memo;
+}
+
+string operation_printer::operator()(const limit_order_create_operation& op) const
+{
+   out << fc::get_typename<limit_order_create_operation>::name();
+   
+   std::string memo;
+   if( op.p_memo ){
+     memo = decode_memo( *(op.p_memo) );
+   }
+   fee(op.fee);
+   return memo;
+}
+
+string operation_printer::operator()(const fill_order_operation& op) const
+{
+   out << fc::get_typename<fill_order_operation>::name();
+   
+   std::string memo;
+   if( op.p_memo ){
+     memo = decode_memo( *(op.p_memo) );
+   }
+   fee(op.fee);
+   return memo;
+}
+
+string operation_printer::operator()(const limit_order_accept_operation& op) const
+{
+   out << fc::get_typename<limit_order_create_operation>::name();
+   
+   std::string memo;
+
+   memo = decode_memo( op.p_memo );
+
+   fee(op.fee);
+   return memo;
+}
+
+string operation_printer::operator()(const limit_order_accepted_operation& op) const
+{
+   out << fc::get_typename<limit_order_accepted_operation>::name();
+   
+   std::string memo;
+
+   memo = decode_memo( op.p_accepted_memo );
+
+   fee(op.fee);
+   return memo;
+}
+
 std::string operation_printer::operator()(const account_create_operation& op) const
 {
    out << "Create Account '" << op.name << "'";
@@ -3071,14 +3154,34 @@ vector<bucket_object> wallet_api::get_market_history( string symbol1, string sym
    return my->_remote_hist->get_market_history( get_asset_id(symbol1), get_asset_id(symbol2), bucket, start, end );
 }
 
-vector<limit_order_object> wallet_api::get_limit_orders(string a, string b, uint32_t limit)const
+vector<limit_order_objviewer> wallet_api::get_limit_orders(string a, string b, uint32_t limit)const
 {
-   return my->_remote_db->get_limit_orders(get_asset(a).id, get_asset(b).id, limit);
+  vector<limit_order_object>  raw_limit_orders = 
+    my->_remote_db->get_limit_orders(get_asset(a).id, get_asset(b).id, limit);
+
+  vector<limit_order_objviewer>  view_limit_orders;
+  view_limit_orders.reserve( raw_limit_orders.size() );
+  
+  for( const limit_order_object& o : raw_limit_orders ){
+    view_limit_orders.push_back( limit_order_objviewer( o, *my) );
+  }
+  
+  return view_limit_orders;
 }
 
-vector<limit_order_object> wallet_api::get_account_limit_orders(string aname, uint32_t limit)const
+vector<limit_order_objviewer> wallet_api::get_account_limit_orders(string aname, uint32_t limit)const
 {
-   return my->_remote_db->get_account_limit_orders( get_account(aname).get_id(), limit);
+  vector<limit_order_object>  raw_limit_orders = 
+    my->_remote_db->get_account_limit_orders( get_account(aname).get_id(), limit);
+      
+  vector<limit_order_objviewer>  view_limit_orders;
+  view_limit_orders.reserve( raw_limit_orders.size() );
+  
+  for( const limit_order_object& o : raw_limit_orders ){
+    view_limit_orders.push_back( limit_order_objviewer( o, *my) );
+}
+
+  return view_limit_orders;
 }
 
 vector<call_order_object> wallet_api::get_call_orders(string a, uint32_t limit)const
@@ -4632,6 +4735,71 @@ vesting_balance_object_with_info::vesting_balance_object_with_info( const vestin
 {
    allowed_withdraw = get_allowed_withdraw( now );
    allowed_withdraw_time = now;
+}
+
+limit_order_objviewer::limit_order_objviewer( const graphene::chain::limit_order_object& o, const detail::wallet_api_impl& wallet)
+{
+  id = o.id;
+
+  expiration = o.expiration;
+  seller = o.seller;
+  for_sale = o.for_sale;
+  sell_price = o.sell_price;
+  deferred_fee = o.deferred_fee;
+
+  umt_fee = o.umt_fee;
+
+  request_id = o.request_id;
+  user_id = o.user_id;
+  counterparty_id = o.counterparty_id;
+  p_memo = o.p_memo;
+  p_accepted_memo = o.p_accepted_memo;
+
+  if( p_memo.valid() ){
+    string txt, err;
+    decode_memo( wallet, *p_memo, txt, err);
+    if( !txt.empty() ){
+      memo = txt;
+    }
+    if( !err.empty()){
+      memo_err = err;
+    }
+  }
+
+  if( p_accepted_memo.valid() ){
+    string txt, err;
+    decode_memo( wallet, *p_accepted_memo, txt, err);
+    if( !txt.empty() ){
+      accepted_memo = txt;
+    }
+    if( !err.empty()){
+      accepted_memo_err = err;
+    }
+  }
+}
+
+void limit_order_objviewer::decode_memo( const detail::wallet_api_impl& wallet, memo_data& encoded_memo, string& txt_memo, string& err_msg)
+{
+    if( wallet.is_locked() )
+    {
+        err_msg = " -- Unlock wallet to see memo.";
+    } else {
+        try {
+          FC_ASSERT(wallet._keys.count(encoded_memo.to) || wallet._keys.count(encoded_memo.from), "Memo is encrypted to a key ${to} or ${from} not in this wallet.", ("to", encoded_memo.to)("from",encoded_memo.from));
+          if( wallet._keys.count(encoded_memo.to) ) {
+              auto my_key = wif_to_key(wallet._keys.at(encoded_memo.to));
+              FC_ASSERT(my_key, "Unable to recover private key to decrypt memo. Wallet may be corrupted.");
+              txt_memo = encoded_memo.get_message(*my_key, encoded_memo.from);
+          } else {
+              auto my_key = wif_to_key(wallet._keys.at(encoded_memo.from));
+              FC_ASSERT(my_key, "Unable to recover private key to decrypt memo. Wallet may be corrupted.");
+              txt_memo = encoded_memo.get_message(*my_key, encoded_memo.to);
+          }
+        } catch (const fc::exception& e) {
+          err_msg = string( " -- Could not decrypt memo: ") + e.what();
+          elog("Error when decrypting memo: ${e}", ("e", e.to_detail_string()));
+        }
+    }
 }
 
 } } // graphene::wallet

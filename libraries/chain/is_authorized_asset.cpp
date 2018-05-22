@@ -44,6 +44,12 @@ bool _is_authorized_asset(
       // must still pass other checks even if it is in allowed_assets
    }
 
+   // check account itself
+   {
+      if( asset_obj.options.blacklist_authorities.find( acct.get_id() ) != asset_obj.options.blacklist_authorities.end() )
+            return false;
+   }
+
    for( const auto id : acct.blacklisting_accounts )
    {
       if( asset_obj.options.blacklist_authorities.find(id) != asset_obj.options.blacklist_authorities.end() )
@@ -53,6 +59,12 @@ bool _is_authorized_asset(
    {
       if( asset_obj.options.whitelist_authorities.size() == 0 )
          return true;
+   }
+
+   // check account itself too
+   {
+      if( asset_obj.options.whitelist_authorities.find( acct.get_id()) != asset_obj.options.whitelist_authorities.end() )
+            return true;
    }
 
    for( const auto id : acct.whitelisting_accounts )

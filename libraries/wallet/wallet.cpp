@@ -1259,18 +1259,58 @@ public:
    signed_transaction create_asset(string issuer,
                                    string symbol,
                                    uint8_t precision,
-                                   asset_options common,
+                                   asset_details common,
                                    fc::optional<bitasset_options> bitasset_opts,
                                    bool broadcast = false)
    { try {
       account_object issuer_account = get_account( issuer );
       FC_ASSERT(!find_asset(symbol).valid(), "Asset with that symbol already exists!");
 
+      asset_options aopt;
+      aopt.max_supply = common.max_supply;
+
+      aopt.issuer_permissions = white_list;
+      aopt.flags = disable_confidential; 
+
+      if( !common.whitelist_authorities.empty() ){
+        aopt.flags |= white_list;
+        std::vector<fc::ecc::public_key> whitelist_memokeys;
+        for( const string& racc: common.whitelist_authorities){
+          account_object robj = get_account( racc);
+          aopt.whitelist_authorities.insert( robj.get_id());
+          if( issuer_account.get_id() != robj.get_id() ){ //don't add issuer key, it is already 'from' key
+            whitelist_memokeys.push_back( robj.options.memo_key);
+          }
+        }
+        aopt.p_memo.set_message( get_private_key( issuer_account.options.memo_key),
+                                 whitelist_memokeys, common.memo);
+      }else{ 
+        aopt.p_memo.set_message( fc::ecc::private_key(), 
+                                 std::vector<fc::ecc::public_key>(), common.memo );
+      }
+
+      if( !common.blacklist_authorities.empty() ){
+        FC_ASSERT( common.blacklist_authorities.find( issuer) == common.blacklist_authorities.end() );  
+        aopt.flags |= white_list;
+        
+        std::vector<fc::ecc::public_key> whitelist_memkeys;
+        for( const string& lacc: common.blacklist_authorities){
+          account_object lobj = get_account( lacc);
+          FC_ASSERT( issuer_account.get_id() != lobj.get_id() );
+          aopt.blacklist_authorities.insert( lobj.get_id());
+        }
+      }
+      
+      aopt.core_exchange_rate.base.amount = 1;
+      aopt.core_exchange_rate.base.asset_id = asset_id_type(0);
+      aopt.core_exchange_rate.quote.amount = 1;
+      aopt.core_exchange_rate.quote.asset_id = asset_id_type(1);
+        
       asset_create_operation create_op;
       create_op.issuer = issuer_account.id;
       create_op.symbol = symbol;
       create_op.precision = precision;
-      create_op.common_options = common;
+      create_op.common_options = aopt;
       create_op.bitasset_opts = bitasset_opts;
 
       signed_transaction tx;
@@ -1283,24 +1323,69 @@ public:
 
    signed_transaction update_asset(string symbol,
                                    optional<string> new_issuer,
-                                   asset_options new_options,
+                                   asset_details new_options,
                                    bool broadcast /* = false */)
    { try {
       optional<asset_object> asset_to_update = find_asset(symbol);
       if (!asset_to_update)
         FC_THROW("No asset with that symbol exists!");
       optional<account_id_type> new_issuer_account_id;
+      account_id_type issuer;
       if (new_issuer)
       {
         account_object new_issuer_account = get_account(*new_issuer);
         new_issuer_account_id = new_issuer_account.id;
+        issuer = new_issuer_account.id;
+      } else {
+        issuer = asset_to_update->issuer;
+      }
+      account_object issuer_account = get_account( issuer );
+
+      asset_options aopt;
+      aopt.max_supply = new_options.max_supply;
+      
+      aopt.market_fee_percent = asset_to_update->options.market_fee_percent;
+      aopt.max_market_fee = asset_to_update->options.max_market_fee;
+      aopt.issuer_permissions = asset_to_update->options.issuer_permissions;
+      aopt.flags = asset_to_update->options.flags;
+      aopt.core_exchange_rate = asset_to_update->options.core_exchange_rate;
+      aopt.whitelist_markets = asset_to_update->options.whitelist_markets;
+      aopt.blacklist_markets = asset_to_update->options.blacklist_markets;
+
+      aopt.flags &= ~white_list;
+
+      if( !new_options.whitelist_authorities.empty() ){
+        aopt.flags |= white_list;
+        std::vector<fc::ecc::public_key> whitelist_memokeys;
+        for( const string& racc: new_options.whitelist_authorities){
+          account_object robj = get_account( racc);
+          aopt.whitelist_authorities.insert( robj.get_id());
+          if( issuer_account.get_id() != robj.get_id() ){ //don't add issuer key, it is already 'from' key
+            whitelist_memokeys.push_back( robj.options.memo_key);
+          }
+        }
+        aopt.p_memo.set_message( get_private_key( issuer_account.options.memo_key),
+                                 whitelist_memokeys, new_options.memo);
+      }else{ 
+        aopt.p_memo.set_message( fc::ecc::private_key(), 
+                                 std::vector<fc::ecc::public_key>(), new_options.memo );
+      }
+
+      if( !new_options.blacklist_authorities.empty() ){
+        aopt.flags |= white_list;
+        std::vector<fc::ecc::public_key> whitelist_memkeys;
+        for( const string& lacc: new_options.blacklist_authorities){
+          account_object lobj = get_account( lacc);
+          FC_ASSERT( issuer_account.get_id() != lobj.get_id() );
+          aopt.blacklist_authorities.insert( lobj.get_id());
+      }
       }
 
       asset_update_operation update_op;
       update_op.issuer = asset_to_update->issuer;
       update_op.asset_to_update = asset_to_update->id;
       update_op.new_issuer = new_issuer_account_id;
-      update_op.new_options = new_options;
+      update_op.new_options = aopt;
 
       signed_transaction tx;
       tx.operations.push_back( update_op );
@@ -2603,25 +2688,6 @@ public:
       return sign_transaction(tx, broadcast);
    }
 
-   void dbg_make_uia(string creator, string symbol)
-   {
-      asset_options opts;
-      opts.flags &= ~(white_list | disable_force_settle | global_settle);
-      opts.issuer_permissions = opts.flags;
-      opts.core_exchange_rate = price(asset(1), asset(1,asset_id_type(1)));
-      create_asset(get_account(creator).name, symbol, 2, opts, {}, true);
-   }
-
-   void dbg_make_mia(string creator, string symbol)
-   {
-      asset_options opts;
-      opts.flags &= ~white_list;
-      opts.issuer_permissions = opts.flags;
-      opts.core_exchange_rate = price(asset(1), asset(1,asset_id_type(1)));
-      bitasset_options bopts;
-      create_asset(get_account(creator).name, symbol, 2, opts, bopts, true);
-   }
-
    void dbg_push_blocks( const std::string& src_filename, uint32_t count )
    {
       use_debug_api();
@@ -2710,55 +2776,6 @@ public:
          result.push_back( v );
       }
       return result;
-   }
-
-   void flood_network(string prefix, uint32_t number_of_transactions)
-   {
-      try
-      {
-         const account_object& master = *_wallet.my_accounts.get<by_name>().lower_bound("import");
-         int number_of_accounts = number_of_transactions / 3;
-         number_of_transactions -= number_of_accounts;
-         //auto key = derive_private_key("floodshill", 0);
-         try {
-            dbg_make_uia(master.name, "SHILL");
-         } catch(...) {/* Ignore; the asset probably already exists.*/}
-
-         fc::time_point start = fc::time_point::now();
-         for( int i = 0; i < number_of_accounts; ++i )
-         {
-            std::ostringstream brain_key;
-            brain_key << "brain key for account " << prefix << i;
-            signed_transaction trx = create_account_with_brain_key(brain_key.str(), prefix + fc::to_string(i), master.name, master.name, /* broadcast = */ true, /* save wallet = */ false);
-         }
-         fc::time_point end = fc::time_point::now();
-         ilog("Created ${n} accounts in ${time} milliseconds",
-              ("n", number_of_accounts)("time", (end - start).count() / 1000));
-
-         start = fc::time_point::now();
-         for( int i = 0; i < number_of_accounts; ++i )
-         {
-            signed_transaction trx = transfer(master.name, prefix + fc::to_string(i), "10", "CORE", "", true);
-            trx = transfer(master.name, prefix + fc::to_string(i), "1", "CORE", "", true);
-         }
-         end = fc::time_point::now();
-         ilog("Transferred to ${n} accounts in ${time} milliseconds",
-              ("n", number_of_accounts*2)("time", (end - start).count() / 1000));
-
-         start = fc::time_point::now();
-         for( int i = 0; i < number_of_accounts; ++i )
-         {
-            signed_transaction trx = issue_asset(prefix + fc::to_string(i), "1000", "SHILL", "", true);
-         }
-         end = fc::time_point::now();
-         ilog("Issued to ${n} accounts in ${time} milliseconds",
-              ("n", number_of_accounts)("time", (end - start).count() / 1000));
-      }
-      catch (...)
-      {
-         throw;
-      }
-
    }
 
    operation get_prototype_operation( string operation_name )
@@ -3057,9 +3074,20 @@ vector<asset> wallet_api::list_account_balances(const string& id)
    return my->_remote_db->get_account_balances(get_account(id).id, flat_set<asset_id_type>());
 }
 
-vector<asset_object> wallet_api::list_assets(const string& lowerbound, uint32_t last_seconds, uint32_t limit)const
+vector<asset_objviewer> wallet_api::list_assets(const string& lowerbound, uint32_t last_seconds, uint32_t limit)const
 {
-   return my->_remote_db->list_assets( lowerbound, last_seconds, limit);
+
+  vector<asset_object>  raw_asset_objects = 
+    my->_remote_db->list_assets( lowerbound, last_seconds, limit);
+
+  vector<asset_objviewer>  view_assets;
+  view_assets.reserve( raw_asset_objects.size() );
+  
+  for( const asset_object& o : raw_asset_objects ){
+    view_assets.push_back( asset_objviewer( o, *my) );
+  }
+  
+  return view_assets;
 }
 
 vector<operation_detail> wallet_api::get_account_history(string name, int limit)const
@@ -3315,11 +3343,11 @@ account_object wallet_api::get_account(string account_name_or_id) const
    return my->get_account(account_name_or_id);
 }
 
-asset_object wallet_api::get_asset(string asset_name_or_id) const
+asset_objviewer wallet_api::get_asset(string asset_name_or_id) const
 {
    auto a = my->find_asset(asset_name_or_id);
    FC_ASSERT(a);
-   return *a;
+   return asset_objviewer( *a, *my);
 }
 
 asset_bitasset_data_object wallet_api::get_bitasset_data(string asset_name_or_id) const
@@ -3545,7 +3573,7 @@ signed_transaction wallet_api::transfer(string from, string to, string amount,
 signed_transaction wallet_api::create_asset(string issuer,
                                             string symbol,
                                             uint8_t precision,
-                                            asset_options common,
+                                            asset_details common,
                                             fc::optional<bitasset_options> bitasset_opts,
                                             bool broadcast)
 
@@ -3555,7 +3583,7 @@ signed_transaction wallet_api::create_asset(string issuer,
 
 signed_transaction wallet_api::update_asset(string symbol,
                                             optional<string> new_issuer,
-                                            asset_options new_options,
+                                            asset_details new_options,
                                             bool broadcast /* = false */)
 {
    return my->update_asset(symbol, new_issuer, new_options, broadcast);
@@ -3755,18 +3783,6 @@ operation wallet_api::get_prototype_operation(string operation_name)
    return my->get_prototype_operation( operation_name );
 }
 
-void wallet_api::dbg_make_uia(string creator, string symbol)
-{
-   FC_ASSERT(!is_locked());
-   my->dbg_make_uia(creator, symbol);
-}
-
-void wallet_api::dbg_make_mia(string creator, string symbol)
-{
-   FC_ASSERT(!is_locked());
-   my->dbg_make_mia(creator, symbol);
-}
-
 void wallet_api::dbg_push_blocks( std::string src_filename, uint32_t count )
 {
    my->dbg_push_blocks( src_filename, count );
@@ -3795,12 +3811,6 @@ void wallet_api::network_add_nodes( const vector<string>& nodes )
 vector< variant > wallet_api::network_get_connected_peers()
 {
    return my->network_get_connected_peers();
-}
-
-void wallet_api::flood_network(string prefix, uint32_t number_of_transactions)
-{
-   FC_ASSERT(!is_locked());
-   my->flood_network(prefix, number_of_transactions);
 }
 
 signed_transaction wallet_api::propose_parameter_change(
@@ -4739,21 +4749,8 @@ vesting_balance_object_with_info::vesting_balance_object_with_info( const vestin
 
 limit_order_objviewer::limit_order_objviewer( const graphene::chain::limit_order_object& o, const detail::wallet_api_impl& wallet)
 {
-  id = o.id;
-
-  expiration = o.expiration;
-  seller = o.seller;
-  for_sale = o.for_sale;
-  sell_price = o.sell_price;
-  deferred_fee = o.deferred_fee;
-
-  umt_fee = o.umt_fee;
-
-  request_id = o.request_id;
-  user_id = o.user_id;
-  counterparty_id = o.counterparty_id;
-  p_memo = o.p_memo;
-  p_accepted_memo = o.p_accepted_memo;
+  graphene::chain::limit_order_object &me = *this;
+  me = o;
 
   if( p_memo.valid() ){
     string txt, err;
@@ -4800,6 +4797,32 @@ void limit_order_objviewer::decode_memo( const detail::wallet_api_impl& wallet, 
           elog("Error when decrypting memo: ${e}", ("e", e.to_detail_string()));
         }
     }
+}
+
+asset_objviewer::asset_objviewer( const graphene::chain::asset_object& o, const detail::wallet_api_impl& wallet)
+{
+  graphene::chain::asset_object& me = *this;
+  me = o;
+  string asset_memo;
+
+  if( options.p_memo.try_get_message( fc::ecc::private_key(), asset_memo)){
+    memo = asset_memo;
+  } else {
+    if( wallet.is_locked() ){
+        memo_err = " -- Unlock wallet to see memo.";
+    } else {
+        for( auto& k : wallet._keys){
+          auto pk = wif_to_key( k.second);
+          if( pk.valid() ){
+            if( options.p_memo.try_get_message( *pk, asset_memo)){
+              memo = asset_memo;
+              return;
+            }
+          }
+        }
+        memo_err = string( " -- Could not decrypt memo. No decryption key.");
+    }
+  }
 }
 
 } } // graphene::wallet

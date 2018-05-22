@@ -304,6 +304,40 @@ class limit_order_objviewer : public graphene::chain::limit_order_object
       void decode_memo( const detail::wallet_api_impl& wallet, memo_data& encoded_memo, string& txt_memo, string& err_msg);
 };
 
+class asset_objviewer : public graphene::chain::asset_object
+{
+   public:
+
+      asset_objviewer( const graphene::chain::asset_object& o, const detail::wallet_api_impl& wallet);
+
+      optional< string > memo;
+      optional< string > memo_err;
+   private:
+      void decode_memo( const detail::wallet_api_impl& wallet, memo_group& encoded_memo, string& txt_memo, string& err_msg);
+};
+
+struct asset_details {
+  /// The maximum supply of this asset which may exist at any given time. This can be as large as
+  /// GRAPHENE_MAX_SHARE_SUPPLY
+  share_type max_supply = GRAPHENE_MAX_SHARE_SUPPLY;
+
+  /// A set of accounts which maintain whitelists to consult for this asset. If whitelist_authorities
+  /// is non-empty, then only accounts in whitelist_authorities are allowed to hold, use, or transfer the asset.
+  flat_set<string> whitelist_authorities;
+  /// A set of accounts which maintain blacklists to consult for this asset. If flags & white_list is set,
+  /// an account may only send, receive, trade, etc. in this asset if none of these accounts appears in
+  /// its account_object::blacklisting_accounts field. If the account is blacklisted, it may not transact in
+  /// this asset even if it is also whitelisted.
+  flat_set<string> blacklist_authorities;
+
+
+  /**
+   * data that describes the meaning/purpose of this asset, fee will be charged proportional to
+   * size of description.
+   */
+  string memo;
+};
+
 /**
  * This wallet assumes it is connected to the database server with a high-bandwidth, low-latency connection and
  * performs minimal caching. This API could be provided locally to be used by a web interface.
@@ -364,7 +398,7 @@ class wallet_api
        * @param limit the maximum number of assets to return (max: 100)
        * @returns the list of asset objects, ordered by symbol
        */
-      vector<asset_object>              list_assets(const string& lowerbound, uint32_t last_seconds, uint32_t limit)const;
+      vector<asset_objviewer>              list_assets(const string& lowerbound, uint32_t last_seconds, uint32_t limit)const;
       
       /** Returns the most recent operations on the named account.
        *
@@ -440,7 +474,7 @@ class wallet_api
        * @param asset_name_or_id the symbol or id of the asset in question
        * @returns the information about the asset stored in the block chain
        */
-      asset_object                      get_asset(string asset_name_or_id) const;
+      asset_objviewer                      get_asset(string asset_name_or_id) const;
 
       /** Returns the BitAsset-specific data for a given asset.
        * Market-issued assets's behavior are determined both by their "BitAsset Data" and
@@ -1099,7 +1133,7 @@ class wallet_api
       signed_transaction create_asset(string issuer,
                                       string symbol,
                                       uint8_t precision,
-                                      asset_options common,
+                                      asset_details common,
                                       fc::optional<bitasset_options> bitasset_opts,
                                       bool broadcast = false);
 
@@ -1135,7 +1169,7 @@ class wallet_api
        */
       signed_transaction update_asset(string symbol,
                                       optional<string> new_issuer,
-                                      asset_options new_options,
+                                      asset_details new_options,
                                       bool broadcast = false);
 
       /** Update the options specific to a BitAsset.
@@ -1622,14 +1656,10 @@ class wallet_api
          
       order_book get_order_book( const string& base, const string& quote, unsigned limit = 50);
 
-      void dbg_make_uia(string creator, string symbol);
-      void dbg_make_mia(string creator, string symbol);
       void dbg_push_blocks( std::string src_filename, uint32_t count );
       void dbg_generate_blocks( std::string debug_wif_key, uint32_t count );
       void dbg_stream_json_objects( const std::string& filename );
       void dbg_update_object( fc::variant_object update );
-
-      void flood_network(string prefix, uint32_t number_of_transactions);
 
       void network_add_nodes( const vector<string>& nodes );
       vector< variant > network_get_connected_peers();
@@ -1719,6 +1749,14 @@ FC_REFLECT_DERIVED( graphene::wallet::limit_order_objviewer,
                     (memo)(memo_err)(accepted_memo)(accepted_memo_err)
                   )
             
+FC_REFLECT_DERIVED( graphene::wallet::asset_objviewer,
+                    (graphene::chain::asset_object),
+                    (memo)(memo_err)
+                  )
+
+FC_REFLECT( graphene::wallet::asset_details, 
+            (max_supply)(whitelist_authorities)(blacklist_authorities)(memo) )
+
 FC_API( graphene::wallet::wallet_api,
         (help)
         (gethelp)
@@ -1817,13 +1855,10 @@ FC_API( graphene::wallet::wallet_api,
         (propose_parameter_change)
         (propose_fee_change)
         (approve_proposal)
-        (dbg_make_uia)
-        (dbg_make_mia)
         (dbg_push_blocks)
         (dbg_generate_blocks)
         (dbg_stream_json_objects)
         (dbg_update_object)
-        (flood_network)
         (network_add_nodes)
         (network_get_connected_peers)
         (sign_memo)

@@ -62,7 +62,7 @@ struct genesis_state_type {
       string symbol;
       string issuer_name;
 
-      string description;
+      string memo;
       uint8_t precision = GRAPHENE_BLOCKCHAIN_PRECISION_DIGITS;
       uint16_t issuer_permissions;
       uint16_t flags;
@@ -132,7 +132,7 @@ struct genesis_state_type {
 FC_REFLECT(graphene::chain::genesis_state_type::initial_account_type, (name)(owner_key)(active_key)(is_lifetime_member))
 
 FC_REFLECT(graphene::chain::genesis_state_type::initial_asset_type,
-           (symbol)(issuer_name)(description)(precision)(issuer_permissions)(flags)(max_supply)(accumulated_fees)(is_bitasset)(collateral_records))
+           (symbol)(issuer_name)(memo)(precision)(issuer_permissions)(flags)(max_supply)(accumulated_fees)(is_bitasset)(collateral_records))
 
 FC_REFLECT(graphene::chain::genesis_state_type::initial_asset_type::initial_collateral_position,
            (owner)(collateral)(debt))

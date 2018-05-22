@@ -74,7 +74,8 @@ namespace graphene { namespace chain {
        * data that describes the meaning/purpose of this asset, fee will be charged proportional to
        * size of description.
        */
-      string description;
+      memo_group p_memo;
+
       extensions_type extensions;
 
       /// Perform internal consistency checks.
@@ -459,7 +460,7 @@ FC_REFLECT( graphene::chain::asset_options,
             (blacklist_authorities)
             (whitelist_markets)
             (blacklist_markets)
-            (description)
+            (p_memo)
             (extensions)
           )
 FC_REFLECT( graphene::chain::bitasset_options,

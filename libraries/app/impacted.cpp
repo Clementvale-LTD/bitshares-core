@@ -84,11 +84,6 @@ struct get_impacted_account_visitor
          add_authority_accounts( _impacted, *(op.active) );
    }
 
-   void operator()( const account_whitelist_operation& op )
-   {
-      _impacted.insert( op.account_to_list );
-   }
-
    void operator()( const account_upgrade_operation& op ) {}
    void operator()( const account_transfer_operation& op )
    {

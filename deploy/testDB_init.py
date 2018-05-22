@@ -20,10 +20,25 @@ jsonrpc_call["method"] = "info"
 jsonrpc_call["params"] = []
 call_cli_wallet( jsonrpc_call )
 
-jsonrpc_call["method"] = "unlock"
-###[node_json["wallet_password"]]
-jsonrpc_call["params"] = [cli_password]
-call_cli_wallet( jsonrpc_call )
+jsonrpc_call["method"] = "is_new"
+jsonrpc_call["params"] = []
+cli_response = call_cli_wallet( jsonrpc_call )
+cli_IsPasswordNew = cli_response["result"]
+
+if cli_IsPasswordNew:
+  jsonrpc_call["method"] = "set_password"
+  jsonrpc_call["params"] = [cli_password]
+  if is_cli_wallet_succeeded(jsonrpc_call):
+    jsonrpc_call["method"] = "unlock"
+    jsonrpc_call["params"] = [cli_password]
+    if is_cli_wallet_succeeded(jsonrpc_call):
+      print( "Your wallet was successfully initialized")
+else:
+    jsonrpc_call["method"] = "unlock"
+    jsonrpc_call["params"] = [cli_password]
+    if not is_cli_wallet_succeeded(jsonrpc_call):
+      print( "Password is incorrect")
+      exit(-1)
   
 jsonrpc_call["method"] = "import_key"
 jsonrpc_call["params"] = ["ptolemy", "5JcA4UqWn8s3ktBaXxeLNcD8CgmWdHHvd9CRkDWtopcCPQVwG8f"]
@@ -36,9 +51,16 @@ jsonrpc_call["method"] = "import_balance"
 jsonrpc_call["params"] = ["ptolemy", ["5JcA4UqWn8s3ktBaXxeLNcD8CgmWdHHvd9CRkDWtopcCPQVwG8f"], True]
 cli_response = call_cli_wallet( jsonrpc_call )
 
-
 jsonrpc_call["method"] = "upgrade_account"
 jsonrpc_call["params"] = ["ptolemy", True]
+cli_response = call_cli_wallet( jsonrpc_call )
+ 
+jsonrpc_call["method"] = "import_key"
+jsonrpc_call["params"] = ["bank", "5KA96LxtCRmkcNwvWrB4QohaXKL3ysEUsddsEsVt5WEapn5Ckf5"]
+cli_response = call_cli_wallet( jsonrpc_call )
+ 
+jsonrpc_call["method"] = "import_balance"
+jsonrpc_call["params"] = ["bank", ["5KA96LxtCRmkcNwvWrB4QohaXKL3ysEUsddsEsVt5WEapn5Ckf5"], True]
 cli_response = call_cli_wallet( jsonrpc_call )
 
 jsonrpc_call["method"] = "register_account"
@@ -49,14 +71,13 @@ jsonrpc_call["method"] = "import_key"
 jsonrpc_call["params"] = ["bubbletone", "5KG2Uao68bRN8QmPaei1bYRdNc9r8wQP1TR3xfx2Y1hiE38ukxV"]
 cli_response = call_cli_wallet( jsonrpc_call )
 
+jsonrpc_call["method"] = "transfer"
+jsonrpc_call["params"] = ["ptolemy", "bubbletone", 1000000000, "BTE", "here is some umt", "true"]
+cli_response = call_cli_wallet( jsonrpc_call )
+
 jsonrpc_call["method"] = "upgrade_account"
 jsonrpc_call["params"] = ["bubbletone", True]
 cli_response = call_cli_wallet( jsonrpc_call )
-
-jsonrpc_call["method"] = "register_account"
-jsonrpc_call["params"] = ["bank", "BTE73hk1bKb4JaNPmBqMWKHWMxF1FiBdq3DyeNpH4gaM1mxY13Lez", "BTE73hk1bKb4JaNPmBqMWKHWMxF1FiBdq3DyeNpH4gaM1mxY13Lez", "bubbletone", "bubbletone", 0, True]
-cli_response = call_cli_wallet( jsonrpc_call )
-
 
 jsonrpc_call["method"] = "register_account"
 jsonrpc_call["params"] = ["t1node", "BTE6jdewg5KQ24T8tBCRnCtgbapEkJ2hBwXE1nXQR23VxLYbMo2cL", "BTE6jdewg5KQ24T8tBCRnCtgbapEkJ2hBwXE1nXQR23VxLYbMo2cL", "bubbletone", "bubbletone", 0, True]
@@ -71,10 +92,6 @@ jsonrpc_call["params"] = ["t3node", "BTE7EJpNzzCJts1EJWfrzkzrWwB65TL7WA51BirngPi
 cli_response = call_cli_wallet( jsonrpc_call )
 
 jsonrpc_call["method"] = "import_key"
-jsonrpc_call["params"] = ["bank", "5KA96LxtCRmkcNwvWrB4QohaXKL3ysEUsddsEsVt5WEapn5Ckf5"]
-cli_response = call_cli_wallet( jsonrpc_call )
-
-jsonrpc_call["method"] = "import_key"
 jsonrpc_call["params"] = ["t1node", "5Jd6bPHZsxZvGcSCxG5AKk8ehb2F8FDPMqGccy2xji7XUcxMba4"]
 cli_response = call_cli_wallet( jsonrpc_call )
 
@@ -86,26 +103,24 @@ jsonrpc_call["method"] = "import_key"
 jsonrpc_call["params"] = ["t3node", "5J2rJgVbj4VTjo4UAnpshDGYiSGxgMhdVFG32BiZ8snuSf6u6X8"]
 cli_response = call_cli_wallet( jsonrpc_call )
 
+# jsonrpc_call["method"] = "create_asset"
+# jsonrpc_call["params"] = ["bank", "SDR", 4, { "max_supply": "1000000000000000", "market_fee_percent": 0, "max_market_fee": "1000000000000000", "issuer_permissions": 64, "flags": 0, "core_exchange_rate": {"base": {"amount": 1, "asset_id": "1.3.0"}, "quote": {"amount": 1,"asset_id": "1.3.1"} }, "whitelist_authorities": [], "blacklist_authorities": [], "whitelist_markets": [], "blacklist_markets": [], "description": "", "extensions": [] }, None, True]
+# cli_response = call_cli_wallet( jsonrpc_call )
 
-jsonrpc_call["method"] = "create_asset"
-jsonrpc_call["params"] = ["bank", "SDR", 4, { "max_supply": "1000000000000000", "market_fee_percent": 0, "max_market_fee": "1000000000000000", "issuer_permissions": 64, "flags": 0, "core_exchange_rate": {"base": {"amount": 1, "asset_id": "1.3.0"}, "quote": {"amount": 1,"asset_id": "1.3.1"} }, "whitelist_authorities": [], "blacklist_authorities": [], "whitelist_markets": [], "blacklist_markets": [], "description": "", "extensions": [] }, None, True]
-cli_response = call_cli_wallet( jsonrpc_call )
+# jsonrpc_call["method"] = "issue_asset"
+# jsonrpc_call["params"] = ["bank", "1000000000", "SDR", "first issue", True]
+# cli_response = call_cli_wallet( jsonrpc_call )
 
-
-jsonrpc_call["method"] = "issue_asset"
-jsonrpc_call["params"] = ["bank", "1000000000", "SDR", "first issue", True]
+jsonrpc_call["method"] = "transfer"
+jsonrpc_call["params"] = ["bank", "t1node", 10000, "SDRT", "here is some umt", "true"]
 cli_response = call_cli_wallet( jsonrpc_call )
 
 jsonrpc_call["method"] = "transfer"
-jsonrpc_call["params"] = ["bank", "t1node", 10000, "SDR", "here is some umt", "true"]
+jsonrpc_call["params"] = ["bank", "t2node", 15000, "SDRT", "here is some umt", "true"]
 cli_response = call_cli_wallet( jsonrpc_call )
 
 jsonrpc_call["method"] = "transfer"
-jsonrpc_call["params"] = ["bank", "t2node", 15000, "SDR", "here is some umt", "true"]
-cli_response = call_cli_wallet( jsonrpc_call )
-
-jsonrpc_call["method"] = "transfer"
-jsonrpc_call["params"] = ["bank", "t3node", 50000, "SDR", "here is some umt", "true"]
+jsonrpc_call["params"] = ["bank", "t3node", 50000, "SDRT", "here is some umt", "true"]
 cli_response = call_cli_wallet( jsonrpc_call )
 
 # jsonrpc_call["method"] = "transfer"

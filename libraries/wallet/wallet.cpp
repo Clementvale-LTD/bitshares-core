@@ -1378,9 +1378,9 @@ public:
           account_object lobj = get_account( lacc);
           FC_ASSERT( issuer_account.get_id() != lobj.get_id() );
           aopt.blacklist_authorities.insert( lobj.get_id());
+        }
       }
-      }
-
+      
       asset_update_operation update_op;
       update_op.issuer = asset_to_update->issuer;
       update_op.asset_to_update = asset_to_update->id;
@@ -1572,24 +1572,6 @@ public:
 
       return sign_transaction( tx, broadcast );
    } FC_CAPTURE_AND_RETHROW( (bidder_name)(debt_amount)(debt_symbol)(additional_collateral)(broadcast) ) }
-
-   signed_transaction whitelist_account(string authorizing_account,
-                                        string account_to_list,
-                                        account_whitelist_operation::account_listing new_listing_status,
-                                        bool broadcast /* = false */)
-   { try {
-      account_whitelist_operation whitelist_op;
-      whitelist_op.authorizing_account = get_account_id(authorizing_account);
-      whitelist_op.account_to_list = get_account_id(account_to_list);
-      whitelist_op.new_listing = new_listing_status;
-
-      signed_transaction tx;
-      tx.operations.push_back( whitelist_op );
-      set_operation_fees( tx, _remote_db->get_global_properties().parameters.current_fees);
-      tx.validate();
-
-      return sign_transaction( tx, broadcast );
-   } FC_CAPTURE_AND_RETHROW( (authorizing_account)(account_to_list)(new_listing_status)(broadcast) ) }
 
    signed_transaction create_committee_member(string owner_account, string url,
                                       bool broadcast /* = false */)
@@ -3648,14 +3630,6 @@ signed_transaction wallet_api::bid_collateral(string bidder_name,
                                               bool broadcast )
 {
    return my->bid_collateral(bidder_name, debt_amount, debt_symbol, additional_collateral, broadcast);
-}
-
-signed_transaction wallet_api::whitelist_account(string authorizing_account,
-                                                 string account_to_list,
-                                                 account_whitelist_operation::account_listing new_listing_status,
-                                                 bool broadcast /* = false */)
-{
-   return my->whitelist_account(authorizing_account, account_to_list, new_listing_status, broadcast);
 }
 
 signed_transaction wallet_api::create_committee_member(string owner_account, string url,

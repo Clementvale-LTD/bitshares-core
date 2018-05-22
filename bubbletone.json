@@ -35,28 +35,28 @@
           }
         ],[
           7,{
-            "fee": 0
-          }
-        ],[
-          8,{
             "membership_annual_fee": 0,
             "membership_lifetime_fee": 50000000
           }
         ],[
-          9,{
+          8,{
             "fee": 0
           }
         ],[
-          10,{
+          9,{
             "symbol3": "0",
             "symbol4": "0",
             "long_symbol": 0,
             "price_per_kbyte": 0
           }
         ],[
-          11,{
+          10,{
             "fee": 0,
             "price_per_kbyte": 0
+          }
+        ],[
+          11,{
+            "fee": 0
           }
         ],[
           12,{
@@ -64,12 +64,12 @@
           }
         ],[
           13,{
-            "fee": 0
+            "fee": 0,
+            "price_per_kbyte": 0
           }
         ],[
           14,{
-            "fee": 0,
-            "price_per_kbyte": 0
+            "fee": 0
           }
         ],[
           15,{
@@ -89,15 +89,16 @@
           }
         ],[
           19,{
-            "fee": 0
-          }
-        ],[
-          20,{
             "fee": 100000000
           }
         ],[
-          21,{
+          20,{
             "fee": 0
+          }
+        ],[
+          21,{
+            "fee": 0,
+            "price_per_kbyte": 0
           }
         ],[
           22,{
@@ -106,8 +107,7 @@
           }
         ],[
           23,{
-            "fee": 0,
-            "price_per_kbyte": 0
+            "fee": 0
           }
         ],[
           24,{
@@ -119,20 +119,20 @@
           }
         ],[
           26,{
-            "fee": 0
-          }
-        ],[
-          27,{
             "fee": 0,
             "price_per_kbyte": 0
           }
         ],[
-          28,{
+          27,{
             "fee": 0
           }
         ],[
-          29,{
+          28,{
             "fee": 100000000
+          }
+        ],[
+          29,{
+            "fee": 0
           }
         ],[
           30,{
@@ -152,23 +152,24 @@
           }
         ],[
           34,{
-            "fee": 0
+            "fee": 0,
+            "price_per_kbyte": 0
           }
         ],[
           35,{
-            "fee": 0,
-            "price_per_kbyte": 0
-          }
-        ],[
-          36,{
             "fee": 0
           }
         ],[
-          37,{}
+          36,{}
+        ],[
+          37,{
+            "fee": 0,
+            "price_per_kbyte": 0
+          }
         ],[
           38,{
             "fee": 0,
-            "price_per_kbyte": 0
+            "price_per_output": 0
           }
         ],[
           39,{
@@ -177,33 +178,28 @@
           }
         ],[
           40,{
-            "fee": 0,
-            "price_per_output": 0
-          }
-        ],[
-          41,{
             "fee": 0
           }
         ],[
-          42,{}
+          41,{}
         ],[
-          43,{
+          42,{
             "fee": 0
           }
         ],[
-          44,{}
+          43,{}
         ],[
-          45,{
+          44,{
             "fee": 0
           }
         ],[
-          46,{}
+          45,{}
         ],[
-          47,{
+          46,{
             "fee": 0
           }
         ],[
-          48,{}
+          47,{}
         ]
       ],
       "scale": 10000
@@ -216,7 +212,7 @@
     "maximum_block_size": 2000000,
     "maximum_time_until_expiration": 86400,
     "maximum_proposal_lifetime": 2419200,
-    "maximum_asset_whitelist_authorities": 10,
+    "maximum_asset_whitelist_authorities": 1000,
     "maximum_asset_feed_publishers": 10,
     "maximum_witness_count": 1001,
     "maximum_committee_count": 1001,
@@ -397,7 +393,7 @@
     }
   ],
   "initial_worker_candidates": [],
-  "initial_chain_id": "e18c1972e0811975e27c2000e08a2007fc3de0c73de42483ba9af41153a04971",
+  "initial_chain_id": "e18c1972e0811975e27c2000e08a2007fc3de0c73de42483ba9af47153a04971",
   "immutable_parameters": {
     "min_committee_member_count": 11,
     "min_witness_count": 11,

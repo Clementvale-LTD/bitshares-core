@@ -305,49 +305,6 @@ void_result account_update_evaluator::do_apply( const account_update_operation& 
    return void_result();
 } FC_CAPTURE_AND_RETHROW( (o) ) }
 
-void_result account_whitelist_evaluator::do_evaluate(const account_whitelist_operation& o)
-{ try {
-   database& d = db();
-
-   listed_account = &o.account_to_list(d);
-   if( !d.get_global_properties().parameters.allow_non_member_whitelists )
-      FC_ASSERT(o.authorizing_account(d).is_lifetime_member());
-
-   return void_result();
-} FC_CAPTURE_AND_RETHROW( (o) ) }
-
-void_result account_whitelist_evaluator::do_apply(const account_whitelist_operation& o)
-{ try {
-   database& d = db();
-
-   d.modify(*listed_account, [&o](account_object& a) {
-      if( o.new_listing & o.white_listed )
-         a.whitelisting_accounts.insert(o.authorizing_account);
-      else
-         a.whitelisting_accounts.erase(o.authorizing_account);
-
-      if( o.new_listing & o.black_listed )
-         a.blacklisting_accounts.insert(o.authorizing_account);
-      else
-         a.blacklisting_accounts.erase(o.authorizing_account);
-   });
-
-   /** for tracking purposes only, this state is not needed to evaluate */
-   d.modify( o.authorizing_account(d), [&]( account_object& a ) {
-     if( o.new_listing & o.white_listed )
-        a.whitelisted_accounts.insert( o.account_to_list );
-     else
-        a.whitelisted_accounts.erase( o.account_to_list );
-
-     if( o.new_listing & o.black_listed )
-        a.blacklisted_accounts.insert( o.account_to_list );
-     else
-        a.blacklisted_accounts.erase( o.account_to_list );
-   });
-
-   return void_result();
-} FC_CAPTURE_AND_RETHROW( (o) ) }
-
 void_result account_upgrade_evaluator::do_evaluate(const account_upgrade_evaluator::operation_type& o)
 { try {
    database& d = db();

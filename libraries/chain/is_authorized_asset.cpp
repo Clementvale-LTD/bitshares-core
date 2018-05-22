@@ -50,12 +50,6 @@ bool _is_authorized_asset(
             return false;
    }
 
-   for( const auto id : acct.blacklisting_accounts )
-   {
-      if( asset_obj.options.blacklist_authorities.find(id) != asset_obj.options.blacklist_authorities.end() )
-         return false;
-   }
-
    {
       if( asset_obj.options.whitelist_authorities.size() == 0 )
          return true;
@@ -65,12 +59,6 @@ bool _is_authorized_asset(
    {
       if( asset_obj.options.whitelist_authorities.find( acct.get_id()) != asset_obj.options.whitelist_authorities.end() )
             return true;
-   }
-
-   for( const auto id : acct.whitelisting_accounts )
-   {
-      if( asset_obj.options.whitelist_authorities.find(id) != asset_obj.options.whitelist_authorities.end() )
-         return true;
    }
 
    return false;

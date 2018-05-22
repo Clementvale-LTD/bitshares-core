@@ -1322,31 +1322,6 @@ class wallet_api
       signed_transaction bid_collateral(string bidder_name, string debt_amount, string debt_symbol,
                                         string additional_collateral, bool broadcast = false);
 
-      /** Whitelist and blacklist accounts, primarily for transacting in whitelisted assets.
-       *
-       * Accounts can freely specify opinions about other accounts, in the form of either whitelisting or blacklisting
-       * them. This information is used in chain validation only to determine whether an account is authorized to transact
-       * in an asset type which enforces a whitelist, but third parties can use this information for other uses as well,
-       * as long as it does not conflict with the use of whitelisted assets.
-       *
-       * An asset which enforces a whitelist specifies a list of accounts to maintain its whitelist, and a list of
-       * accounts to maintain its blacklist. In order for a given account A to hold and transact in a whitelisted asset S,
-       * A must be whitelisted by at least one of S's whitelist_authorities and blacklisted by none of S's
-       * blacklist_authorities. If A receives a balance of S, and is later removed from the whitelist(s) which allowed it
-       * to hold S, or added to any blacklist S specifies as authoritative, A's balance of S will be frozen until A's
-       * authorization is reinstated.
-       *
-       * @param authorizing_account the account who is doing the whitelisting
-       * @param account_to_list the account being whitelisted
-       * @param new_listing_status the new whitelisting status
-       * @param broadcast true to broadcast the transaction on the network
-       * @returns the signed transaction changing the whitelisting status
-       */
-      signed_transaction whitelist_account(string authorizing_account,
-                                           string account_to_list,
-                                           account_whitelist_operation::account_listing new_listing_status,
-                                           bool broadcast = false);
-
       /** Creates a committee_member object owned by the given account.
        *
        * An account can have at most one committee_member object.
@@ -1812,7 +1787,6 @@ FC_API( graphene::wallet::wallet_api,
         (global_settle_asset)
         (settle_asset)
         (bid_collateral)
-        (whitelist_account)
         (create_committee_member)
         (get_witness)
         (get_committee_member)

@@ -248,8 +248,14 @@ int main( int argc, char** argv )
 
    egenesis_info info;
 
-   load_genesis( options, info );
-   info.fillin();
+   try{
+    load_genesis( options, info );
+    info.fillin();
+   } catch ( const fc::exception& e ) {
+      std::cerr << "embed_genesis:  error: " << e.to_detail_string() << "\n";
+      return 1;
+   }
+   
 
    fc::mutable_variant_object template_context = fc::mutable_variant_object()
       ( "generated_file_banner", generated_file_banner )

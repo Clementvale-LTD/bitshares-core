@@ -353,7 +353,7 @@
       "block_signing_key": "BTE7wqrPb3ts5oGGMY4D5iLxJQK9Afn9TjofvhPCMbKU3GmKN98Bi"
     },{
       "owner_name": "init6",
-      "block_signing_keyblock_interval": "BTE7wqrPb3ts5oGGMY4D5iLxJQK9Afn9TjofvhPCMbKU3GmKN98Bi"
+      "block_signing_key": "BTE7wqrPb3ts5oGGMY4D5iLxJQK9Afn9TjofvhPCMbKU3GmKN98Bi"
     },{
       "owner_name": "init7",
       "block_signing_key": "BTE7wqrPb3ts5oGGMY4D5iLxJQK9Afn9TjofvhPCMbKU3GmKN98Bi"
@@ -393,7 +393,7 @@
     }
   ],
   "initial_worker_candidates": [],
-  "initial_chain_id": "e18c1972e0811975e27c2000e08a2007fc3de0c73de42483ba9af47153a04971",
+  "initial_chain_id": "e18c1972e0811975e27c2000e08a2007fc3de0c73de42483ba9af1d153a04971",
   "immutable_parameters": {
     "min_committee_member_count": 11,
     "min_witness_count": 11,

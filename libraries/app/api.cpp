@@ -300,7 +300,7 @@ namespace graphene { namespace app {
     {
        FC_ASSERT( _app.chain_database() );
        const auto& db = *_app.chain_database();
-       FC_ASSERT( limit <= 100 );
+       FC_ASSERT( limit <= 10000 );
        vector<operation_history_object> result;
        const auto& stats = account(db).statistics(db);
        if( stats.most_recent_op == account_transaction_history_id_type() ) return result;
@@ -333,7 +333,7 @@ namespace graphene { namespace app {
     {
        FC_ASSERT( _app.chain_database() );
        const auto& db = *_app.chain_database();
-       FC_ASSERT( limit <= 100 );
+       FC_ASSERT( limit <= 10000 );
        vector<operation_history_object> result;
        const auto& stats = account(db).statistics(db);
        if( stats.most_recent_op == account_transaction_history_id_type() ) return result;

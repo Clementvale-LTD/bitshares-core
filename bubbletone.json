@@ -313,7 +313,7 @@
       "description": "Universal SDR pegged token",
       "precision": 4,
       "issuer_permissions": 0,
-      "flags": 64,
+      "flags": 0,
       "issuer_name": "bank",
       "max_supply": "1000000000000000",
       "accumulated_fees": 0,

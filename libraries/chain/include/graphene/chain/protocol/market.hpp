@@ -154,35 +154,6 @@ namespace graphene { namespace chain {
       void            validate()const;
    };
 
-
-
-   /**
-    *  @ingroup operations
-    *
-    *  This operation can be used to add collateral, cover, and adjust the margin call price for a particular user.
-    *
-    *  For prediction markets the collateral and debt must always be equal.
-    *
-    *  This operation will fail if it would trigger a margin call that couldn't be filled.  If the margin call hits
-    *  the call price limit then it will fail if the call price is above the settlement price.
-    *
-    *  @note this operation can be used to force a market order using the collateral without requiring outside funds.
-    */
-   struct call_order_update_operation : public base_operation
-   {
-      /** this is slightly more expensive than limit orders, this pricing impacts prediction markets */
-      struct fee_parameters_type { uint64_t fee = 20 * GRAPHENE_BLOCKCHAIN_PRECISION; };
-
-      asset               fee;
-      account_id_type     funding_account; ///< pays fee, collateral, and cover
-      asset               delta_collateral; ///< the amount of collateral to add to the margin position
-      asset               delta_debt; ///< the amount of the debt to be paid off, may be negative to issue new debt
-      extensions_type     extensions;
-
-      account_id_type fee_payer()const { return funding_account; }
-      void            validate()const;
-   };
-
    struct counterparty_info
    {
      optional< uint64_t > request_id;
@@ -237,27 +208,6 @@ namespace graphene { namespace chain {
    };
 
    /**
-    *  @ingroup operations
-    *
-    *  This operation can be used after a black swan to bid collateral for
-    *  taking over part of the debt and the settlement_fund (see BSIP-0018).
-    */
-   struct bid_collateral_operation : public base_operation
-   {
-      /** should be equivalent to call_order_update fee */
-      struct fee_parameters_type { uint64_t fee = 20 * GRAPHENE_BLOCKCHAIN_PRECISION; };
-
-      asset               fee;
-      account_id_type     bidder; ///< pays fee and additional collateral
-      asset               additional_collateral; ///< the amount of collateral to bid for the debt
-      asset               debt_covered; ///< the amount of debt to take over
-      extensions_type     extensions;
-
-      account_id_type fee_payer()const { return bidder; }
-      void            validate()const;
-   };
-
-   /**
     * @ingroup operations
     *
     * @note This is a virtual operation that is created while reviving a
@@ -286,8 +236,6 @@ namespace graphene { namespace chain {
 
 FC_REFLECT( graphene::chain::limit_order_create_operation::fee_parameters_type, (fee) )
 FC_REFLECT( graphene::chain::limit_order_cancel_operation::fee_parameters_type, (fee) )
-FC_REFLECT( graphene::chain::call_order_update_operation::fee_parameters_type, (fee) )
-FC_REFLECT( graphene::chain::bid_collateral_operation::fee_parameters_type, (fee) )
 FC_REFLECT( graphene::chain::fill_order_operation::fee_parameters_type,  ) // VIRTUAL
 FC_REFLECT( graphene::chain::execute_bid_operation::fee_parameters_type,  ) // VIRTUAL
 FC_REFLECT( graphene::chain::limit_order_accept_operation::fee_parameters_type, (fee) )
@@ -295,9 +243,7 @@ FC_REFLECT( graphene::chain::limit_order_accepted_operation::fee_parameters_type
 
 FC_REFLECT( graphene::chain::limit_order_create_operation,(fee)(seller)(amount_to_sell)(min_to_receive)(expiration)(fill_or_kill)(request_id)(user_id)(counterparty_id)(p_memo)(extensions))
 FC_REFLECT( graphene::chain::limit_order_cancel_operation,(fee)(fee_paying_account)(order)(extensions) )
-FC_REFLECT( graphene::chain::call_order_update_operation, (fee)(funding_account)(delta_collateral)(delta_debt)(extensions) )
 FC_REFLECT( graphene::chain::fill_order_operation, (fee)(order_id)(account_id)(pays)(receives)(fill_price)(is_maker)(request_id)(user_id)(p_memo) )
-FC_REFLECT( graphene::chain::bid_collateral_operation, (fee)(bidder)(additional_collateral)(debt_covered)(extensions) )
 FC_REFLECT( graphene::chain::execute_bid_operation, (fee)(bidder)(debt)(collateral) )
 FC_REFLECT( graphene::chain::limit_order_accept_operation,(fee)(seller)(asset_id_to_sell)(asset_id_to_receive)(request_id)(user_id)(counterparty_id)(p_memo)(extensions))
 FC_REFLECT( graphene::chain::limit_order_accepted_operation,(fee)(order_id)(order_creator_account_id)(asset_id_to_sell)(asset_id_to_receive)(request_id)(user_id)(accepted_by_account_id)(p_accepted_memo))

@@ -36,11 +36,6 @@ struct get_impacted_account_visitor
    {
       _impacted.insert( op.fee_paying_account );
    }
-   void operator()( const call_order_update_operation& op ) {}
-   void operator()( const bid_collateral_operation& op )
-   {
-      _impacted.insert( op.bidder );
-   }
    void operator()( const fill_order_operation& op )
    {
       _impacted.insert( op.account_id );
@@ -245,11 +240,6 @@ static void get_relevant_accounts( const object* obj, flat_set<account_id_type>&
            assert( aobj != nullptr );
            accounts.insert( aobj->seller );
            break;
-        } case call_order_object_type:{
-           const auto& aobj = dynamic_cast<const call_order_object*>(obj);
-           assert( aobj != nullptr );
-           accounts.insert( aobj->borrower );
-           break;
         } case custom_object_type:{
           break;
         } case proposal_object_type:{
@@ -335,12 +325,6 @@ static void get_relevant_accounts( const object* obj, flat_set<account_id_type>&
               break;
              case impl_fba_accumulator_object_type:
               break;
-             case impl_collateral_bid_object_type:{
-              const auto& aobj = dynamic_cast<const collateral_bid_object*>(obj);
-              assert( aobj != nullptr );
-              accounts.insert( aobj->bidder );
-              break;
-           }
       }
    }
 } // end get_relevant_accounts( const object* obj, flat_set<account_id_type>& accounts )

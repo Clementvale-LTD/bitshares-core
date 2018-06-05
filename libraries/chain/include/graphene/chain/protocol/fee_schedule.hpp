@@ -62,21 +62,6 @@ namespace graphene { namespace chain {
       }
    };
 
-   template<>
-   class fee_helper<bid_collateral_operation> {
-     public:
-      const bid_collateral_operation::fee_parameters_type& cget(const flat_set<fee_parameters>& parameters)const
-      {
-         auto itr = parameters.find( bid_collateral_operation::fee_parameters_type() );
-         if ( itr != parameters.end() )
-            return itr->get<bid_collateral_operation::fee_parameters_type>();
-
-         static bid_collateral_operation::fee_parameters_type bid_collateral_dummy;
-         bid_collateral_dummy.fee = fee_helper<call_order_update_operation>().cget(parameters).fee;
-         return bid_collateral_dummy;
-      }
-   };
-
    /**
     *  @brief contains all of the parameters necessary to calculate the fee for any operation
     */

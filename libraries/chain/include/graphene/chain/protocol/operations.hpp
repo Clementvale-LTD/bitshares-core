@@ -50,7 +50,6 @@ namespace graphene { namespace chain {
             transfer_operation,
             limit_order_create_operation,
             limit_order_cancel_operation,
-            call_order_update_operation,
             fill_order_operation,           // VIRTUAL
             account_create_operation,
             account_update_operation,
@@ -91,8 +90,6 @@ namespace graphene { namespace chain {
             asset_settle_cancel_operation,  // VIRTUAL
             asset_claim_fees_operation,
             fba_distribute_operation,       // VIRTUAL
-            bid_collateral_operation,
-            execute_bid_operation,           // VIRTUAL
             limit_order_accept_operation,
             limit_order_accepted_operation   //VIRTUAL 
          > operation;

@@ -106,10 +106,7 @@ class database_api_impl : public std::enable_shared_from_this<database_api_impl>
       // Markets / feeds
       vector<limit_order_object>         get_limit_orders(asset_id_type a, asset_id_type b, uint32_t limit)const;
       vector<limit_order_object>         get_account_limit_orders( account_id_type account_id, uint32_t limit)const;
-      vector<call_order_object>          get_call_orders(asset_id_type a, uint32_t limit)const;
       vector<force_settlement_object>    get_settle_orders(asset_id_type a, uint32_t limit)const;
-      vector<call_order_object>          get_margin_positions( const account_id_type& id )const;
-      vector<collateral_bid_object>      get_collateral_bids(const asset_id_type asset, uint32_t limit, uint32_t start)const;
       void subscribe_to_market(std::function<void(const variant&)> callback, asset_id_type a, asset_id_type b);
       void unsubscribe_from_market(asset_id_type a, asset_id_type b);
       market_ticker                      get_ticker( const string& base, const string& quote, bool skip_order_book = false )const;
@@ -689,11 +686,6 @@ std::map<std::string, full_account> database_api_impl::get_full_accounts( const 
                     [&acnt] (const limit_order_object& order) {
                        acnt.limit_orders.emplace_back(order);
                     });
-      auto call_range = _db.get_index_type<call_order_index>().indices().get<by_account>().equal_range(account->id);
-      std::for_each(call_range.first, call_range.second,
-                    [&acnt] (const call_order_object& call) {
-                       acnt.call_orders.emplace_back(call);
-                    });
       auto settle_range = _db.get_index_type<force_settlement_index>().indices().get<by_account>().equal_range(account->id);
       std::for_each(settle_range.first, settle_range.second,
                     [&acnt] (const force_settlement_object& settle) {
@@ -1071,28 +1063,6 @@ vector<limit_order_object> database_api_impl::get_account_limit_orders( account_
   return result;
 }
 
-vector<call_order_object> database_api::get_call_orders(asset_id_type a, uint32_t limit)const
-{
-   return my->get_call_orders( a, limit );
-}
-
-vector<call_order_object> database_api_impl::get_call_orders(asset_id_type a, uint32_t limit)const
-{
-   const auto& call_index = _db.get_index_type<call_order_index>().indices().get<by_price>();
-   const asset_object& mia = _db.get(a);
-   price index_price = price::min(mia.bitasset_data(_db).options.short_backing_asset, mia.get_id());
-   
-   vector< call_order_object> result;
-   auto itr_min = call_index.lower_bound(index_price.min());
-   auto itr_max = call_index.lower_bound(index_price.max());
-   while( itr_min != itr_max && result.size() < limit ) 
-   {
-      result.emplace_back(*itr_min);
-      ++itr_min;
-   }
-   return result;
-}
-
 vector<force_settlement_object> database_api::get_settle_orders(asset_id_type a, uint32_t limit)const
 {
    return my->get_settle_orders( a, limit );
@@ -1113,55 +1083,6 @@ vector<force_settlement_object> database_api_impl::get_settle_orders(asset_id_ty
    }
    return result;
 }
-
-vector<call_order_object> database_api::get_margin_positions( const account_id_type& id )const
-{
-   return my->get_margin_positions( id );
-}
-
-vector<call_order_object> database_api_impl::get_margin_positions( const account_id_type& id )const
-{
-   try
-   {
-      const auto& idx = _db.get_index_type<call_order_index>();
-      const auto& aidx = idx.indices().get<by_account>();
-      auto start = aidx.lower_bound( boost::make_tuple( id, asset_id_type(0) ) );
-      auto end = aidx.lower_bound( boost::make_tuple( id+1, asset_id_type(0) ) );
-      vector<call_order_object> result;
-      while( start != end )
-      {
-         result.push_back(*start);
-         ++start;
-      }
-      return result;
-   } FC_CAPTURE_AND_RETHROW( (id) )
-}
-
-vector<collateral_bid_object> database_api::get_collateral_bids(const asset_id_type asset, uint32_t limit, uint32_t start)const
-{
-   return my->get_collateral_bids( asset, limit, start );
-}
-
-vector<collateral_bid_object> database_api_impl::get_collateral_bids(const asset_id_type asset_id, uint32_t limit, uint32_t skip)const
-{ try {
-   FC_ASSERT( limit <= 100 );
-   const asset_object& swan = asset_id(_db);
-   FC_ASSERT( swan.is_market_issued() );
-   const asset_bitasset_data_object& bad = swan.bitasset_data(_db);
-   const asset_object& back = bad.options.short_backing_asset(_db);
-   const auto& idx = _db.get_index_type<collateral_bid_index>();
-   const auto& aidx = idx.indices().get<by_price>();
-   auto start = aidx.lower_bound( boost::make_tuple( asset_id, price::max(back.id, asset_id), collateral_bid_id_type() ) );
-   auto end = aidx.lower_bound( boost::make_tuple( asset_id, price::min(back.id, asset_id), collateral_bid_id_type(GRAPHENE_DB_MAX_INSTANCE_ID) ) );
-   vector<collateral_bid_object> result;
-   while( skip-- > 0 && start != end ) { ++start; }
-   while( start != end && limit-- > 0)
-   {
-      result.push_back(*start);
-      ++start;
-   }
-   return result;
-} FC_CAPTURE_AND_RETHROW( (asset_id)(limit)(skip) ) }
 
 void database_api::subscribe_to_market(std::function<void(const variant&)> callback, asset_id_type a, asset_id_type b)
 {
@@ -1199,7 +1120,6 @@ market_ticker database_api_impl::get_ticker( const string& base, const string& q
     FC_ASSERT( assets[1], "Invalid quote asset symbol: ${s}", ("s",quote) );
 
     const fc::time_point_sec now = fc::time_point::now();
-    const fc::time_point_sec yesterday = fc::time_point_sec( now.sec_since_epoch() - 86400 );
 
     market_ticker result;
     result.time = now;
@@ -2219,11 +2139,7 @@ void database_api_impl::handle_object_changed(bool force_notify, bool full_objec
 
       for(auto id : ids)
       {
-         if( id.is<call_order_object>() )
-         {
-            enqueue_if_subscribed_to_market<call_order_object>( find_object(id), broadcast_queue, full_object );
-         }
-         else if( id.is<limit_order_object>() )
+         if( id.is<limit_order_object>() )
          {
             enqueue_if_subscribed_to_market<limit_order_object>( find_object(id), broadcast_queue, full_object );
          }

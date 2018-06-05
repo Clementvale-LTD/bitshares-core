@@ -397,7 +397,6 @@ void_result asset_update_feed_producers_evaluator::do_apply(const asset_update_f
             a.feeds[*itr];
       a.update_median_feeds(db().head_block_time());
    });
-   db().check_call_orders( o.asset_to_update(db()) );
 
    return void_result();
 } FC_CAPTURE_AND_RETHROW( (o) ) }
@@ -410,22 +409,12 @@ void_result asset_global_settle_evaluator::do_evaluate(const asset_global_settle
    FC_ASSERT(asset_to_settle->can_global_settle());
    FC_ASSERT(asset_to_settle->issuer == op.issuer );
    FC_ASSERT(asset_to_settle->dynamic_data(d).current_supply > 0);
-   const auto& idx = d.get_index_type<call_order_index>().indices().get<by_collateral>();
-   assert( !idx.empty() );
-   auto itr = idx.lower_bound(boost::make_tuple(price::min(asset_to_settle->bitasset_data(d).options.short_backing_asset,
-                                                           op.asset_to_settle)));
-   assert( itr != idx.end() && itr->debt_type() == op.asset_to_settle );
-   const call_order_object& least_collateralized_short = *itr;
-   FC_ASSERT(least_collateralized_short.get_debt() * op.settle_price <= least_collateralized_short.get_collateral(),
-             "Cannot force settle at supplied price: least collateralized short lacks sufficient collateral to settle.");
 
    return void_result();
 } FC_CAPTURE_AND_RETHROW( (op) ) }
 
 void_result asset_global_settle_evaluator::do_apply(const asset_global_settle_evaluator::operation_type& op)
 { try {
-   database& d = db();
-   d.globally_settle_asset( op.asset_to_settle(db()), op.settle_price );
    return void_result();
 } FC_CAPTURE_AND_RETHROW( (op) ) }
 
@@ -535,24 +524,8 @@ void_result asset_publish_feeds_evaluator::do_apply(const asset_publish_feed_ope
    auto old_feed =  bad.current_feed;
    // Store medians for this asset
    d.modify(bad , [&o,&d](asset_bitasset_data_object& a) {
-      a.feeds[o.publisher] = make_pair(d.head_block_time(), o.feed);
       a.update_median_feeds(d.head_block_time());
    });
-
-   if( !(old_feed == bad.current_feed) )
-   {
-      if( bad.has_settlement() ) // implies head_block_time > HARDFORK CORE 216 TIME
-      {
-         const auto& mia_dyn = base.dynamic_asset_data_id(d);
-         if( !bad.current_feed.settlement_price.is_null()
-             && ( mia_dyn.current_supply == 0
-                  || ~price::call_price(asset(mia_dyn.current_supply, o.asset_id),
-                                        asset(bad.settlement_fund, bad.options.short_backing_asset),
-                                        bad.current_feed.maintenance_collateral_ratio ) < bad.current_feed.settlement_price ) )
-            d.revive_bitasset(base);
-      }
-      db().check_call_orders(base);
-   }
 
    return void_result();
 } FC_CAPTURE_AND_RETHROW((o)) }

@@ -44,17 +44,4 @@ void limit_order_cancel_operation::validate()const
    FC_ASSERT( fee.amount >= 0 );
 }
 
-void call_order_update_operation::validate()const
-{ try {
-   FC_ASSERT( fee.amount >= 0 );
-   FC_ASSERT( delta_collateral.asset_id != delta_debt.asset_id );
-   FC_ASSERT( delta_collateral.amount != 0 || delta_debt.amount != 0 );
-} FC_CAPTURE_AND_RETHROW((*this)) }
-
-void bid_collateral_operation::validate()const
-{ try {
-   FC_ASSERT( fee.amount >= 0 );
-   FC_ASSERT( debt_covered.amount == 0 || (debt_covered.amount > 0 && additional_collateral.amount > 0) );
-} FC_CAPTURE_AND_RETHROW((*this)) }
-
 } } // graphene::chain

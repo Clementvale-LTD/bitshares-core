@@ -26,10 +26,6 @@ def main():
         keys.add(account["owner_key"])
         keys.add(account["active_key"])
 
-    for asset in genesis["initial_assets"]:
-        for cr in asset.get("collateral_records", []):
-            keys.add(cr["owner"])
-
     for balance in genesis["initial_balances"]:
         keys.add(balance["owner"])
 

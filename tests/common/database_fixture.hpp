@@ -209,13 +209,9 @@ struct database_fixture {
    void publish_feed(asset_id_type mia, account_id_type by, const price_feed& f)
    { publish_feed(mia(db), by(db), f); }
    void publish_feed(const asset_object& mia, const account_object& by, const price_feed& f);
-   const call_order_object* borrow(account_id_type who, asset what, asset collateral)
-   { return borrow(who(db), what, collateral); }
-   const call_order_object* borrow(const account_object& who, asset what, asset collateral);
    void cover(account_id_type who, asset what, asset collateral_freed)
    { cover(who(db), what, collateral_freed); }
    void cover(const account_object& who, asset what, asset collateral_freed);
-   void bid_collateral(const account_object& who, const asset& to_bid, const asset& to_cover);
 
    const asset_object& get_asset( const string& symbol )const;
    const account_object& get_account( const string& name )const;
@@ -278,7 +274,6 @@ struct database_fixture {
    void print_market( const string& syma, const string& symb )const;
    string pretty( const asset& a )const;
    void print_limit_order( const limit_order_object& cur )const;
-   void print_call_orders( )const;
    void print_joint_market( const string& syma, const string& symb )const;
    int64_t get_balance( account_id_type account, asset_id_type a )const;
    int64_t get_balance( const account_object& account, const asset_object& a )const;

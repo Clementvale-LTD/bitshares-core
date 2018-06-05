@@ -132,10 +132,6 @@ BOOST_AUTO_TEST_CASE(asset_claim_fees_test)
 
       enable_fees();
 
-      // Alice and Bob create some coins
-      borrow( alice_id, _izzy( 200), _core( 60000) );
-      borrow(   bob_id, _jill(2000), _core(180000) );
-
       // Alice and Bob place orders which match
       create_sell_order( alice_id, _izzy(100), _jill(300) );   // Alice is willing to sell her Izzy's for 3 Jill
       create_sell_order(   bob_id, _jill(700), _izzy(200) );   // Bob is buying up to 200 Izzy's for up to 3.5 Jill
@@ -955,24 +951,6 @@ BOOST_AUTO_TEST_CASE( defaults_test )
     schedule.parameters.insert( new_order_fee );
     fee = schedule.calculate_fee( limit_order_create_operation() );
     BOOST_CHECK_EQUAL( new_order_fee.fee, fee.amount.value );
-
-    // bid_collateral fee defaults to call_order_update fee
-    // call_order_update fee is unset -> default
-    const call_order_update_operation::fee_parameters_type default_short_fee;
-    call_order_update_operation::fee_parameters_type new_short_fee; new_short_fee.fee = 123;
-    fee = schedule.calculate_fee( bid_collateral_operation() );
-    BOOST_CHECK_EQUAL( default_short_fee.fee, fee.amount.value );
-
-    // set call_order_update fee + check bid_collateral fee
-    schedule.parameters.insert( new_short_fee );
-    fee = schedule.calculate_fee( bid_collateral_operation() );
-    BOOST_CHECK_EQUAL( new_short_fee.fee, fee.amount.value );
-
-    // set bid_collateral fee + check
-    bid_collateral_operation::fee_parameters_type new_bid_fee; new_bid_fee.fee = 124;
-    schedule.parameters.insert( new_bid_fee );
-    fee = schedule.calculate_fee( bid_collateral_operation() );
-    BOOST_CHECK_EQUAL( new_bid_fee.fee, fee.amount.value );
   }
   catch( const fc::exception& e )
   {

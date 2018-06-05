@@ -17,42 +17,42 @@
             "fee": 0
           }
         ],[
-          3,{
-            "fee": 0
-          }
+          3,{}
         ],[
-          4,{}
-        ],[
-          5,{
+          4,{
             "basic_fee": 1000000,
             "premium_fee": 1000000,
             "price_per_kbyte": 0
           }
         ],[
-          6,{
+          5,{
             "fee": 0,
             "price_per_kbyte": 0
           }
         ],[
-          7,{
+          6,{
             "membership_annual_fee": 0,
             "membership_lifetime_fee": 50000000
           }
         ],[
-          8,{
+          7,{
             "fee": 0
           }
         ],[
-          9,{
+          8,{
             "symbol3": "0",
             "symbol4": "0",
             "long_symbol": 0,
             "price_per_kbyte": 0
           }
         ],[
-          10,{
+          9,{
             "fee": 0,
             "price_per_kbyte": 0
+          }
+        ],[
+          10,{
+            "fee": 0
           }
         ],[
           11,{
@@ -60,12 +60,12 @@
           }
         ],[
           12,{
-            "fee": 0
+            "fee": 0,
+            "price_per_kbyte": 0
           }
         ],[
           13,{
-            "fee": 0,
-            "price_per_kbyte": 0
+            "fee": 0
           }
         ],[
           14,{
@@ -85,15 +85,16 @@
           }
         ],[
           18,{
-            "fee": 0
-          }
-        ],[
-          19,{
             "fee": 100000000
           }
         ],[
-          20,{
+          19,{
             "fee": 0
+          }
+        ],[
+          20,{
+            "fee": 0,
+            "price_per_kbyte": 0
           }
         ],[
           21,{
@@ -102,8 +103,7 @@
           }
         ],[
           22,{
-            "fee": 0,
-            "price_per_kbyte": 0
+            "fee": 0
           }
         ],[
           23,{
@@ -115,20 +115,20 @@
           }
         ],[
           25,{
-            "fee": 0
-          }
-        ],[
-          26,{
             "fee": 0,
             "price_per_kbyte": 0
           }
         ],[
-          27,{
+          26,{
             "fee": 0
           }
         ],[
-          28,{
+          27,{
             "fee": 100000000
+          }
+        ],[
+          28,{
+            "fee": 0
           }
         ],[
           29,{
@@ -148,23 +148,24 @@
           }
         ],[
           33,{
-            "fee": 0
+            "fee": 0,
+            "price_per_kbyte": 0
           }
         ],[
           34,{
-            "fee": 0,
-            "price_per_kbyte": 0
-          }
-        ],[
-          35,{
             "fee": 0
           }
         ],[
-          36,{}
+          35,{}
+        ],[
+          36,{
+            "fee": 0,
+            "price_per_kbyte": 0
+          }
         ],[
           37,{
             "fee": 0,
-            "price_per_kbyte": 0
+            "price_per_output": 0
           }
         ],[
           38,{
@@ -173,33 +174,22 @@
           }
         ],[
           39,{
-            "fee": 0,
-            "price_per_output": 0
-          }
-        ],[
-          40,{
             "fee": 0
           }
         ],[
-          41,{}
+          40,{}
         ],[
-          42,{
+          41,{
             "fee": 0
           }
         ],[
-          43,{}
+          42,{}
         ],[
-          44,{
+          43,{
             "fee": 0
           }
         ],[
-          45,{}
-        ],[
-          46,{
-            "fee": 0
-          }
-        ],[
-          47,{}
+          44,{}
         ]
       ],
       "scale": 10000
@@ -317,8 +307,7 @@
       "issuer_name": "bank",
       "max_supply": "1000000000000000",
       "accumulated_fees": 0,
-      "is_bitasset": false,
-      "collateral_records": []
+      "is_bitasset": false
     }],
   "initial_balances": [{
       "owner": "BTE3a2bK9APBszTAJLZUsAimzk9pWaVqKZkZ",

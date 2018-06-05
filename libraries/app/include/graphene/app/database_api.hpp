@@ -361,15 +361,6 @@ class database_api
        * @return The limit orders
        */
       vector<limit_order_object> get_account_limit_orders( account_id_type account_id, uint32_t limit)const;
-      
-
-      /**
-       * @brief Get call orders in a given asset
-       * @param a ID of asset being called
-       * @param limit Maximum number of orders to retrieve
-       * @return The call orders, ordered from earliest to be called to latest
-       */
-      vector<call_order_object> get_call_orders(asset_id_type a, uint32_t limit)const;
 
       /**
        * @brief Get forced settlement orders in a given asset
@@ -378,20 +369,6 @@ class database_api
        * @return The settle orders, ordered from earliest settlement date to latest
        */
       vector<force_settlement_object> get_settle_orders(asset_id_type a, uint32_t limit)const;
-
-      /**
-       * @brief Get collateral_bid_objects for a given asset
-       * @param a ID of asset
-       * @param limit Maximum number of objects to retrieve
-       * @param start skip that many results
-       * @return The settle orders, ordered from earliest settlement date to latest
-       */
-      vector<collateral_bid_object> get_collateral_bids(const asset_id_type asset, uint32_t limit, uint32_t start)const;
-
-      /**
-       *  @return all open margin positions for a given account id.
-       */
-      vector<call_order_object> get_margin_positions( const account_id_type& id )const;
 
       /**
        * @brief Request notification when the active orders in the market between two assets changes
@@ -695,10 +672,7 @@ FC_API(graphene::app::database_api,
    (get_order_book)
    (get_limit_orders)
    (get_account_limit_orders)
-   (get_call_orders)
    (get_settle_orders)
-   (get_margin_positions)
-   (get_collateral_bids)
    (subscribe_to_market)
    (unsubscribe_from_market)
    (get_ticker)

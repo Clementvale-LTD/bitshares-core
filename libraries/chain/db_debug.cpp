@@ -43,7 +43,7 @@ void database::debug_dump()
 
    const auto& balance_index = db.get_index_type<account_balance_index>().indices();
    const simple_index<account_statistics_object>& statistics_index = db.get_index_type<simple_index<account_statistics_object>>();
-   const auto& bids = db.get_index_type<collateral_bid_index>().indices();
+
    map<asset_id_type,share_type> total_balances;
    map<asset_id_type,share_type> total_debts;
    share_type core_in_orders;
@@ -59,22 +59,13 @@ void database::debug_dump()
     //  idump(("statistics")(s));
       reported_core_in_orders += s.total_core_in_orders;
    }
-   for( const collateral_bid_object& b : bids )
-      total_balances[b.inv_swan_price.base.asset_id] += b.inv_swan_price.base.amount;
+
    for( const limit_order_object& o : db.get_index_type<limit_order_index>().indices() )
    {
  //     idump(("limit_order")(o));
       auto for_sale = o.amount_for_sale();
       if( for_sale.asset_id == asset_id_type() ) core_in_orders += for_sale.amount;
       total_balances[for_sale.asset_id] += for_sale.amount;
-   }
-   for( const call_order_object& o : db.get_index_type<call_order_index>().indices() )
-   {
-//      idump(("call_order")(o));
-      auto col = o.get_collateral();
-      if( col.asset_id == asset_id_type() ) core_in_orders += col.amount;
-      total_balances[col.asset_id] += col.amount;
-      total_debts[o.get_debt().asset_id] += o.get_debt().amount;
    }
    for( const asset_object& asset_obj : db.get_index_type<asset_index>().indices() )
    {

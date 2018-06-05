@@ -153,7 +153,7 @@ void database_fixture::verify_asset_supplies( const database& db )
    const simple_index<account_statistics_object>& statistics_index = db.get_index_type<simple_index<account_statistics_object>>();
    const auto& balance_index = db.get_index_type<account_balance_index>().indices();
    const auto& settle_index = db.get_index_type<force_settlement_index>().indices();
-   const auto& bids = db.get_index_type<collateral_bid_index>().indices();
+
    map<asset_id_type,share_type> total_balances;
    map<asset_id_type,share_type> total_debts;
    share_type core_in_orders;
@@ -163,8 +163,7 @@ void database_fixture::verify_asset_supplies( const database& db )
       total_balances[b.asset_type] += b.balance;
    for( const force_settlement_object& s : settle_index )
       total_balances[s.balance.asset_id] += s.balance.amount;
-   for( const collateral_bid_object& b : bids )
-      total_balances[b.inv_swan_price.base.asset_id] += b.inv_swan_price.base.amount;
+
    for( const account_statistics_object& a : statistics_index )
    {
       reported_core_in_orders += a.total_core_in_orders;
@@ -176,13 +175,6 @@ void database_fixture::verify_asset_supplies( const database& db )
       if( for_sale.asset_id == asset_id_type() ) core_in_orders += for_sale.amount;
       total_balances[for_sale.asset_id] += for_sale.amount;
       total_balances[asset_id_type()] += o.deferred_fee;
-   }
-   for( const call_order_object& o : db.get_index_type<call_order_index>().indices() )
-   {
-      asset col = o.get_collateral();
-      if( col.asset_id == asset_id_type() ) core_in_orders += col.amount;
-      total_balances[col.asset_id] += col.amount;
-      total_debts[o.get_debt().asset_id] += o.get_debt().amount;
    }
    for( const asset_object& asset_obj : db.get_index_type<asset_index>().indices() )
    {
@@ -831,62 +823,6 @@ operation_result database_fixture::force_settle( const account_object& who, asse
    return op_result;
 } FC_CAPTURE_AND_RETHROW( (who)(what) ) }
 
-const call_order_object* database_fixture::borrow(const account_object& who, asset what, asset collateral)
-{ try {
-   set_expiration( db, trx );
-   trx.operations.clear();
-   call_order_update_operation update;
-   update.funding_account = who.id;
-   update.delta_collateral = collateral;
-   update.delta_debt = what;
-   trx.operations.push_back(update);
-   for( auto& op : trx.operations ) db.current_fee_schedule().set_fee(op);
-   trx.validate();
-   db.push_transaction(trx, ~0);
-   trx.operations.clear();
-   verify_asset_supplies(db);
-
-   auto& call_idx = db.get_index_type<call_order_index>().indices().get<by_account>();
-   auto itr = call_idx.find( boost::make_tuple(who.id, what.asset_id) );
-   const call_order_object* call_obj = nullptr;
-
-   if( itr != call_idx.end() )
-      call_obj = &*itr;
-   return call_obj;
-} FC_CAPTURE_AND_RETHROW( (who.name)(what)(collateral) ) }
-
-void database_fixture::cover(const account_object& who, asset what, asset collateral)
-{ try {
-   set_expiration( db, trx );
-   trx.operations.clear();
-   call_order_update_operation update;
-   update.funding_account = who.id;
-   update.delta_collateral = -collateral;
-   update.delta_debt = -what;
-   trx.operations.push_back(update);
-   for( auto& op : trx.operations ) db.current_fee_schedule().set_fee(op);
-   trx.validate();
-   db.push_transaction(trx, ~0);
-   trx.operations.clear();
-   verify_asset_supplies(db);
-} FC_CAPTURE_AND_RETHROW( (who.name)(what)(collateral) ) }
-
-void database_fixture::bid_collateral(const account_object& who, const asset& to_bid, const asset& to_cover)
-{ try {
-   set_expiration( db, trx );
-   trx.operations.clear();
-   bid_collateral_operation bid;
-   bid.bidder = who.id;
-   bid.additional_collateral = to_bid;
-   bid.debt_covered = to_cover;
-   trx.operations.push_back(bid);
-   for( auto& op : trx.operations ) db.current_fee_schedule().set_fee(op);
-   trx.validate();
-   db.push_transaction(trx, ~0);
-   trx.operations.clear();
-   verify_asset_supplies(db);
-} FC_CAPTURE_AND_RETHROW( (who.name)(to_bid)(to_cover) ) }
-
 void database_fixture::fund_fee_pool( const account_object& from, const asset_object& asset_to_fund, const share_type amount )
 {
    asset_fund_fee_pool_operation fund;
@@ -994,34 +930,6 @@ void database_fixture::print_limit_order( const limit_order_object& cur )const
   std::cout << std::setw(16) << pretty( cur.amount_for_sale() ) << " ";
   std::cout << std::setw(16) << pretty( cur.amount_to_receive() ) << " ";
   std::cout << std::setw(16) << cur.sell_price.to_real() << " ";
-}
-
-void database_fixture::print_call_orders()const
-{
-  cout << std::fixed;
-  cout.precision(5);
-  cout << std::setw(10) << std::left  << "NAME"      << " ";
-  cout << std::setw(10) << std::right << "TYPE"      << " ";
-  cout << std::setw(16) << std::right << "DEBT"  << " ";
-  cout << std::setw(16) << std::right << "COLLAT"  << " ";
-  cout << std::setw(16) << std::right << "CALL PRICE(D/C)"     << " ";
-  cout << std::setw(16) << std::right << "~CALL PRICE(C/D)"     << " ";
-  cout << std::setw(16) << std::right << "SWAN(D/C)"     << " ";
-  cout << std::setw(16) << std::right << "SWAN(C/D)"     << "\n";
-  cout << string(70, '=');
-
-  for( const call_order_object& o : db.get_index_type<call_order_index>().indices() )
-  {
-     std::cout << "\n";
-     cout << std::setw( 10 ) << std::left   << o.borrower(db).name << " ";
-     cout << std::setw( 16 ) << std::right  << pretty( o.get_debt() ) << " ";
-     cout << std::setw( 16 ) << std::right  << pretty( o.get_collateral() ) << " ";
-     cout << std::setw( 16 ) << std::right  << o.call_price.to_real() << " ";
-     cout << std::setw( 16 ) << std::right  << (~o.call_price).to_real() << " ";
-     cout << std::setw( 16 ) << std::right  << (o.get_debt()/o.get_collateral()).to_real() << " ";
-     cout << std::setw( 16 ) << std::right  << (~(o.get_debt()/o.get_collateral())).to_real() << " ";
-  }
-     std::cout << "\n";
 }
 
 void database_fixture::print_joint_market( const string& syma, const string& symb )const

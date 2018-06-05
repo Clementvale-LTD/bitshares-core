@@ -53,12 +53,6 @@ struct genesis_state_type {
       bool is_lifetime_member = false;
    };
    struct initial_asset_type {
-      struct initial_collateral_position {
-         address owner;
-         share_type collateral;
-         share_type debt;
-      };
-
       string symbol;
       string issuer_name;
 
@@ -71,7 +65,6 @@ struct genesis_state_type {
       share_type accumulated_fees;
 
       bool is_bitasset = false;
-      vector<initial_collateral_position> collateral_records;
    };
    struct initial_balance_type {
       address owner;
@@ -132,10 +125,7 @@ struct genesis_state_type {
 FC_REFLECT(graphene::chain::genesis_state_type::initial_account_type, (name)(owner_key)(active_key)(is_lifetime_member))
 
 FC_REFLECT(graphene::chain::genesis_state_type::initial_asset_type,
-           (symbol)(issuer_name)(memo)(precision)(issuer_permissions)(flags)(max_supply)(accumulated_fees)(is_bitasset)(collateral_records))
-
-FC_REFLECT(graphene::chain::genesis_state_type::initial_asset_type::initial_collateral_position,
-           (owner)(collateral)(debt))
+           (symbol)(issuer_name)(memo)(precision)(issuer_permissions)(flags)(max_supply)(accumulated_fees)(is_bitasset))
 
 FC_REFLECT(graphene::chain::genesis_state_type::initial_balance_type,
            (owner)(asset_symbol)(amount))

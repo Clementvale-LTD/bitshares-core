@@ -434,17 +434,7 @@ class wallet_api
       vector<bucket_object>             get_market_history(string symbol, string symbol2, uint32_t bucket, fc::time_point_sec start, fc::time_point_sec end)const;
       vector<limit_order_objviewer>     get_limit_orders(string a, string b, uint32_t limit)const;
       vector<limit_order_objviewer>     get_account_limit_orders(string aname, uint32_t limit)const;
-      vector<call_order_object>         get_call_orders(string a, uint32_t limit)const;
       vector<force_settlement_object>   get_settle_orders(string a, uint32_t limit)const;
-
-      /** Returns the collateral_bid object for the given MPA
-       *
-       * @param asset the name or id of the asset
-       * @param limit the number of entries to return
-       * @param start the sequence number where to start looping back throw the history
-       * @returns a list of \c collateral_bid_objects
-       */
-      vector<collateral_bid_object> get_collateral_bids(string asset, uint32_t limit = 100, uint32_t start = 0)const;
       
       /** Returns the block chain's slowly-changing settings.
        * This object contains all of the properties of the blockchain that are fixed
@@ -1083,23 +1073,6 @@ class wallet_api
                               double amount,
                               bool broadcast );
 
-      /** Borrow an asset or update the debt/collateral ratio for the loan.
-       *
-       * This is the first step in shorting an asset.  Call \c sell_asset() to complete the short.
-       *
-       * @param borrower_name the name or id of the account associated with the transaction.
-       * @param amount_to_borrow the amount of the asset being borrowed.  Make this value
-       *                         negative to pay back debt.
-       * @param asset_symbol the symbol or id of the asset being borrowed.
-       * @param amount_of_collateral the amount of the backing asset to add to your collateral
-       *        position.  Make this negative to claim back some of your collateral.
-       *        The backing asset is defined in the \c bitasset_options for the asset being borrowed.
-       * @param broadcast true to broadcast the transaction on the network
-       * @returns the signed transaction borrowing the asset
-       */
-      signed_transaction borrow_asset(string borrower_name, string amount_to_borrow, string asset_symbol,
-                                      string amount_of_collateral, bool broadcast = false);
-
       /** Cancel an existing order
        *
        * @param order_id the id of order to be cancelled
@@ -1302,25 +1275,6 @@ class wallet_api
                                       string amount_to_settle,
                                       string symbol,
                                       bool broadcast = false);
-
-      /** Creates or updates a bid on an MPA after global settlement.
-       *
-       * In order to revive a market-pegged asset after global settlement (aka
-       * black swan), investors can bid collateral in order to take over part of
-       * the debt and the settlement fund, see BSIP-0018. Updating an existing
-       * bid to cover 0 debt will delete the bid.
-       *
-       * @param bidder_name the name or id of the account making the bid
-       * @param debt_amount the amount of debt of the named asset to bid for
-       * @param debt_symbol the name or id of the MPA to bid for
-       * @param additional_collateral the amount of additional collateral to bid
-       *        for taking over debt_amount. The asset type of this amount is
-       *        determined automatically from debt_symbol.
-       * @param broadcast true to broadcast the transaction on the network
-       * @returns the signed transaction creating/updating the bid
-       */
-      signed_transaction bid_collateral(string bidder_name, string debt_amount, string debt_symbol,
-                                        string additional_collateral, bool broadcast = false);
 
       /** Creates a committee_member object owned by the given account.
        *
@@ -1769,7 +1723,6 @@ FC_API( graphene::wallet::wallet_api,
         (accept_limit_order)
         (sell)
         (buy)
-        (borrow_asset)
         (cancel_order)
         (transfer)
         (transfer2)
@@ -1786,7 +1739,6 @@ FC_API( graphene::wallet::wallet_api,
         (reserve_asset)
         (global_settle_asset)
         (settle_asset)
-        (bid_collateral)
         (create_committee_member)
         (get_witness)
         (get_committee_member)
@@ -1809,7 +1761,6 @@ FC_API( graphene::wallet::wallet_api,
         (get_account_history)
         (get_account_history_operations)
         (get_relative_account_history)
-        (get_collateral_bids)
         (is_public_key_registered)
         (get_market_history)
         (get_global_properties)
@@ -1820,7 +1771,6 @@ FC_API( graphene::wallet::wallet_api,
         (normalize_brain_key)
         (get_limit_orders)
         (get_account_limit_orders)
-        (get_call_orders)
         (get_settle_orders)
         (save_wallet_file)
         (serialize_transaction)

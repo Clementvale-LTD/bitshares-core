@@ -38,10 +38,6 @@ def main():
         account["owner_key"] = convert(account["owner_key"])
         account["active_key"] = convert(account["active_key"])
 
-    for asset in genesis["initial_assets"]:
-        for cr in asset.get("collateral_records", []):
-            cr["owner"] = convert(cr["owner"])
-
     for balance in genesis["initial_balances"]:
         balance["owner"] = convert(balance["owner"])
 

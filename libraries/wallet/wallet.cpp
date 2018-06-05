@@ -1550,29 +1550,6 @@ public:
       return sign_transaction( tx, broadcast );
    } FC_CAPTURE_AND_RETHROW( (account_to_settle)(amount_to_settle)(symbol)(broadcast) ) }
 
-   signed_transaction bid_collateral(string bidder_name,
-                                     string debt_amount, string debt_symbol,
-                                     string additional_collateral,
-                                     bool broadcast )
-   { try {
-      optional<asset_object> debt_asset = find_asset(debt_symbol);
-      if (!debt_asset)
-        FC_THROW("No asset with that symbol exists!");
-      const asset_object& collateral = get_asset(get_object(*debt_asset->bitasset_data_id).options.short_backing_asset);
-
-      bid_collateral_operation op;
-      op.bidder = get_account_id(bidder_name);
-      op.debt_covered = debt_asset->amount_from_string(debt_amount);
-      op.additional_collateral = collateral.amount_from_string(additional_collateral);
-
-      signed_transaction tx;
-      tx.operations.push_back( op );
-      set_operation_fees( tx, _remote_db->get_global_properties().parameters.current_fees);
-      tx.validate();
-
-      return sign_transaction( tx, broadcast );
-   } FC_CAPTURE_AND_RETHROW( (bidder_name)(debt_amount)(debt_symbol)(additional_collateral)(broadcast) ) }
-
    signed_transaction create_committee_member(string owner_account, string url,
                                       bool broadcast /* = false */)
    { try {
@@ -2202,28 +2179,6 @@ public:
       tx.validate();
 
       return sign_transaction( tx, broadcast );
-   }
-
-   signed_transaction borrow_asset(string seller_name, string amount_to_borrow, string asset_symbol,
-                                       string amount_of_collateral, bool broadcast = false)
-   {
-      account_object seller = get_account(seller_name);
-      asset_object mia = get_asset(asset_symbol);
-      FC_ASSERT(mia.is_market_issued());
-      asset_object collateral = get_asset(get_object(*mia.bitasset_data_id).options.short_backing_asset);
-
-      call_order_update_operation op;
-      op.funding_account = seller.id;
-      op.delta_debt   = mia.amount_from_string(amount_to_borrow);
-      op.delta_collateral = collateral.amount_from_string(amount_of_collateral);
-
-      signed_transaction trx;
-      trx.operations = {op};
-      set_operation_fees( trx, _remote_db->get_global_properties().parameters.current_fees);
-      trx.validate();
-      idump((broadcast));
-
-      return sign_transaction(trx, broadcast);
    }
 
    signed_transaction cancel_order(object_id_type order_id, bool broadcast = false)
@@ -3194,19 +3149,9 @@ vector<limit_order_objviewer> wallet_api::get_account_limit_orders(string aname,
   return view_limit_orders;
 }
 
-vector<call_order_object> wallet_api::get_call_orders(string a, uint32_t limit)const
-{
-   return my->_remote_db->get_call_orders(get_asset(a).id, limit);
-}
-
 vector<force_settlement_object> wallet_api::get_settle_orders(string a, uint32_t limit)const
 {
    return my->_remote_db->get_settle_orders(get_asset(a).id, limit);
-}
-
-vector<collateral_bid_object> wallet_api::get_collateral_bids(string asset, uint32_t limit, uint32_t start)const
-{
-   return my->_remote_db->get_collateral_bids(get_asset(asset).id, limit, start);
 }
 
 brain_key_info wallet_api::suggest_brain_key()const
@@ -3622,14 +3567,6 @@ signed_transaction wallet_api::settle_asset(string account_to_settle,
                                             bool broadcast /* = false */)
 {
    return my->settle_asset(account_to_settle, amount_to_settle, symbol, broadcast);
-}
-
-signed_transaction wallet_api::bid_collateral(string bidder_name,
-                                              string debt_amount, string debt_symbol,
-                                              string additional_collateral,
-                                              bool broadcast )
-{
-   return my->bid_collateral(bidder_name, debt_amount, debt_symbol, additional_collateral, broadcast);
 }
 
 signed_transaction wallet_api::create_committee_member(string owner_account, string url,
@@ -4145,13 +4082,6 @@ signed_transaction wallet_api::buy( string buyer_account,
    fc::optional<offer_request_detail> offer_request;
    return my->sell_asset( buyer_account, std::to_string( rate * amount ), quote,
                           std::to_string( amount ), base, offer_request, 0, false, broadcast );
-}
-
-signed_transaction wallet_api::borrow_asset(string seller_name, string amount_to_sell,
-                                                string asset_symbol, string amount_of_collateral, bool broadcast)
-{
-   FC_ASSERT(!is_locked());
-   return my->borrow_asset(seller_name, amount_to_sell, asset_symbol, amount_of_collateral, broadcast);
 }
 
 signed_transaction wallet_api::cancel_order(object_id_type order_id, bool broadcast)

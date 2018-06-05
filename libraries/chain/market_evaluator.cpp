@@ -172,8 +172,6 @@ asset limit_order_cancel_evaluator::do_apply(const limit_order_cancel_operation&
 { try {
    database& d = db();
 
-   auto base_asset = _order->sell_price.base.asset_id;
-   auto quote_asset = _order->sell_price.quote.asset_id;
    auto refunded = _order->amount_for_sale();
 
    d.cancel_order(*_order, false /* don't create a virtual op*/);

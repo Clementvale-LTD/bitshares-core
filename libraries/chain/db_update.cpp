@@ -220,33 +220,6 @@ void database::clear_expired_orders()
 
 } FC_CAPTURE_AND_RETHROW() }
 
-void database::update_expired_feeds()
-{
-   auto& asset_idx = get_index_type<asset_index>().indices().get<by_type>();
-   auto itr = asset_idx.lower_bound( true /** market issued */ );
-   while( itr != asset_idx.end() )
-   {
-      const asset_object& a = *itr;
-      ++itr;
-      assert( a.is_market_issued() );
-
-      const asset_bitasset_data_object& b = a.bitasset_data(*this);
-      bool feed_is_expired;
-      feed_is_expired = b.feed_is_expired( head_block_time() );
-      if( feed_is_expired )
-      {
-         modify(b, [this](asset_bitasset_data_object& a) {
-            a.update_median_feeds(head_block_time());
-         });
-      }
-      if( !b.current_feed.core_exchange_rate.is_null() &&
-          a.options.core_exchange_rate != b.current_feed.core_exchange_rate )
-         modify(a, [&b](asset_object& a) {
-            a.options.core_exchange_rate = b.current_feed.core_exchange_rate;
-         });
-   }
-}
-
 void database::update_maintenance_flag( bool new_maintenance_flag )
 {
    modify( get_dynamic_global_properties(), [&]( dynamic_global_property_object& dpo )

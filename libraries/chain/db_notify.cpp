@@ -75,9 +75,6 @@ struct get_impacted_account_visitor
          _impacted.insert( *(op.new_issuer) );
    }
 
-   void operator()( const asset_update_bitasset_operation& op ) {}
-   void operator()( const asset_update_feed_producers_operation& op ) {}
-
    void operator()( const asset_issue_operation& op )
    {
       _impacted.insert( op.issue_to_account );
@@ -85,9 +82,6 @@ struct get_impacted_account_visitor
 
    void operator()( const asset_reserve_operation& op ) {}
    void operator()( const asset_fund_fee_pool_operation& op ) {}
-   void operator()( const asset_settle_operation& op ) {}
-   void operator()( const asset_global_settle_operation& op ) {}
-   void operator()( const asset_publish_feed_operation& op ) {}
    void operator()( const witness_create_operation& op )
    {
       _impacted.insert( op.witness_account );
@@ -178,11 +172,6 @@ struct get_impacted_account_visitor
       for( const auto& in : op.inputs )
          add_authority_accounts( _impacted, in.owner );
    }
-
-   void operator()( const asset_settle_cancel_operation& op )
-   {
-      _impacted.insert( op.account );
-   }
 };
 
 static void operation_get_impacted_accounts( const operation& op, flat_set<account_id_type>& result )
@@ -214,11 +203,6 @@ static void get_relevant_accounts( const object* obj, flat_set<account_id_type>&
            const auto& aobj = dynamic_cast<const asset_object*>(obj);
            assert( aobj != nullptr );
            accounts.insert( aobj->issuer );
-           break;
-        } case force_settlement_object_type:{
-           const auto& aobj = dynamic_cast<const force_settlement_object*>(obj);
-           assert( aobj != nullptr );
-           accounts.insert( aobj->owner );
            break;
         } case committee_member_object_type:{
            const auto& aobj = dynamic_cast<const committee_member_object*>(obj);

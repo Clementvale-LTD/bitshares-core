@@ -759,12 +759,6 @@ void database::perform_chain_maintenance(const signed_block& next_block, const g
       d.accounts_registered_this_interval = 0;
    });
 
-   // Reset all BitAsset force settlement volumes to zero
-   for( const auto& d : get_index_type<asset_bitasset_data_index>().indices() )
-   {
-      modify( d, [](asset_bitasset_data_object& o) { o.force_settled_volume = 0; });
-   }
-
    // process_budget needs to run at the bottom because
    //   it needs to know the next_maintenance_time
    process_budget();

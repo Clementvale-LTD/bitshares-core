@@ -29,7 +29,6 @@ namespace graphene { namespace chain {
 
    class account_object;
    class asset_object;
-   class asset_bitasset_data_object;
    struct limit_order_cancel_operation;
    struct limit_order_create_operation;
    struct limit_order_accept_operation;

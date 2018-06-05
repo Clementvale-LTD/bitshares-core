@@ -106,7 +106,6 @@ class database_api_impl : public std::enable_shared_from_this<database_api_impl>
       // Markets / feeds
       vector<limit_order_object>         get_limit_orders(asset_id_type a, asset_id_type b, uint32_t limit)const;
       vector<limit_order_object>         get_account_limit_orders( account_id_type account_id, uint32_t limit)const;
-      vector<force_settlement_object>    get_settle_orders(asset_id_type a, uint32_t limit)const;
       void subscribe_to_market(std::function<void(const variant&)> callback, asset_id_type a, asset_id_type b);
       void unsubscribe_from_market(asset_id_type a, asset_id_type b);
       market_ticker                      get_ticker( const string& base, const string& quote, bool skip_order_book = false )const;
@@ -686,11 +685,6 @@ std::map<std::string, full_account> database_api_impl::get_full_accounts( const 
                     [&acnt] (const limit_order_object& order) {
                        acnt.limit_orders.emplace_back(order);
                     });
-      auto settle_range = _db.get_index_type<force_settlement_index>().indices().get<by_account>().equal_range(account->id);
-      std::for_each(settle_range.first, settle_range.second,
-                    [&acnt] (const force_settlement_object& settle) {
-                       acnt.settle_orders.emplace_back(settle);
-                    });
 
       // get assets issued by user
       auto asset_range = _db.get_index_type<asset_index>().indices().get<by_issuer>().equal_range(account->id);
@@ -1061,27 +1055,6 @@ vector<limit_order_object> database_api_impl::get_account_limit_orders( account_
   }
 
   return result;
-}
-
-vector<force_settlement_object> database_api::get_settle_orders(asset_id_type a, uint32_t limit)const
-{
-   return my->get_settle_orders( a, limit );
-}
-
-vector<force_settlement_object> database_api_impl::get_settle_orders(asset_id_type a, uint32_t limit)const
-{
-   const auto& settle_index = _db.get_index_type<force_settlement_index>().indices().get<by_expiration>();
-   const asset_object& mia = _db.get(a);
-
-   vector<force_settlement_object> result;
-   auto itr_min = settle_index.lower_bound(mia.get_id());
-   auto itr_max = settle_index.upper_bound(mia.get_id());
-   while( itr_min != itr_max && result.size() < limit )
-   {
-      result.emplace_back(*itr_min);
-      ++itr_min;
-   }
-   return result;
 }
 
 void database_api::subscribe_to_market(std::function<void(const variant&)> callback, asset_id_type a, asset_id_type b)

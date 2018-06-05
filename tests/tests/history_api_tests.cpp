@@ -50,7 +50,6 @@ BOOST_AUTO_TEST_CASE(get_account_history) {
       graphene::app::history_api hist_api(app);
 
       //account_id_type() do 3 ops
-      create_bitasset("USD", account_id_type());
       create_account("dan");
       create_account("bob");
 
@@ -93,7 +92,6 @@ BOOST_AUTO_TEST_CASE(get_account_history_operations) {
       graphene::app::history_api hist_api(app);
 
       //account_id_type() do 3 ops
-      create_bitasset("CNY", account_id_type());
       create_account("sam");
       create_account("alice");
 

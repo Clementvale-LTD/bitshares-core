@@ -41,11 +41,6 @@ bool fba_accumulator_object::is_configured( const database& db )const
       ilog( "FBA fee in block ${b} not paid because of FBA misconfiguration:  designated asset does not exist", ("b", db.head_block_num()) );
       return false;
    }
-   if( dasset->is_market_issued() )
-   {
-      ilog( "FBA fee in block ${b} not paid because of FBA misconfiguration:  FBA is a BitAsset", ("b", db.head_block_num()) );
-      return false;
-   }
 
    const uint16_t allowed_flags = charge_market_fee;
 

@@ -52,7 +52,8 @@
           }
         ],[
           10,{
-            "fee": 0
+            "fee": 0,
+            "price_per_kbyte": 0
           }
         ],[
           11,{
@@ -60,12 +61,11 @@
           }
         ],[
           12,{
-            "fee": 0,
-            "price_per_kbyte": 0
+            "fee": 0
           }
         ],[
           13,{
-            "fee": 0
+            "fee": 100000000
           }
         ],[
           14,{
@@ -73,11 +73,13 @@
           }
         ],[
           15,{
-            "fee": 0
+            "fee": 0,
+            "price_per_kbyte": 0
           }
         ],[
           16,{
-            "fee": 0
+            "fee": 0,
+            "price_per_kbyte": 0
           }
         ],[
           17,{
@@ -85,7 +87,7 @@
           }
         ],[
           18,{
-            "fee": 100000000
+            "fee": 0
           }
         ],[
           19,{
@@ -98,12 +100,11 @@
           }
         ],[
           21,{
-            "fee": 0,
-            "price_per_kbyte": 0
+            "fee": 0
           }
         ],[
           22,{
-            "fee": 0
+            "fee": 100000000
           }
         ],[
           23,{
@@ -115,8 +116,7 @@
           }
         ],[
           25,{
-            "fee": 0,
-            "price_per_kbyte": 0
+            "fee": 0
           }
         ],[
           26,{
@@ -124,70 +124,48 @@
           }
         ],[
           27,{
-            "fee": 100000000
+            "fee": 0
           }
         ],[
           28,{
-            "fee": 0
+            "fee": 0,
+            "price_per_kbyte": 0
           }
         ],[
           29,{
             "fee": 0
           }
         ],[
-          30,{
-            "fee": 0
-          }
+          30,{}
         ],[
           31,{
-            "fee": 0
+            "fee": 0,
+            "price_per_kbyte": 0
           }
         ],[
           32,{
-            "fee": 0
+            "fee": 0,
+            "price_per_output": 0
           }
         ],[
           33,{
             "fee": 0,
-            "price_per_kbyte": 0
+            "price_per_output": 0
           }
         ],[
           34,{
             "fee": 0
           }
         ],[
-          35,{}
+          35,{
+            "fee": 0
+          }
         ],[
           36,{
-            "fee": 0,
-            "price_per_kbyte": 0
-          }
-        ],[
-          37,{
-            "fee": 0,
-            "price_per_output": 0
-          }
-        ],[
-          38,{
-            "fee": 0,
-            "price_per_output": 0
-          }
-        ],[
-          39,{
             "fee": 0
           }
         ],[
-          40,{}
-        ],[
-          41,{
-            "fee": 0
-          }
-        ],[
-          42,{
-            "fee": 0
-          }
-        ],[
-          43,{}
+          37,{}
         ]
       ],
       "scale": 10000
@@ -304,8 +282,7 @@
       "flags": 0,
       "issuer_name": "bank",
       "max_supply": "1000000000000000",
-      "accumulated_fees": 0,
-      "is_bitasset": false
+      "accumulated_fees": 0
     }],
   "initial_balances": [{
       "owner": "BTE3a2bK9APBszTAJLZUsAimzk9pWaVqKZkZ",

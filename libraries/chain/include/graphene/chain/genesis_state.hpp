@@ -63,8 +63,6 @@ struct genesis_state_type {
 
       share_type max_supply;
       share_type accumulated_fees;
-
-      bool is_bitasset = false;
    };
    struct initial_balance_type {
       address owner;
@@ -125,7 +123,7 @@ struct genesis_state_type {
 FC_REFLECT(graphene::chain::genesis_state_type::initial_account_type, (name)(owner_key)(active_key)(is_lifetime_member))
 
 FC_REFLECT(graphene::chain::genesis_state_type::initial_asset_type,
-           (symbol)(issuer_name)(memo)(precision)(issuer_permissions)(flags)(max_supply)(accumulated_fees)(is_bitasset))
+           (symbol)(issuer_name)(memo)(precision)(issuer_permissions)(flags)(max_supply)(accumulated_fees))
 
 FC_REFLECT(graphene::chain::genesis_state_type::initial_balance_type,
            (owner)(asset_symbol)(amount))

@@ -64,7 +64,6 @@ BOOST_AUTO_TEST_CASE( create_advanced_uia )
       BOOST_CHECK(asset(1, test_asset_id) * test_asset.options.core_exchange_rate == asset(2));
       BOOST_CHECK(test_asset.options.flags & white_list);
       BOOST_CHECK(test_asset.options.max_supply == 100000000);
-      BOOST_CHECK(!test_asset.bitasset_data_id.valid());
       BOOST_CHECK(test_asset.options.market_fee_percent == GRAPHENE_MAX_MARKET_FEE_PERCENT/100);
 
       const asset_dynamic_data_object& test_asset_dynamic_data = test_asset.dynamic_asset_data_id(db);

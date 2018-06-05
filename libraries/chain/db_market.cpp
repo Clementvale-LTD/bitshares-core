@@ -33,21 +33,6 @@
 
 namespace graphene { namespace chain {
 
-void database::cancel_order(const force_settlement_object& order, bool create_virtual_op)
-{
-   adjust_balance(order.owner, order.balance);
-
-   if( create_virtual_op )
-   {
-      asset_settle_cancel_operation vop;
-      vop.settlement = order.id;
-      vop.account = order.owner;
-      vop.amount = order.balance;
-      push_applied_operation( vop );
-   }
-   remove(order);
-}
-
 void database::cancel_order( const limit_order_object& order, bool create_virtual_op  )
 {
    auto refunded = order.amount_for_sale();
@@ -364,33 +349,6 @@ bool database::fill_order( const limit_order_object& order, const asset& pays, c
       return false;
    }
 } FC_CAPTURE_AND_RETHROW( (order)(pays)(receives) ) }
-
-bool database::fill_order( const force_settlement_object& settle, const asset& pays, const asset& receives,
-                           const price& fill_price, const bool is_maker )
-{ try {
-   bool filled = false;
-
-   auto issuer_fees = pay_market_fees(get(receives.asset_id), receives);
-
-   if( pays < settle.balance )
-   {
-      modify(settle, [&pays](force_settlement_object& s) {
-         s.balance -= pays;
-      });
-      filled = false;
-   } else {
-      filled = true;
-   }
-   adjust_balance(settle.owner, receives - issuer_fees);
-
-   assert( pays.asset_id != receives.asset_id );
-   push_applied_operation( fill_order_operation( settle.id, settle.owner, pays, receives, issuer_fees, fill_price, is_maker ) );
-
-   if (filled)
-      remove(settle);
-
-   return filled;
-} FC_CAPTURE_AND_RETHROW( (settle)(pays)(receives) ) }
 
 void database::pay_order( const account_object& receiver, const asset& receives, const asset& pays )
 {

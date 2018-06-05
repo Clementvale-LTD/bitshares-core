@@ -335,7 +335,6 @@ namespace graphene { namespace chain {
 
          //////////////////// db_market.cpp ////////////////////
 
-         void cancel_order(const force_settlement_object& order, bool create_virtual_op = true);
          void cancel_order(const limit_order_object& order, bool create_virtual_op = true);
 
          /**
@@ -378,8 +377,6 @@ namespace graphene { namespace chain {
           */
          bool fill_order( const limit_order_object& order, const asset& pays, const asset& receives, bool cull_if_small,
                           const price& fill_price, const bool is_maker, const counterparty_info* cparty_info = NULL );
-         bool fill_order( const force_settlement_object& settle, const asset& pays, const asset& receives,
-                          const price& fill_price, const bool is_maker );
 
          // helpers to fill_order
          void pay_order( const account_object& receiver, const asset& receives, const asset& pays );
@@ -440,7 +437,6 @@ namespace graphene { namespace chain {
          void clear_expired_transactions();
          void clear_expired_proposals();
          void clear_expired_orders();
-         void update_expired_feeds();
          void update_maintenance_flag( bool new_maintenance_flag );
          void update_withdraw_permissions();
 

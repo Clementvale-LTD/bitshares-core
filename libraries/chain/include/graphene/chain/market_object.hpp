@@ -106,57 +106,9 @@ typedef multi_index_container<
 
 typedef generic_index<limit_order_object, limit_order_multi_index_type> limit_order_index;
 
-/**
- *  @brief tracks bitassets scheduled for force settlement at some point in the future.
- *
- *  On the @ref settlement_date the @ref balance will be converted to the collateral asset
- *  and paid to @ref owner and then this object will be deleted.
- */
-class force_settlement_object : public abstract_object<force_settlement_object>
-{
-   public:
-      static const uint8_t space_id = protocol_ids;
-      static const uint8_t type_id  = force_settlement_object_type;
-
-      account_id_type   owner;
-      asset             balance;
-      time_point_sec    settlement_date;
-
-      asset_id_type settlement_asset_id()const
-      { return balance.asset_id; }
-};
-
-struct by_expiration;
-typedef multi_index_container<
-   force_settlement_object,
-   indexed_by<
-      ordered_unique< tag<by_id>, member< object, object_id_type, &object::id > >,
-      ordered_unique< tag<by_account>,
-         composite_key< force_settlement_object,
-            member<force_settlement_object, account_id_type, &force_settlement_object::owner>,
-            member< object, object_id_type, &object::id >
-         >
-      >,
-      ordered_unique< tag<by_expiration>,
-         composite_key< force_settlement_object,
-            const_mem_fun<force_settlement_object, asset_id_type, &force_settlement_object::settlement_asset_id>,
-            member<force_settlement_object, time_point_sec, &force_settlement_object::settlement_date>,
-            member< object, object_id_type, &object::id >
-         >
-      >
-   >
-> force_settlement_object_multi_index_type;
-
-typedef generic_index<force_settlement_object, force_settlement_object_multi_index_type>   force_settlement_index;
-
 } } // graphene::chain
 
 FC_REFLECT_DERIVED( graphene::chain::limit_order_object,
                     (graphene::db::object),
                     (expiration)(seller)(for_sale)(sell_price)(deferred_fee)(umt_fee)(request_id)(user_id)(counterparty_id)(p_memo)(p_accepted_memo)
-                  )
-
-FC_REFLECT_DERIVED( graphene::chain::force_settlement_object,
-                    (graphene::db::object),
-                    (owner)(balance)(settlement_date)
                   )

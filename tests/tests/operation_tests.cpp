@@ -246,76 +246,6 @@ BOOST_AUTO_TEST_CASE( create_committee_member )
    }
 }
 
-BOOST_AUTO_TEST_CASE( create_mia )
-{
-   try {
-      const asset_object& bitusd = create_bitasset( "USDBIT" );
-      BOOST_CHECK(bitusd.symbol == "USDBIT");
-      BOOST_CHECK(bitusd.bitasset_data(db).options.short_backing_asset == asset_id_type());
-      BOOST_CHECK(bitusd.dynamic_asset_data_id(db).current_supply == 0);
-      GRAPHENE_REQUIRE_THROW( create_bitasset("USDBIT"), fc::exception);
-   } catch ( const fc::exception& e ) {
-      elog( "${e}", ("e", e.to_detail_string() ) );
-      throw;
-   }
-}
-
-BOOST_AUTO_TEST_CASE( update_mia )
-{
-   try {
-      INVOKE(create_mia);
-      generate_block();
-      const asset_object& bit_usd = get_asset("USDBIT");
-
-      asset_update_operation op;
-      op.issuer = bit_usd.issuer;
-      op.asset_to_update = bit_usd.id;
-      op.new_options = bit_usd.options;
-      trx.operations.emplace_back(op);
-
-      trx.operations.back() = op;
-      PUSH_TX( db, trx, ~0 );
-      std::swap(op.new_options.flags, op.new_options.issuer_permissions);
-      op.new_issuer = account_id_type();
-      trx.operations.back() = op;
-      PUSH_TX( db, trx, ~0 );
-
-      {
-         asset_publish_feed_operation pop;
-         pop.asset_id = bit_usd.get_id();
-         pop.publisher = get_account("init0").get_id();
-         price_feed feed;
-         feed.settlement_price = feed.core_exchange_rate = price(bit_usd.amount(5), bit_usd.amount(5));
-         REQUIRE_THROW_WITH_VALUE(pop, feed, feed);
-         feed.settlement_price = feed.core_exchange_rate = ~price(bit_usd.amount(5), asset(5));
-         REQUIRE_THROW_WITH_VALUE(pop, feed, feed);
-         feed.settlement_price = feed.core_exchange_rate = price(bit_usd.amount(5), asset(5));
-         pop.feed = feed;
-         REQUIRE_THROW_WITH_VALUE(pop, feed.maintenance_collateral_ratio, 0);
-         trx.operations.back() = pop;
-         PUSH_TX( db, trx, ~0 );
-      }
-
-      trx.operations.clear();
-      auto nathan = create_account("nathan");
-      op.issuer = account_id_type();
-      op.new_issuer = nathan.id;
-      trx.operations.emplace_back(op);
-      PUSH_TX( db, trx, ~0 );
-      BOOST_CHECK(bit_usd.issuer == nathan.id);
-
-      op.issuer = nathan.id;
-      op.new_issuer = account_id_type();
-      trx.operations.back() = op;
-      PUSH_TX( db, trx, ~0 );
-      BOOST_CHECK(bit_usd.issuer == account_id_type());
-   } catch ( const fc::exception& e ) {
-      elog( "${e}", ("e", e.to_detail_string() ) );
-      throw;
-   }
-}
-
-
 BOOST_AUTO_TEST_CASE( create_uia )
 {
    try {
@@ -338,7 +268,6 @@ BOOST_AUTO_TEST_CASE( create_uia )
       BOOST_CHECK(asset(1, test_asset_id) * test_asset.options.core_exchange_rate == asset(2));
       BOOST_CHECK((test_asset.options.flags & white_list) == 0);
       BOOST_CHECK(test_asset.options.max_supply == 100000000);
-      BOOST_CHECK(!test_asset.bitasset_data_id.valid());
       BOOST_CHECK(test_asset.options.market_fee_percent == GRAPHENE_MAX_MARKET_FEE_PERCENT/100);
       GRAPHENE_REQUIRE_THROW(PUSH_TX( db, trx, ~0 ), fc::exception);
 
@@ -765,65 +694,6 @@ BOOST_AUTO_TEST_CASE( cancel_limit_order_test )
     elog( "${e}", ("e", e.to_detail_string() ) );
     throw;
  }
-}
-
-BOOST_AUTO_TEST_CASE( witness_feeds )
-{
-   using namespace graphene::chain;
-   try {
-      INVOKE( create_mia );
-      {
-         auto& current = get_asset( "USDBIT" );
-         asset_update_operation uop;
-         uop.issuer =  current.issuer;
-         uop.asset_to_update = current.id;
-         uop.new_options = current.options;
-         uop.new_issuer = account_id_type();
-         trx.operations.push_back(uop);
-         PUSH_TX( db, trx, ~0 );
-         trx.clear();
-      }
-      generate_block();
-      const asset_object& bit_usd = get_asset("USDBIT");
-      auto& global_props = db.get_global_properties();
-      vector<account_id_type> active_witnesses;
-      for( const witness_id_type& wit_id : global_props.active_witnesses )
-         active_witnesses.push_back( wit_id(db).witness_account );
-      BOOST_REQUIRE_EQUAL(active_witnesses.size(), 10);
-
-      asset_publish_feed_operation op;
-      op.publisher = active_witnesses[0];
-      op.asset_id = bit_usd.get_id();
-      op.feed.settlement_price = op.feed.core_exchange_rate = ~price(asset(GRAPHENE_BLOCKCHAIN_PRECISION),bit_usd.amount(30));
-      // Accept defaults for required collateral
-      trx.operations.emplace_back(op);
-      PUSH_TX( db, trx, ~0 );
-
-      const asset_bitasset_data_object& bitasset = bit_usd.bitasset_data(db);
-      BOOST_CHECK(bitasset.current_feed.settlement_price.to_real() == 30.0 / GRAPHENE_BLOCKCHAIN_PRECISION);
-      BOOST_CHECK(bitasset.current_feed.maintenance_collateral_ratio == GRAPHENE_DEFAULT_MAINTENANCE_COLLATERAL_RATIO);
-
-      op.publisher = active_witnesses[1];
-      op.feed.settlement_price = op.feed.core_exchange_rate = ~price(asset(GRAPHENE_BLOCKCHAIN_PRECISION),bit_usd.amount(25));
-      trx.operations.back() = op;
-      PUSH_TX( db, trx, ~0 );
-
-      BOOST_CHECK_EQUAL(bitasset.current_feed.settlement_price.to_real(), 30.0 / GRAPHENE_BLOCKCHAIN_PRECISION);
-      BOOST_CHECK(bitasset.current_feed.maintenance_collateral_ratio == GRAPHENE_DEFAULT_MAINTENANCE_COLLATERAL_RATIO);
-
-      op.publisher = active_witnesses[2];
-      op.feed.settlement_price = op.feed.core_exchange_rate = ~price(asset(GRAPHENE_BLOCKCHAIN_PRECISION),bit_usd.amount(40));
-      // But this witness is an idiot.
-      op.feed.maintenance_collateral_ratio = 1001;
-      trx.operations.back() = op;
-      PUSH_TX( db, trx, ~0 );
-
-      BOOST_CHECK_EQUAL(bitasset.current_feed.settlement_price.to_real(), 30.0 / GRAPHENE_BLOCKCHAIN_PRECISION);
-      BOOST_CHECK(bitasset.current_feed.maintenance_collateral_ratio == GRAPHENE_DEFAULT_MAINTENANCE_COLLATERAL_RATIO);
-   } catch (const fc::exception& e) {
-      edump((e.to_detail_string()));
-      throw;
-   }
 }
 
 #define ITWAS_HARDFORK_555_TIME (fc::time_point_sec( 1456250400 ))

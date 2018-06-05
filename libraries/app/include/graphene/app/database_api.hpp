@@ -363,14 +363,6 @@ class database_api
       vector<limit_order_object> get_account_limit_orders( account_id_type account_id, uint32_t limit)const;
 
       /**
-       * @brief Get forced settlement orders in a given asset
-       * @param a ID of asset being settled
-       * @param limit Maximum number of orders to retrieve
-       * @return The settle orders, ordered from earliest settlement date to latest
-       */
-      vector<force_settlement_object> get_settle_orders(asset_id_type a, uint32_t limit)const;
-
-      /**
        * @brief Request notification when the active orders in the market between two assets changes
        * @param callback Callback method which is called when the market changes
        * @param a First asset ID
@@ -672,7 +664,6 @@ FC_API(graphene::app::database_api,
    (get_order_book)
    (get_limit_orders)
    (get_account_limit_orders)
-   (get_settle_orders)
    (subscribe_to_market)
    (unsubscribe_from_market)
    (get_ticker)

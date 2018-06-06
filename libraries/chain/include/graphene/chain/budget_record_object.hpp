@@ -34,7 +34,6 @@ struct budget_record
 
    // sources of budget
    share_type from_initial_reserve = 0;
-   share_type from_accumulated_fees = 0;
    share_type from_unused_witness_budget = 0;
 
    // witness budget requested by the committee
@@ -72,7 +71,6 @@ FC_REFLECT(
    graphene::chain::budget_record,
    (time_since_last_budget)
    (from_initial_reserve)
-   (from_accumulated_fees)
    (from_unused_witness_budget)
    (requested_witness_budget)
    (total_budget)

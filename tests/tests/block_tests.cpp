@@ -1215,7 +1215,6 @@ BOOST_AUTO_TEST_CASE( genesis_reserve_ids )
          usd.memo = "federally floated";
          usd.precision = 4;
          usd.max_supply = GRAPHENE_MAX_SHARE_SUPPLY;
-         usd.accumulated_fees = 0;
          
          genesis_state.immutable_parameters.num_special_accounts = num_special_accounts;
          genesis_state.immutable_parameters.num_special_assets = num_special_assets;

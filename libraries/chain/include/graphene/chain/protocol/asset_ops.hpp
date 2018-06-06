@@ -106,23 +106,6 @@ namespace graphene { namespace chain {
    };
 
    /**
-    * @ingroup operations
-    */
-   struct asset_fund_fee_pool_operation : public base_operation
-   {
-      struct fee_parameters_type { uint64_t fee =  GRAPHENE_BLOCKCHAIN_PRECISION; };
-
-      asset           fee; ///< core asset
-      account_id_type from_account;
-      asset_id_type   asset_id;
-      share_type      amount; ///< core asset
-      extensions_type extensions;
-
-      account_id_type fee_payer()const { return from_account; }
-      void       validate()const;
-   };
-
-   /**
     * @brief Update options common to all assets
     * @ingroup operations
     *
@@ -201,29 +184,7 @@ namespace graphene { namespace chain {
       void            validate()const;
    };
 
-   /**
-    * @brief used to transfer accumulated fees back to the issuer's balance.
-    */
-   struct asset_claim_fees_operation : public base_operation
-   {
-      struct fee_parameters_type {
-         uint64_t fee = 20 * GRAPHENE_BLOCKCHAIN_PRECISION;
-      };
-
-      asset           fee;
-      account_id_type issuer;
-      asset           amount_to_claim; /// amount_to_claim.asset_id->issuer must == issuer
-      extensions_type extensions;
-
-      account_id_type fee_payer()const { return issuer; }
-      void            validate()const;
-   };
-
-
 } } // graphene::chain
-
-FC_REFLECT( graphene::chain::asset_claim_fees_operation, (fee)(issuer)(amount_to_claim)(extensions) )
-FC_REFLECT( graphene::chain::asset_claim_fees_operation::fee_parameters_type, (fee) )
 
 FC_REFLECT( graphene::chain::asset_options,
             (max_supply)
@@ -238,7 +199,6 @@ FC_REFLECT( graphene::chain::asset_options,
           )
 
 FC_REFLECT( graphene::chain::asset_create_operation::fee_parameters_type, (symbol3)(symbol4)(long_symbol)(price_per_kbyte) )
-FC_REFLECT( graphene::chain::asset_fund_fee_pool_operation::fee_parameters_type, (fee) )
 FC_REFLECT( graphene::chain::asset_update_operation::fee_parameters_type, (fee)(price_per_kbyte) )
 FC_REFLECT( graphene::chain::asset_issue_operation::fee_parameters_type, (fee)(price_per_kbyte) )
 FC_REFLECT( graphene::chain::asset_reserve_operation::fee_parameters_type, (fee) )
@@ -264,5 +224,3 @@ FC_REFLECT( graphene::chain::asset_issue_operation,
             (fee)(issuer)(asset_to_issue)(issue_to_account)(memo)(extensions) )
 FC_REFLECT( graphene::chain::asset_reserve_operation,
             (fee)(payer)(amount_to_reserve)(extensions) )
-
-FC_REFLECT( graphene::chain::asset_fund_fee_pool_operation, (fee)(from_account)(asset_id)(amount)(extensions) );

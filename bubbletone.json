@@ -61,15 +61,16 @@
           }
         ],[
           12,{
-            "fee": 0
-          }
-        ],[
-          13,{
             "fee": 100000000
           }
         ],[
-          14,{
+          13,{
             "fee": 0
+          }
+        ],[
+          14,{
+            "fee": 0,
+            "price_per_kbyte": 0
           }
         ],[
           15,{
@@ -78,8 +79,7 @@
           }
         ],[
           16,{
-            "fee": 0,
-            "price_per_kbyte": 0
+            "fee": 0
           }
         ],[
           17,{
@@ -91,20 +91,20 @@
           }
         ],[
           19,{
-            "fee": 0
-          }
-        ],[
-          20,{
             "fee": 0,
             "price_per_kbyte": 0
           }
         ],[
-          21,{
+          20,{
             "fee": 0
           }
         ],[
-          22,{
+          21,{
             "fee": 100000000
+          }
+        ],[
+          22,{
+            "fee": 0
           }
         ],[
           23,{
@@ -124,23 +124,24 @@
           }
         ],[
           27,{
-            "fee": 0
+            "fee": 0,
+            "price_per_kbyte": 0
           }
         ],[
           28,{
-            "fee": 0,
-            "price_per_kbyte": 0
-          }
-        ],[
-          29,{
             "fee": 0
           }
         ],[
-          30,{}
+          29,{}
+        ],[
+          30,{
+            "fee": 0,
+            "price_per_kbyte": 0
+          }
         ],[
           31,{
             "fee": 0,
-            "price_per_kbyte": 0
+            "price_per_output": 0
           }
         ],[
           32,{
@@ -149,23 +150,14 @@
           }
         ],[
           33,{
-            "fee": 0,
-            "price_per_output": 0
+            "fee": 0
           }
         ],[
           34,{
             "fee": 0
           }
         ],[
-          35,{
-            "fee": 0
-          }
-        ],[
-          36,{
-            "fee": 0
-          }
-        ],[
-          37,{}
+          35,{}
         ]
       ],
       "scale": 10000
@@ -281,8 +273,7 @@
       "issuer_permissions": 0,
       "flags": 0,
       "issuer_name": "bank",
-      "max_supply": "1000000000000000",
-      "accumulated_fees": 0
+      "max_supply": "1000000000000000"
     }],
   "initial_balances": [{
       "owner": "BTE3a2bK9APBszTAJLZUsAimzk9pWaVqKZkZ",

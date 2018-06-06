@@ -148,7 +148,6 @@ void database_fixture::verify_asset_supplies( const database& db )
 {
    //wlog("*** Begin asset supply verification ***");
    const asset_dynamic_data_object& core_asset_data = db.get_core_asset().dynamic_asset_data_id(db);
-   BOOST_CHECK(core_asset_data.fee_pool == 0);
 
    const simple_index<account_statistics_object>& statistics_index = db.get_index_type<simple_index<account_statistics_object>>();
    const auto& balance_index = db.get_index_type<account_balance_index>().indices();
@@ -176,8 +175,6 @@ void database_fixture::verify_asset_supplies( const database& db )
    for( const asset_object& asset_obj : db.get_index_type<asset_index>().indices() )
    {
       const auto& dasset_obj = asset_obj.dynamic_asset_data_id(db);
-      total_balances[asset_obj.id] += dasset_obj.accumulated_fees;
-      total_balances[asset_id_type()] += dasset_obj.fee_pool;
       total_balances[asset_obj.id] += dasset_obj.confidential_supply.value;
    }
    for( const vesting_balance_object& vbo : db.get_index_type< vesting_balance_index >().indices() )
@@ -686,21 +683,6 @@ void database_fixture::transfer(
       verify_asset_supplies(db);
       trx.operations.clear();
    } FC_CAPTURE_AND_RETHROW( (from.id)(to.id)(amount)(fee) )
-}
-
-void database_fixture::fund_fee_pool( const account_object& from, const asset_object& asset_to_fund, const share_type amount )
-{
-   asset_fund_fee_pool_operation fund;
-   fund.from_account = from.id;
-   fund.asset_id = asset_to_fund.id;
-   fund.amount = amount;
-   trx.operations.push_back( fund );
-
-   for( auto& op : trx.operations ) db.current_fee_schedule().set_fee(op);
-   trx.validate();
-   db.push_transaction(trx, ~0);
-   trx.operations.clear();
-   verify_asset_supplies(db);
 }
 
 void database_fixture::enable_fees()

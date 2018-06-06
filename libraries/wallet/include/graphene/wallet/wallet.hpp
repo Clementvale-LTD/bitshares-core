@@ -1130,25 +1130,6 @@ class wallet_api
                                       asset_details new_options,
                                       bool broadcast = false);
       
-      /** Pay into the fee pool for the given asset.
-       *
-       * User-issued assets can optionally have a pool of the core asset which is 
-       * automatically used to pay transaction fees for any transaction using that
-       * asset (using the asset's core exchange rate).
-       *
-       * This command allows anyone to deposit the core asset into this fee pool.
-       *
-       * @param from the name or id of the account sending the core asset
-       * @param symbol the name or id of the asset whose fee pool you wish to fund
-       * @param amount the amount of the core asset to deposit
-       * @param broadcast true to broadcast the transaction on the network
-       * @returns the signed transaction funding the fee pool
-       */
-      signed_transaction fund_asset_fee_pool(string from,
-                                             string symbol,
-                                             string amount,
-                                             bool broadcast = false);
-
       /** Burns the given user-issued asset.
        *
        * This command burns the user-issued asset to reduce the amount in circulation.
@@ -1619,7 +1600,6 @@ FC_API( graphene::wallet::wallet_api,
         (update_asset)
         (issue_asset)
         (get_asset)
-        (fund_asset_fee_pool)
         (reserve_asset)
         (create_committee_member)
         (get_witness)

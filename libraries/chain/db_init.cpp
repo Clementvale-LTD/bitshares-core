@@ -141,7 +141,6 @@ void database::initialize_evaluators()
    register_evaluator<limit_order_cancel_evaluator>();
    register_evaluator<transfer_evaluator>();
    register_evaluator<override_transfer_evaluator>();
-   register_evaluator<asset_fund_fee_pool_evaluator>();
    register_evaluator<proposal_create_evaluator>();
    register_evaluator<proposal_update_evaluator>();
    register_evaluator<proposal_delete_evaluator>();
@@ -158,7 +157,6 @@ void database::initialize_evaluators()
    register_evaluator<transfer_to_blind_evaluator>();
    register_evaluator<transfer_from_blind_evaluator>();
    register_evaluator<blind_transfer_evaluator>();
-   register_evaluator<asset_claim_fees_evaluator>();
 }
 
 void database::initialize_indexes()
@@ -455,10 +453,7 @@ void database::init_genesis(const genesis_state_type& genesis_state)
       asset_dynamic_data_id_type dynamic_data_id;
 
       dynamic_data_id = create<asset_dynamic_data_object>([&](asset_dynamic_data_object& d) {
-         d.accumulated_fees = asset.accumulated_fees;
       }).id;
-
-      total_supplies[ new_asset_id ] += asset.accumulated_fees;
 
       auto next_asset_id = get_index<asset_object>().get_next_id();
 

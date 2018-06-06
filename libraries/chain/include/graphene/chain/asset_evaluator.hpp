@@ -35,13 +35,6 @@ namespace graphene { namespace chain {
 
          void_result do_evaluate( const asset_create_operation& o );
          object_id_type do_apply( const asset_create_operation& o );
-
-         /** override the default behavior defined by generic_evalautor which is to
-          * post the fee to fee_paying_account_stats.pending_fees
-          */
-         virtual void pay_fee() override;
-      private:
-         bool fee_is_odd;
    };
 
    class asset_issue_evaluator : public evaluator<asset_issue_evaluator>
@@ -76,26 +69,6 @@ namespace graphene { namespace chain {
          void_result do_apply( const asset_update_operation& o );
 
          const asset_object* asset_to_update = nullptr;
-   };
-
-   class asset_fund_fee_pool_evaluator : public evaluator<asset_fund_fee_pool_evaluator>
-   {
-      public:
-         typedef asset_fund_fee_pool_operation operation_type;
-
-         void_result do_evaluate(const asset_fund_fee_pool_operation& op);
-         void_result do_apply(const asset_fund_fee_pool_operation& op);
-
-         const asset_dynamic_data_object* asset_dyn_data = nullptr;
-   };
-
-   class asset_claim_fees_evaluator : public evaluator<asset_claim_fees_evaluator>
-   {
-      public:
-         typedef asset_claim_fees_operation operation_type;
-
-         void_result do_evaluate( const asset_claim_fees_operation& o );
-         void_result do_apply( const asset_claim_fees_operation& o );
    };
 
 } } // graphene::chain

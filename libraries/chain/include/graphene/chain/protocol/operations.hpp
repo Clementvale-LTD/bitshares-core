@@ -59,7 +59,6 @@ namespace graphene { namespace chain {
             asset_update_operation,
             asset_issue_operation,
             asset_reserve_operation,
-            asset_fund_fee_pool_operation,
             witness_create_operation,
             witness_update_operation,
             proposal_create_operation,
@@ -82,7 +81,6 @@ namespace graphene { namespace chain {
             transfer_to_blind_operation,
             blind_transfer_operation,
             transfer_from_blind_operation,
-            asset_claim_fees_operation,
             limit_order_accept_operation,
             limit_order_accepted_operation   //VIRTUAL 
          > operation;

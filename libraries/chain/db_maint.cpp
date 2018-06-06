@@ -268,7 +268,6 @@ void database::initialize_budget_record( fc::time_point_sec now, budget_record& 
    const asset_dynamic_data_object& core_dd = core.dynamic_asset_data_id(*this);
 
    rec.from_initial_reserve = core.reserved(*this);
-   rec.from_accumulated_fees = core_dd.accumulated_fees;
    rec.from_unused_witness_budget = dpo.witness_budget;
 
    if(    (dpo.last_budget_time == fc::time_point_sec())
@@ -281,16 +280,9 @@ void database::initialize_budget_record( fc::time_point_sec now, budget_record& 
    int64_t dt = (now - dpo.last_budget_time).to_seconds();
    rec.time_since_last_budget = uint64_t( dt );
 
-   // We'll consider accumulated_fees to be reserved at the BEGINNING
-   // of the maintenance interval.  However, for speed we only
-   // call modify() on the asset_dynamic_data_object once at the
-   // end of the maintenance interval.  Thus the accumulated_fees
-   // are available for the budget at this point, but not included
-   // in core.reserved().
-   share_type reserve = rec.from_initial_reserve + core_dd.accumulated_fees;
-   // Similarly, we consider leftover witness_budget to be burned
+   // We consider leftover witness_budget to be burned
    // at the BEGINNING of the maintenance interval.
-   reserve += dpo.witness_budget;
+   share_type reserve = dpo.witness_budget;
 
    fc::uint128_t budget_u128 = reserve.value;
    budget_u128 *= uint64_t(dt);
@@ -370,7 +362,6 @@ void database::process_budget()
       rec.supply_delta = rec.witness_budget
          + rec.worker_budget
          - rec.leftover_worker_funds
-         - rec.from_accumulated_fees
          - rec.from_unused_witness_budget;
 
       modify(core, [&]( asset_dynamic_data_object& _core )
@@ -381,10 +372,8 @@ void database::process_budget()
                                    witness_budget
                                  + worker_budget
                                  - leftover_worker_funds
-                                 - _core.accumulated_fees
                                  - dpo.witness_budget
                                 );
-         _core.accumulated_fees = 0;
       });
 
       modify(dpo, [&]( dynamic_global_property_object& _dpo )

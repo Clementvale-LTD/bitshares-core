@@ -70,19 +70,6 @@ database& generic_evaluator::db()const { return trx_state->db(); }
       core_fee_paid = fee_from_account.amount;
    }
 
-   void generic_evaluator::convert_fee()
-   {
-      if( !trx_state->skip_fee ) {
-         if( fee_asset->get_id() != asset_id_type() )
-         {
-            db().modify(*fee_asset_dyn_data, [this](asset_dynamic_data_object& d) {
-               d.accumulated_fees += fee_from_account.amount;
-               d.fee_pool -= core_fee_paid;
-            });
-         }
-      }
-   }
-
    void generic_evaluator::pay_fee()
    { try {
       if( !trx_state->skip_fee ) {

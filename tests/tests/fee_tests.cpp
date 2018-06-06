@@ -924,8 +924,6 @@ BOOST_AUTO_TEST_CASE( issue_433_test )
       const auto& fees = *db.get_global_properties().parameters.current_fees;
       const auto asset_create_fees = fees.get<asset_create_operation>();
 
-      fund_fee_pool( alice, myusd, 5*asset_create_fees.long_symbol );
-
       asset_create_operation op;
       op.issuer = alice_id;
       op.symbol = "ALICE";
@@ -963,8 +961,6 @@ BOOST_AUTO_TEST_CASE( issue_433_indirect_test )
 
       const auto& fees = *db.get_global_properties().parameters.current_fees;
       const auto asset_create_fees = fees.get<asset_create_operation>();
-
-      fund_fee_pool( alice, myusd, 5*asset_create_fees.long_symbol );
 
       asset_create_operation op;
       op.issuer = alice_id;

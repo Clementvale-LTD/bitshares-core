@@ -52,8 +52,6 @@ namespace graphene { namespace chain {
          /// The number of shares currently in existence
          share_type current_supply;
          share_type confidential_supply; ///< total asset held in confidential balances
-         share_type accumulated_fees; ///< fees accumulate to be paid out over time
-         share_type fee_pool;         ///< in core asset
    };
 
    /**
@@ -147,7 +145,7 @@ namespace graphene { namespace chain {
 } } // graphene::chain
 
 FC_REFLECT_DERIVED( graphene::chain::asset_dynamic_data_object, (graphene::db::object),
-                    (current_supply)(confidential_supply)(accumulated_fees)(fee_pool) )
+                    (current_supply)(confidential_supply))
 
 FC_REFLECT_DERIVED( graphene::chain::asset_object, (graphene::db::object),
                     (symbol)

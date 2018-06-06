@@ -101,10 +101,6 @@ object_id_type asset_create_evaluator::do_apply( const asset_create_operation& o
          a.symbol = op.symbol;
          a.precision = op.precision;
          a.options = op.common_options;
-         if( a.options.core_exchange_rate.base.asset_id.instance.value == 0 )
-            a.options.core_exchange_rate.quote.asset_id = next_asset_id;
-         else
-            a.options.core_exchange_rate.base.asset_id = next_asset_id;
          a.modification_timestamp = fc::time_point::now();
          a.dynamic_asset_data_id = dyn_asset.id;
       });

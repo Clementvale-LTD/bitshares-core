@@ -104,7 +104,7 @@ jsonrpc_call["params"] = ["t3node", "5J2rJgVbj4VTjo4UAnpshDGYiSGxgMhdVFG32BiZ8sn
 cli_response = call_cli_wallet( jsonrpc_call )
 
 # jsonrpc_call["method"] = "create_asset"
-# jsonrpc_call["params"] = ["bank", "SDR", 4, { "max_supply": "1000000000000000", "market_fee_percent": 0, "max_market_fee": "1000000000000000", "issuer_permissions": 64, "flags": 0, "core_exchange_rate": {"base": {"amount": 1, "asset_id": "1.3.0"}, "quote": {"amount": 1,"asset_id": "1.3.1"} }, "whitelist_authorities": [], "blacklist_authorities": [], "whitelist_markets": [], "blacklist_markets": [], "description": "", "extensions": [] }, None, True]
+# jsonrpc_call["params"] = ["bank", "SDR", 4, { "max_supply": "1000000000000000", "market_fee_percent": 0, "max_market_fee": "1000000000000000", "issuer_permissions": 64, "flags": 0, "whitelist_authorities": [], "blacklist_authorities": [], "whitelist_markets": [], "blacklist_markets": [], "description": "", "extensions": [] }, None, True]
 # cli_response = call_cli_wallet( jsonrpc_call )
 
 # jsonrpc_call["method"] = "issue_asset"

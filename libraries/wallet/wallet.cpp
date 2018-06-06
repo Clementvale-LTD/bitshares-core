@@ -839,20 +839,20 @@ public:
       FC_ASSERT( operation_index < trx.operations.size());
       trx.operations[operation_index] = new_op;
    }
-   asset set_fees_on_builder_transaction(transaction_handle_type handle, string fee_asset = GRAPHENE_SYMBOL)
+   asset set_fees_on_builder_transaction(transaction_handle_type handle )
    {
       FC_ASSERT(_builder_transactions.count(handle));
 
-      auto fee_asset_obj = get_asset(fee_asset);
+      auto fee_asset_obj = get_asset( GRAPHENE_SYMBOL);
       asset total_fee = fee_asset_obj.amount(0);
 
       auto gprops = _remote_db->get_global_properties().parameters;
       if( fee_asset_obj.get_id() != asset_id_type() )
       {
          for( auto& op : _builder_transactions[handle].operations )
-            total_fee += gprops.current_fees->set_fee( op, fee_asset_obj.options.core_exchange_rate );
+            total_fee += gprops.current_fees->set_fee( op);
 
-         FC_ASSERT((total_fee * fee_asset_obj.options.core_exchange_rate).amount <=
+         FC_ASSERT( total_fee.amount <=
                    get_object<asset_dynamic_data_object>(fee_asset_obj.dynamic_asset_data_id).fee_pool,
                    "Cannot pay fees in ${asset}, as this asset's fee pool is insufficiently funded.",
                    ("asset", fee_asset_obj.symbol));
@@ -1300,11 +1300,6 @@ public:
         }
       }
       
-      aopt.core_exchange_rate.base.amount = 1;
-      aopt.core_exchange_rate.base.asset_id = asset_id_type(0);
-      aopt.core_exchange_rate.quote.amount = 1;
-      aopt.core_exchange_rate.quote.asset_id = asset_id_type(1);
-        
       asset_create_operation create_op;
       create_op.issuer = issuer_account.id;
       create_op.symbol = symbol;
@@ -1342,11 +1337,8 @@ public:
       asset_options aopt;
       aopt.max_supply = new_options.max_supply;
       
-      aopt.market_fee_percent = asset_to_update->options.market_fee_percent;
-      aopt.max_market_fee = asset_to_update->options.max_market_fee;
       aopt.issuer_permissions = asset_to_update->options.issuer_permissions;
       aopt.flags = asset_to_update->options.flags;
-      aopt.core_exchange_rate = asset_to_update->options.core_exchange_rate;
       aopt.whitelist_markets = asset_to_update->options.whitelist_markets;
       aopt.blacklist_markets = asset_to_update->options.blacklist_markets;
 
@@ -3107,9 +3099,9 @@ void wallet_api::replace_operation_in_builder_transaction(transaction_handle_typ
    my->replace_operation_in_builder_transaction(handle, operation_index, new_op);
 }
 
-asset wallet_api::set_fees_on_builder_transaction(transaction_handle_type handle, string fee_asset)
+asset wallet_api::set_fees_on_builder_transaction(transaction_handle_type handle)
 {
-   return my->set_fees_on_builder_transaction(handle, fee_asset);
+   return my->set_fees_on_builder_transaction(handle);
 }
 
 transaction wallet_api::preview_builder_transaction(transaction_handle_type handle)
@@ -4058,7 +4050,7 @@ blind_confirmation wallet_api::transfer_from_blind( string from_blind_account_ke
    FC_ASSERT(asset_obj.valid(), "Could not find asset matching ${asset}", ("asset", symbol));
    auto amount = asset_obj->amount_from_string(amount_in);
 
-   from_blind.fee  = fees->calculate_fee( from_blind, asset_obj->options.core_exchange_rate );
+   from_blind.fee  = fees->calculate_fee( from_blind );
 
    auto blind_in = asset_obj->amount_to_string( from_blind.fee + amount );
 
@@ -4073,7 +4065,7 @@ blind_confirmation wallet_api::transfer_from_blind( string from_blind_account_ke
    from_blind.amount = amount;
    from_blind.blinding_factor = conf.outputs.back().decrypted_memo.blinding_factor;
    from_blind.inputs.push_back( {conf.outputs.back().decrypted_memo.commitment, authority() } );
-   from_blind.fee  = fees->calculate_fee( from_blind, asset_obj->options.core_exchange_rate );
+   from_blind.fee  = fees->calculate_fee( from_blind );
 
    idump( (from_blind) );
    conf.trx.operations.push_back(from_blind);
@@ -4141,7 +4133,7 @@ blind_confirmation wallet_api::blind_transfer_help( string from_key_or_label,
 
    //auto from_priv_key = my->get_private_key( from_key );
 
-   blind_tr.fee  = fees->calculate_fee( blind_tr, asset_obj->options.core_exchange_rate );
+   blind_tr.fee  = fees->calculate_fee( blind_tr);
 
    vector<commitment_type> used;
 

@@ -327,10 +327,6 @@ void database::init_genesis(const genesis_state_type& genesis_state)
          a.options.flags = 0;
          a.options.issuer_permissions = 0;
          a.issuer = GRAPHENE_NULL_ACCOUNT;
-         a.options.core_exchange_rate.base.amount = 1;
-         a.options.core_exchange_rate.base.asset_id = asset_id_type(0);
-         a.options.core_exchange_rate.quote.amount = 1;
-         a.options.core_exchange_rate.quote.asset_id = asset_id_type(0);
          a.options.p_memo.set_message( fc::ecc::private_key(), std::vector<fc::ecc::public_key>(), "core");
          a.dynamic_asset_data_id = dyn_asset.id;
       });
@@ -355,10 +351,6 @@ void database::init_genesis(const genesis_state_type& genesis_state)
          a.options.flags = 0;
          a.options.issuer_permissions = 0;
          a.issuer = GRAPHENE_NULL_ACCOUNT;
-         a.options.core_exchange_rate.base.amount = 1;
-         a.options.core_exchange_rate.base.asset_id = asset_id_type(0);
-         a.options.core_exchange_rate.quote.amount = 1;
-         a.options.core_exchange_rate.quote.asset_id = next_asset_id;
          a.options.p_memo.set_message( fc::ecc::private_key(), std::vector<fc::ecc::public_key>(), "special");
          a.dynamic_asset_data_id = dyn_asset.id;
       });
@@ -479,11 +471,7 @@ void database::init_genesis(const genesis_state_type& genesis_state)
          a.options.max_supply = asset.max_supply;
          a.options.flags = asset.flags;
          a.options.issuer_permissions = asset.issuer_permissions;
-         a.options.core_exchange_rate.base.amount = 1;
-         a.options.core_exchange_rate.base.asset_id = asset_id_type(0);
-         a.options.core_exchange_rate.quote.amount = 1;
-         a.options.core_exchange_rate.quote.asset_id = next_asset_id;
-//         a.options.issuer_permissions = charge_market_fee | override_authority | white_list | transfer_restricted | disable_confidential;
+//         a.options.issuer_permissions = override_authority | white_list | transfer_restricted | disable_confidential;
          a.dynamic_asset_data_id = dynamic_data_id;
       });
    }

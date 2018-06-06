@@ -483,7 +483,7 @@ BOOST_AUTO_TEST_CASE( fee_refund_test )
       transfer( account_id_type(), bob_id, asset(bob_b0) );
 
       asset_id_type core_id = asset_id_type();
-      asset_id_type usd_id = create_user_issued_asset( "IZZYUSD", izzy_id(db), charge_market_fee ).id;
+      asset_id_type usd_id = create_user_issued_asset( "IZZYUSD", izzy_id(db), 0 ).id;
       issue_uia( alice_id, asset( alice_b0, usd_id ) );
       issue_uia( bob_id, asset( bob_b0, usd_id ) );
 
@@ -633,7 +633,7 @@ BOOST_AUTO_TEST_CASE( stealth_fba_test )
 
       // Izzy creates STEALTH
       asset_id_type stealth_id = create_user_issued_asset( "STEALTH", izzy_id(db),
-         disable_confidential | transfer_restricted | override_authority | white_list | charge_market_fee ).id;
+         disable_confidential | transfer_restricted | override_authority | white_list ).id;
 
       /*
       // this is disabled because it doesn't work, our modify() is probably being overwritten by undo
@@ -664,10 +664,9 @@ BOOST_AUTO_TEST_CASE( stealth_fba_test )
          update_op.asset_to_update = stealth_id;
          asset_options new_options;
          new_options = stealth_id(db).options;
-         new_options.issuer_permissions = charge_market_fee;
-         new_options.flags = disable_confidential | transfer_restricted | override_authority | white_list | charge_market_fee;
+         new_options.issuer_permissions = 0;
+         new_options.flags = disable_confidential | transfer_restricted | override_authority | white_list ;
          // after fixing #579 you should be able to delete the following line
-         new_options.core_exchange_rate = price( asset( 1, stealth_id ), asset( 1, asset_id_type() ) );
          update_op.new_options = new_options;
          signed_transaction tx;
          tx.operations.push_back( update_op );
@@ -699,14 +698,14 @@ BOOST_AUTO_TEST_CASE( stealth_fba_test )
          update_op.asset_to_update = stealth_id;
          asset_options new_options;
          new_options = stealth_id(db).options;
-         new_options.issuer_permissions = new_options.flags | charge_market_fee;
+         new_options.issuer_permissions = new_options.flags ;
          update_op.new_options = new_options;
          signed_transaction tx;
          // enable perms is one op
          tx.operations.push_back( update_op );
 
-         new_options.issuer_permissions = charge_market_fee;
-         new_options.flags = charge_market_fee;
+         new_options.issuer_permissions = 0;
+         new_options.flags = 0;
          update_op.new_options = new_options;
          // reset wrongly set flags and reset permissions can be done in a single op
          tx.operations.push_back( update_op );
@@ -860,7 +859,6 @@ BOOST_AUTO_TEST_CASE( issue_429_test )
          asset_create_operation op;
          op.issuer = alice_id;
          op.symbol = "ALICE";
-         op.common_options.core_exchange_rate = asset( 1 ) / asset( 1, asset_id_type( 1 ) );
          op.fee = asset( (fees_to_pay.long_symbol + fees_to_pay.price_per_kbyte) & (~1) );
          tx.operations.push_back( op );
          set_expiration( db, tx );
@@ -875,7 +873,6 @@ BOOST_AUTO_TEST_CASE( issue_429_test )
          asset_create_operation op;
          op.issuer = alice_id;
          op.symbol = "ALICE.ODD";
-         op.common_options.core_exchange_rate = asset( 1 ) / asset( 1, asset_id_type( 1 ) );
          op.fee = asset((fees_to_pay.long_symbol + fees_to_pay.price_per_kbyte) | 1);
          tx.operations.push_back( op );
          set_expiration( db, tx );
@@ -892,7 +889,6 @@ BOOST_AUTO_TEST_CASE( issue_429_test )
          asset_create_operation op;
          op.issuer = alice_id;
          op.symbol = "ALICE.ODDER";
-         op.common_options.core_exchange_rate = asset( 1 ) / asset( 1, asset_id_type( 1 ) );
          op.fee = asset((fees_to_pay.long_symbol + fees_to_pay.price_per_kbyte) | 1);
          tx.operations.push_back( op );
          set_expiration( db, tx );
@@ -933,7 +929,6 @@ BOOST_AUTO_TEST_CASE( issue_433_test )
       asset_create_operation op;
       op.issuer = alice_id;
       op.symbol = "ALICE";
-      op.common_options.core_exchange_rate = asset( 1 ) / asset( 1, asset_id_type( 1 ) );
       op.fee = myusd.amount( ((asset_create_fees.long_symbol + asset_create_fees.price_per_kbyte) & (~1)) );
       signed_transaction tx;
       tx.operations.push_back( op );
@@ -974,7 +969,6 @@ BOOST_AUTO_TEST_CASE( issue_433_indirect_test )
       asset_create_operation op;
       op.issuer = alice_id;
       op.symbol = "ALICE";
-      op.common_options.core_exchange_rate = asset( 1 ) / asset( 1, asset_id_type( 1 ) );
       op.fee = myusd.amount( ((asset_create_fees.long_symbol + asset_create_fees.price_per_kbyte) & (~1)) );
 
       const auto proposal_create_fees = fees.get<proposal_create_operation>();

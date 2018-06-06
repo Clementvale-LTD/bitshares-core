@@ -74,8 +74,6 @@ namespace graphene { namespace chain {
          /// @return true if symbol is a valid ticker symbol; false otherwise.
          static bool is_valid_symbol( const string& symbol );
 
-         /// @return true if this asset charges a fee for the issuer on market operations; false otherwise
-         bool charges_market_fees()const { return options.flags & charge_market_fee; }
          /// @return true if this asset may only be transferred to/from the issuer or market orders
          bool is_transfer_restricted()const { return options.flags & transfer_restricted; }
          bool can_override()const { return options.flags & override_authority; }

@@ -173,8 +173,8 @@ namespace graphene { namespace chain {
       struct fee_parameters_type {};
 
       fill_order_operation(){}
-      fill_order_operation( object_id_type o, account_id_type a, asset p, asset r, asset f, price fp, bool m, const counterparty_info* cparty_info = NULL)
-         :order_id(o),account_id(a),pays(p),receives(r),fee(f),fill_price(fp),is_maker(m) {
+      fill_order_operation( object_id_type o, account_id_type a, asset p, asset r, price fp, bool m, const counterparty_info* cparty_info = NULL)
+         :order_id(o),account_id(a),pays(p),receives(r),fill_price(fp),is_maker(m) {
            if( NULL != cparty_info){
              request_id = cparty_info->request_id;
              user_id = cparty_info->user_id;

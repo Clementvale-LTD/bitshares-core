@@ -99,8 +99,6 @@ void  asset_create_operation::validate()const
    FC_ASSERT( is_valid_symbol(symbol) );
    common_options.validate();
 
-   asset dummy = asset(1) * common_options.core_exchange_rate;
-   FC_ASSERT(dummy.asset_id == asset_id_type(1));
    FC_ASSERT(precision <= 12);
 }
 
@@ -110,9 +108,6 @@ void asset_update_operation::validate()const
    if( new_issuer )
       FC_ASSERT(issuer != *new_issuer);
    new_options.validate();
-
-   asset dummy = asset(1, asset_to_update) * new_options.core_exchange_rate;
-   FC_ASSERT(dummy.asset_id == asset_id_type());
 }
 
 share_type asset_update_operation::calculate_fee(const asset_update_operation::fee_parameters_type& k)const
@@ -146,14 +141,8 @@ void asset_options::validate()const
 {
    FC_ASSERT( max_supply > 0 );
    FC_ASSERT( max_supply <= GRAPHENE_MAX_SHARE_SUPPLY );
-   FC_ASSERT( market_fee_percent <= GRAPHENE_100_PERCENT );
-   FC_ASSERT( max_market_fee >= 0 && max_market_fee <= GRAPHENE_MAX_SHARE_SUPPLY );
    // There must be no high bits in permissions whose meaning is not known.
    FC_ASSERT( !(issuer_permissions & ~ASSET_ISSUER_PERMISSION_MASK) );
-
-   core_exchange_rate.validate();
-   FC_ASSERT( core_exchange_rate.base.asset_id.instance.value == 0 ||
-              core_exchange_rate.quote.asset_id.instance.value == 0 );
 
    if(!whitelist_authorities.empty() || !blacklist_authorities.empty())
       FC_ASSERT( flags & white_list );

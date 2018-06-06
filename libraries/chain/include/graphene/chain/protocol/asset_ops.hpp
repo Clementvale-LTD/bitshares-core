@@ -38,23 +38,11 @@ namespace graphene { namespace chain {
       /// The maximum supply of this asset which may exist at any given time. This can be as large as
       /// GRAPHENE_MAX_SHARE_SUPPLY
       share_type max_supply = GRAPHENE_MAX_SHARE_SUPPLY;
-      /// When this asset is traded on the markets, this percentage of the total traded will be exacted and paid
-      /// to the issuer. This is a fixed point value, representing hundredths of a percent, i.e. a value of 100
-      /// in this field means a 1% fee is charged on market trades of this asset.
-      uint16_t market_fee_percent = 0;
-      /// Market fees calculated as @ref market_fee_percent of the traded volume are capped to this value
-      share_type max_market_fee = GRAPHENE_MAX_SHARE_SUPPLY;
 
       /// The flags which the issuer has permission to update. See @ref asset_issuer_permission_flags
       uint16_t issuer_permissions = UIA_ASSET_ISSUER_PERMISSION_MASK;
       /// The currently active flags on this permission. See @ref asset_issuer_permission_flags
       uint16_t flags = 0;
-
-      /// When a non-core asset is used to pay a fee, the blockchain must convert that asset to core asset in
-      /// order to accept the fee. If this asset's fee pool is funded, the chain will automatically deposite fees
-      /// in this asset to its accumulated fees, and withdraw from the fee pool the same amount as converted at
-      /// the core exchange rate.
-      price core_exchange_rate;
 
       /// A set of accounts which maintain whitelists to consult for this asset. If whitelist_authorities
       /// is non-empty, then only accounts in whitelist_authorities are allowed to hold, use, or transfer the asset.
@@ -239,11 +227,8 @@ FC_REFLECT( graphene::chain::asset_claim_fees_operation::fee_parameters_type, (f
 
 FC_REFLECT( graphene::chain::asset_options,
             (max_supply)
-            (market_fee_percent)
-            (max_market_fee)
             (issuer_permissions)
             (flags)
-            (core_exchange_rate)
             (whitelist_authorities)
             (blacklist_authorities)
             (whitelist_markets)

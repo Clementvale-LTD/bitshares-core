@@ -86,7 +86,7 @@ namespace graphene { namespace chain {
 
    enum asset_issuer_permission_flags
    {
-      charge_market_fee    = 0x01, /**< an issuer-specified percentage of all market trades in this asset is paid to the issuer */
+      aflags_reserve0      = 0x01, /**< charge_market_fee: an issuer-specified percentage of all market trades in this asset is paid to the issuer */
       white_list           = 0x02, /**< accounts must be whitelisted in order to hold this asset */
       override_authority   = 0x04, /**< issuer may transfer asset back to himself */
       transfer_restricted  = 0x08, /**< require the issuer to be one party to every transfer */
@@ -96,8 +96,8 @@ namespace graphene { namespace chain {
       aflags_reserve3      = 0x80, /**< witness_fed_asset: allow the asset to be fed by witnesses */
       aflags_reserve4      = 0x100 /**< committee_fed_asset: allow the asset to be fed by the committee */
    };
-   const static uint32_t ASSET_ISSUER_PERMISSION_MASK = charge_market_fee|white_list|override_authority|transfer_restricted|disable_confidential;
-   const static uint32_t UIA_ASSET_ISSUER_PERMISSION_MASK = charge_market_fee|white_list|override_authority|transfer_restricted|disable_confidential;
+   const static uint32_t ASSET_ISSUER_PERMISSION_MASK = white_list|override_authority|transfer_restricted|disable_confidential;
+   const static uint32_t UIA_ASSET_ISSUER_PERMISSION_MASK = white_list|override_authority|transfer_restricted|disable_confidential;
 
    enum reserved_spaces
    {
@@ -380,7 +380,7 @@ FC_REFLECT_TYPENAME( graphene::chain::fba_accumulator_id_type )
 FC_REFLECT( graphene::chain::void_t, )
 
 FC_REFLECT_ENUM( graphene::chain::asset_issuer_permission_flags,
-   (charge_market_fee)
+   (aflags_reserve0)
    (white_list)
    (transfer_restricted)
    (override_authority)

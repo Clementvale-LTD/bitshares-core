@@ -312,11 +312,10 @@ bool database::fill_order( const limit_order_object& order, const asset& pays, c
       adjust_balance(GRAPHENE_UMT_FEE_POOL_ACCOUNT, umt_fee);
     }
 
-   auto issuer_fees = pay_market_fees( recv_asset, receives );
-   pay_order( seller, receives - issuer_fees, pays );
+   pay_order( seller, receives, pays );
 
    assert( pays.asset_id != receives.asset_id );
-   push_applied_operation( fill_order_operation( order.id, order.seller, pays, receives, issuer_fees, fill_price, is_maker, cparty_info ));
+   push_applied_operation( fill_order_operation( order.id, order.seller, pays, receives, fill_price, is_maker, cparty_info ));
 
    // conditional because cheap integer comparison may allow us to avoid two expensive modify() and object lookups
    if( order.deferred_fee > 0 )
@@ -360,44 +359,6 @@ void database::pay_order( const account_object& receiver, const asset& receives,
          }
    });
    adjust_balance(receiver.get_id(), receives);
-}
-
-asset database::calculate_market_fee( const asset_object& trade_asset, const asset& trade_amount )
-{
-   assert( trade_asset.id == trade_amount.asset_id );
-
-   if( !trade_asset.charges_market_fees() )
-      return trade_asset.amount(0);
-   if( trade_asset.options.market_fee_percent == 0 )
-      return trade_asset.amount(0);
-
-   fc::uint128 a(trade_amount.amount.value);
-   a *= trade_asset.options.market_fee_percent;
-   a /= GRAPHENE_100_PERCENT;
-   asset percent_fee = trade_asset.amount(a.to_uint64());
-
-   if( percent_fee.amount > trade_asset.options.max_market_fee )
-      percent_fee.amount = trade_asset.options.max_market_fee;
-
-   return percent_fee;
-}
-
-asset database::pay_market_fees( const asset_object& recv_asset, const asset& receives )
-{
-   auto issuer_fees = calculate_market_fee( recv_asset, receives );
-   assert(issuer_fees <= receives );
-
-   //Don't dirty undo state if not actually collecting any fees
-   if( issuer_fees.amount > 0 )
-   {
-      const auto& recv_dyn_data = recv_asset.dynamic_asset_data_id(*this);
-      modify( recv_dyn_data, [&]( asset_dynamic_data_object& obj ){
-                   //idump((issuer_fees));
-         obj.accumulated_fees += issuer_fees.amount;
-      });
-   }
-
-   return issuer_fees;
 }
 
 } }

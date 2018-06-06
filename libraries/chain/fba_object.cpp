@@ -42,7 +42,7 @@ bool fba_accumulator_object::is_configured( const database& db )const
       return false;
    }
 
-   const uint16_t allowed_flags = charge_market_fee;
+   const uint16_t allowed_flags = 0;
 
    // check enabled issuer_permissions bits is subset of allowed_flags bits
    if( (dasset->options.issuer_permissions & allowed_flags) != dasset->options.issuer_permissions )

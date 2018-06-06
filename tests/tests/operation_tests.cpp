@@ -256,19 +256,15 @@ BOOST_AUTO_TEST_CASE( create_uia )
       creator.symbol = UIA_TEST_SYMBOL;
       creator.common_options.max_supply = 100000000;
       creator.precision = 2;
-      creator.common_options.market_fee_percent = GRAPHENE_MAX_MARKET_FEE_PERCENT/100; /*1%*/
       creator.common_options.issuer_permissions = UIA_ASSET_ISSUER_PERMISSION_MASK;
-      creator.common_options.flags = charge_market_fee;
-      creator.common_options.core_exchange_rate = price({asset(2),asset(1,asset_id_type(1))});
+      creator.common_options.flags = 0;
       trx.operations.push_back(std::move(creator));
       PUSH_TX( db, trx, ~0 );
 
       const asset_object& test_asset = test_asset_id(db);
       BOOST_CHECK(test_asset.symbol == UIA_TEST_SYMBOL);
-      BOOST_CHECK(asset(1, test_asset_id) * test_asset.options.core_exchange_rate == asset(2));
       BOOST_CHECK((test_asset.options.flags & white_list) == 0);
       BOOST_CHECK(test_asset.options.max_supply == 100000000);
-      BOOST_CHECK(test_asset.options.market_fee_percent == GRAPHENE_MAX_MARKET_FEE_PERCENT/100);
       GRAPHENE_REQUIRE_THROW(PUSH_TX( db, trx, ~0 ), fc::exception);
 
       const asset_dynamic_data_object& test_asset_dynamic_data = test_asset.dynamic_asset_data_id(db);
@@ -288,8 +284,6 @@ BOOST_AUTO_TEST_CASE( create_uia )
       REQUIRE_THROW_WITH_VALUE(op, symbol, "AAA.");
       REQUIRE_THROW_WITH_VALUE(op, symbol, "AB CD");
       REQUIRE_THROW_WITH_VALUE(op, symbol, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-      REQUIRE_THROW_WITH_VALUE(op, common_options.core_exchange_rate, price({asset(-100), asset(1)}));
-      REQUIRE_THROW_WITH_VALUE(op, common_options.core_exchange_rate, price({asset(100),asset(-1)}));
    } catch(fc::exception& e) {
       edump((e.to_detail_string()));
       throw;
@@ -318,17 +312,6 @@ BOOST_AUTO_TEST_CASE( update_uia )
       //Cannot convert to an MIA
       BOOST_TEST_MESSAGE( "Make sure we can't convert UIA to MIA" );
       REQUIRE_THROW_WITH_VALUE(op, new_options.issuer_permissions, ASSET_ISSUER_PERMISSION_MASK);
-      REQUIRE_THROW_WITH_VALUE(op, new_options.core_exchange_rate, price(asset(5), asset(5)));
-
-      BOOST_TEST_MESSAGE( "Test updating core_exchange_rate" );
-      op.new_options.core_exchange_rate = price(asset(3), test.amount(5));
-      trx.operations.back() = op;
-      PUSH_TX( db, trx, ~0 );
-      REQUIRE_THROW_WITH_VALUE(op, new_options.core_exchange_rate, price());
-      op.new_options.core_exchange_rate = test.options.core_exchange_rate;
-      op.new_issuer = nathan.id;
-      trx.operations.back() = op;
-      PUSH_TX( db, trx, ~0 );
 
       BOOST_TEST_MESSAGE( "Test setting flags" );
       op.issuer = nathan.id;
@@ -624,16 +607,15 @@ BOOST_AUTO_TEST_CASE( uia_fees )
       BOOST_CHECK(asset_dynamic.fee_pool == 1000*prec);
 
       transfer_operation op;
-      op.fee = test_asset.amount(0);
+      op.fee = db.current_fee_schedule().calculate_fee( op );
       op.from = nathan_account.id;
       op.to   = committee_account.id;
       op.amount = test_asset.amount(100);
-      op.fee = db.current_fee_schedule().calculate_fee( op, test_asset.options.core_exchange_rate );
       BOOST_CHECK(op.fee.asset_id == test_asset.id);
       asset old_balance = db.get_balance(nathan_account.get_id(), test_asset.get_id());
       asset fee = op.fee;
       BOOST_CHECK(fee.amount > 0);
-      asset core_fee = fee*test_asset.options.core_exchange_rate;
+      asset core_fee = fee;
       trx.operations.push_back(std::move(op));
       PUSH_TX( db, trx, ~0 );
 

@@ -381,9 +381,6 @@ namespace graphene { namespace chain {
          // helpers to fill_order
          void pay_order( const account_object& receiver, const asset& receives, const asset& pays );
 
-         asset calculate_market_fee(const asset_object& recv_asset, const asset& trade_amount);
-         asset pay_market_fees( const asset_object& recv_asset, const asset& receives );
-
 
          ///@}
          /**

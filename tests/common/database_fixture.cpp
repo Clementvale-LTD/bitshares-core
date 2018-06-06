@@ -422,10 +422,9 @@ const asset_object& database_fixture::create_user_issued_asset( const string& na
    creator.symbol = name;
    creator.common_options.max_supply = 0;
    creator.precision = 2;
-   creator.common_options.core_exchange_rate = price({asset(1,asset_id_type(1)),asset(1)});
    creator.common_options.max_supply = GRAPHENE_MAX_SHARE_SUPPLY;
-   creator.common_options.flags = charge_market_fee;
-   creator.common_options.issuer_permissions = charge_market_fee;
+   creator.common_options.flags = 0;
+   creator.common_options.issuer_permissions = 0;
    trx.operations.push_back(std::move(creator));
    trx.validate();
    processed_transaction ptx = db.push_transaction(trx, ~0);
@@ -441,7 +440,6 @@ const asset_object& database_fixture::create_user_issued_asset( const string& na
    creator.symbol = name;
    creator.common_options.max_supply = 0;
    creator.precision = 2;
-   creator.common_options.core_exchange_rate = price({asset(1,asset_id_type(1)),asset(1)});
    creator.common_options.max_supply = GRAPHENE_MAX_SHARE_SUPPLY;
    creator.common_options.flags = flags;
    creator.common_options.issuer_permissions = flags;

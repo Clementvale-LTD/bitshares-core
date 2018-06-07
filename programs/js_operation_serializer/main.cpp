@@ -390,7 +390,6 @@ int main( int argc, char** argv )
     detail_ns::js_name<operation>::name("operation");
     detail_ns::js_name<operation_result>::name("operation_result");
     detail_ns::js_name<future_extensions>::name("future_extensions");
-    detail_ns::js_name<worker_initializer>::name("worker_initializer");
     detail_ns::js_name<predicate>::name("predicate");
     detail_ns::js_name<vesting_policy_initializer>::name("vesting_policy_initializer");
     detail_ns::serializer<fee_parameters>::init();

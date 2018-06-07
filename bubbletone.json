@@ -116,23 +116,24 @@
           }
         ],[
           25,{
-            "fee": 0
+            "fee": 0,
+            "price_per_kbyte": 0
           }
         ],[
           26,{
-            "fee": 0,
-            "price_per_kbyte": 0
-          }
-        ],[
-          27,{
             "fee": 0
           }
         ],[
-          28,{}
+          27,{}
+        ],[
+          28,{
+            "fee": 0,
+            "price_per_kbyte": 0
+          }
         ],[
           29,{
             "fee": 0,
-            "price_per_kbyte": 0
+            "price_per_output": 0
           }
         ],[
           30,{
@@ -141,19 +142,14 @@
           }
         ],[
           31,{
-            "fee": 0,
-            "price_per_output": 0
+            "fee": 0
           }
         ],[
           32,{
             "fee": 0
           }
         ],[
-          33,{
-            "fee": 0
-          }
-        ],[
-          34,{}
+          33,{}
         ]
       ],
       "scale": 10000
@@ -179,7 +175,6 @@
     "count_non_member_votes": true,
     "allow_non_member_whitelists": false,
     "witness_pay_per_block": 0,
-    "worker_budget_per_day": "0",
     "max_predicate_opcode": 1,
     "fee_liquidation_threshold": 0,
     "accounts_per_fee_scale": 1000,

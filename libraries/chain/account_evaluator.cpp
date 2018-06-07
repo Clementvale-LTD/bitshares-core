@@ -72,26 +72,8 @@ void verify_account_votes( const database& db, const account_options& options )
               "Voted for more committee members than currently allowed (${c})", ("c", chain_params.maximum_committee_count) );
 
    uint32_t max_vote_id = gpo.next_available_vote_id;
-   bool has_worker_votes = false;
-   for( auto id : options.votes )
-   {
-      FC_ASSERT( id < max_vote_id );
-      has_worker_votes |= (id.type() == vote_id_type::worker);
-   }
 
-   if( has_worker_votes )
    {
-      const auto& against_worker_idx = db.get_index_type<worker_index>().indices().get<by_vote_against>();
-      for( auto id : options.votes )
-      {
-         if( id.type() == vote_id_type::worker )
-         {
-            FC_ASSERT( against_worker_idx.find( id ) == against_worker_idx.end() );
-         }
-      }
-   }
-   {
-      const auto& approve_worker_idx = db.get_index_type<worker_index>().indices().get<by_vote_for>();
       const auto& committee_idx = db.get_index_type<committee_member_index>().indices().get<by_vote_id>();
       const auto& witness_idx = db.get_index_type<witness_index>().indices().get<by_vote_id>();
       for ( auto id : options.votes ) {
@@ -101,9 +83,6 @@ void verify_account_votes( const database& db, const account_options& options )
                break;
             case vote_id_type::witness:
                FC_ASSERT( witness_idx.find(id) != witness_idx.end());
-               break;
-            case vote_id_type::worker:
-               FC_ASSERT( approve_worker_idx.find( id ) != approve_worker_idx.end() );
                break;
             default:
                FC_THROW( "Invalid Vote Type: ${id}", ("id", id) );

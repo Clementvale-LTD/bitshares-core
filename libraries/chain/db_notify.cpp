@@ -133,7 +133,6 @@ struct get_impacted_account_visitor
    }
 
    void operator()( const vesting_balance_withdraw_operation& op ) {}
-   void operator()( const worker_create_operation& op ) {}
    void operator()( const custom_operation& op ) {}
    void operator()( const assert_operation& op ) {}
    void operator()( const balance_claim_operation& op ) {}
@@ -235,11 +234,6 @@ static void get_relevant_accounts( const object* obj, flat_set<account_id_type>&
            const auto& aobj = dynamic_cast<const vesting_balance_object*>(obj);
            assert( aobj != nullptr );
            accounts.insert( aobj->owner );
-           break;
-        } case worker_object_type:{
-           const auto& aobj = dynamic_cast<const worker_object*>(obj);
-           assert( aobj != nullptr );
-           accounts.insert( aobj->worker_account );
            break;
         } case balance_object_type:{
            /** these are free from any accounts */

@@ -109,8 +109,6 @@ namespace graphene { namespace chain {
 
          fc::time_point_sec          modification_timestamp;
 
-         optional<account_id_type> buyback_account;
-
          asset_id_type get_id()const { return id; }
 
          void validate()const
@@ -154,5 +152,4 @@ FC_REFLECT_DERIVED( graphene::chain::asset_object, (graphene::db::object),
                     (options)
                     (dynamic_asset_data_id)
                     (modification_timestamp)
-                    (buyback_account)
                   )

@@ -715,29 +715,6 @@ BOOST_AUTO_TEST_CASE( stealth_fba_test )
          PUSH_TX( db, tx );
       }
 
-      // Philbin registers Rex who will be the asset's buyback, including sig from the new issuer (Tom)
-      account_id_type rex_id;
-      {
-         buyback_account_options bbo;
-         bbo.asset_to_buy = stealth_id;
-         bbo.asset_to_buy_issuer = tom_id;
-         bbo.markets.emplace( asset_id_type() );
-         account_create_operation create_op = make_account( "rex" );
-         create_op.registrar = philbin_id;
-         create_op.extensions.value.buyback_options = bbo;
-         create_op.owner = authority::null_authority();
-         create_op.active = authority::null_authority();
-
-         signed_transaction tx;
-         tx.operations.push_back( create_op );
-         set_expiration( db, tx );
-         sign( tx, philbin_private_key );
-         sign( tx, tom_private_key );
-
-         processed_transaction ptx = PUSH_TX( db, tx );
-         rex_id = ptx.operation_results.back().get< object_id_type >();
-      }
-
       // Tom issues some asset to Alice and Bob
       set_expiration( db, trx );  // #11
       issue_uia( alice_id, asset( 1000, stealth_id ) );
@@ -807,7 +784,6 @@ BOOST_AUTO_TEST_CASE( stealth_fba_test )
       generate_blocks(db.get_dynamic_global_properties().next_maintenance_time);
 
       idump( ( get_operation_history( chloe_id ) ) );
-      idump( ( get_operation_history( rex_id ) ) );
       idump( ( get_operation_history( tom_id ) ) );
    }
    catch( const fc::exception& e )

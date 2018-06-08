@@ -80,7 +80,6 @@ namespace graphene { namespace chain {
       block_id_predicate
      > predicate;
 
-
    /**
     *  @brief assert that some conditions are true.
     *  @ingroup operations

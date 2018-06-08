@@ -31,22 +31,4 @@ namespace graphene { namespace chain {
 
 class database;
 
-/**
- * fba_accumulator_object accumulates fees to be paid out via buyback or other FBA mechanism.
- */
-
-class fba_accumulator_object : public graphene::db::abstract_object< fba_accumulator_object >
-{
-   public:
-      static const uint8_t space_id = implementation_ids;
-      static const uint8_t type_id = impl_fba_accumulator_object_type;
-
-      share_type accumulated_fba_fees;
-      optional< asset_id_type > designated_asset;
-
-      bool is_configured( const database& db )const;
-};
-
 } } // graphene::chain
-
-FC_REFLECT_DERIVED( graphene::chain::fba_accumulator_object, (graphene::db::object), (accumulated_fba_fees)(designated_asset) )

@@ -288,10 +288,6 @@ static void get_relevant_accounts( const object* obj, flat_set<account_id_type>&
               break;
              case impl_special_authority_object_type:
               break;
-             case impl_buyback_object_type:
-              break;
-             case impl_fba_accumulator_object_type:
-              break;
       }
    }
 } // end get_relevant_accounts( const object* obj, flat_set<account_id_type>& accounts )

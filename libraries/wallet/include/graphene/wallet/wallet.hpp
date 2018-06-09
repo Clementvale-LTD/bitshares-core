@@ -736,13 +736,6 @@ class wallet_api
        * @param owner the owner key for the new account
        * @param active the active key for the new account
        * @param registrar_account the account which will pay the fee to register the user
-       * @param referrer_account the account who is acting as a referrer, and may receive a
-       *                         portion of the user's transaction fees.  This can be the
-       *                         same as the registrar_account if there is no referrer.
-       * @param referrer_percent the percentage (0 - 100) of the new user's transaction fees
-       *                         not claimed by the blockchain that will be distributed to the
-       *                         referrer; the rest will be sent to the registrar.  Will be
-       *                         multiplied by GRAPHENE_1_PERCENT when constructing the transaction.
        * @param broadcast true to broadcast the transaction on the network
        * @returns the signed transaction registering the account
        */
@@ -750,8 +743,6 @@ class wallet_api
                                           public_key_type owner,
                                           public_key_type active,
                                           string  registrar_account,
-                                          string  referrer_account,
-                                          uint32_t referrer_percent,
                                           bool broadcast = false);
 
       /** Adds another account controlling key
@@ -794,8 +785,6 @@ class wallet_api
 
       /** Creates a new account and registers it on the blockchain.
        *
-       * @todo why no referrer_percent here?
-       *
        * @see suggest_brain_key()
        * @see register_account()
        *
@@ -804,16 +793,12 @@ class wallet_api
        *                     are more expensive to register; the rules are still in flux, but in general
        *                     names of more than 8 characters with at least one digit will be cheap.
        * @param registrar_account the account which will pay the fee to register the user
-       * @param referrer_account the account who is acting as a referrer, and may receive a
-       *                         portion of the user's transaction fees.  This can be the
-       *                         same as the registrar_account if there is no referrer.
        * @param broadcast true to broadcast the transaction on the network
        * @returns the signed transaction registering the account
        */
       signed_transaction create_account_with_brain_key(string brain_key,
                                                        string account_name,
                                                        string registrar_account,
-                                                       string referrer_account,
                                                        bool broadcast = false);
 
       /** Transfer an amount from one account to another.

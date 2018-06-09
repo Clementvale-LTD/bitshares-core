@@ -168,8 +168,6 @@
     "maximum_committee_count": 1001,
     "maximum_authority_membership": 10,
     "reserve_percent_of_fee": 2000,
-    "network_percent_of_fee": 2000,
-    "lifetime_referrer_percent_of_fee": 3000,
     "cashback_vesting_period_seconds": 31536000,
     "cashback_vesting_threshold": 10000000,
     "count_non_member_votes": true,

@@ -194,8 +194,6 @@ struct database_fixture {
    account_create_operation make_account(
       const std::string& name,
       const account_object& registrar,
-      const account_object& referrer,
-      uint8_t referrer_percent = 100,
       public_key_type key = public_key_type()
       );
 
@@ -221,17 +219,13 @@ struct database_fixture {
    const account_object& create_account(
       const string& name,
       const account_object& registrar,
-      const account_object& referrer,
-      uint8_t referrer_percent = 100,
       const public_key_type& key = public_key_type()
       );
 
    const account_object& create_account(
       const string& name,
       const private_key_type& key,
-      const account_id_type& registrar_id = account_id_type(),
-      const account_id_type& referrer_id = account_id_type(),
-      uint8_t referrer_percent = 100
+      const account_id_type& registrar_id = account_id_type()
       );
 
    const committee_member_object& create_committee_member( const account_object& owner );

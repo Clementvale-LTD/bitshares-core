@@ -63,11 +63,6 @@ namespace graphene { namespace chain {
          share_type total_core_in_orders;
 
          /**
-          * Tracks the total fees paid by this account for the purpose of calculating bulk discounts.
-          */
-         share_type lifetime_fees_paid;
-
-         /**
           * Tracks the fees paid by this account which have not been disseminated to the various parties that receive
           * them yet (registrar, referrer, lifetime referrer, network, etc). This is used as an optimization to avoid
           * doing massive amounts of uint128 arithmetic on each and every operation.
@@ -139,18 +134,6 @@ namespace graphene { namespace chain {
 
          ///The account that paid the fee to register this account. Receives a percentage of referral rewards.
          account_id_type registrar;
-         /// The account credited as referring this account. Receives a percentage of referral rewards.
-         account_id_type referrer;
-         /// The lifetime member at the top of the referral tree. Receives a percentage of referral rewards.
-         account_id_type lifetime_referrer;
-
-         /// Percentage of fee which should go to network.
-         uint16_t network_fee_percentage = GRAPHENE_DEFAULT_NETWORK_PERCENT_OF_FEE;
-         /// Percentage of fee which should go to lifetime referrer.
-         uint16_t lifetime_referrer_fee_percentage = 0;
-         /// Percentage of referral rewards (leftover fee after paying network and lifetime referrer) which should go
-         /// to referrer. The remainder of referral rewards goes to the registrar.
-         uint16_t referrer_rewards_percentage = 0;
 
          /// The account's name. This name must be unique among all account names on the graph. May not be empty.
          string name;
@@ -172,11 +155,6 @@ namespace graphene { namespace chain {
          /// The reference implementation records the account's statistics in a separate object. This field contains the
          /// ID of that object.
          account_statistics_id_type statistics;
-
-         /**
-          * Vesting balance which receives cashback_reward deposits.
-          */
-         optional<vesting_balance_id_type> cashback_vb;
 
          special_authority owner_special_authority = no_special_authority();
          special_authority active_special_authority = no_special_authority();
@@ -200,13 +178,6 @@ namespace graphene { namespace chain {
          {
             return (owner_special_authority.which() != special_authority::tag< no_special_authority >::value)
                 || (active_special_authority.which() != special_authority::tag< no_special_authority >::value);
-         }
-
-         template<typename DB>
-         const vesting_balance_object& cashback_balance(const DB& db)const
-         {
-            FC_ASSERT(cashback_vb);
-            return db.get(*cashback_vb);
          }
 
          /// @return true if this is a lifetime member account; false otherwise.
@@ -340,10 +311,8 @@ namespace graphene { namespace chain {
 
 FC_REFLECT_DERIVED( graphene::chain::account_object,
                     (graphene::db::object),
-                    (membership_expiration_date)(registrar)(referrer)(lifetime_referrer)
-                    (network_fee_percentage)(lifetime_referrer_fee_percentage)(referrer_rewards_percentage)
+                    (membership_expiration_date)(registrar)
                     (name)(owner)(active)(options)(statistics)
-                    (cashback_vb)
                     (owner_special_authority)(active_special_authority)
                     (top_n_control_flags)
                     (allowed_assets)
@@ -359,7 +328,6 @@ FC_REFLECT_DERIVED( graphene::chain::account_statistics_object,
                     (most_recent_op)
                     (total_ops)(removed_ops)
                     (total_core_in_orders)
-                    (lifetime_fees_paid)
                     (pending_fees)(pending_vested_fees)
                   )
 

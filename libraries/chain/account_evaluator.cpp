@@ -99,7 +99,6 @@ void_result account_create_evaluator::do_evaluate( const account_create_operatio
 
    FC_ASSERT( d.find_object(op.options.voting_account), "Invalid proxy account specified." );
    FC_ASSERT( fee_paying_account->is_lifetime_member(), "Only Lifetime members may register an account." );
-   FC_ASSERT( op.referrer(d).is_member(d.head_block_time()), "The referrer must be either a lifetime or annual subscriber." );
 
    try
    {
@@ -130,17 +129,11 @@ object_id_type account_create_evaluator::do_apply( const account_create_operatio
 { try {
 
    database& d = db();
-   uint16_t referrer_percent = o.referrer_percent;
 
    const auto& new_acnt_object = db().create<account_object>( [&]( account_object& obj ){
          obj.registrar = o.registrar;
-         obj.referrer = o.referrer;
-         obj.lifetime_referrer = o.referrer(db()).lifetime_referrer;
 
          auto& params = db().get_global_properties().parameters;
-         obj.network_fee_percentage = params.network_percent_of_fee;
-         obj.lifetime_referrer_fee_percentage = params.lifetime_referrer_percent_of_fee;
-         obj.referrer_rewards_percentage = referrer_percent;
 
          obj.name             = o.name;
          obj.owner            = o.owner;
@@ -153,17 +146,6 @@ object_id_type account_create_evaluator::do_apply( const account_create_operatio
          if( o.extensions.value.active_special_authority.valid() )
             obj.active_special_authority = *(o.extensions.value.active_special_authority);
    });
-
-   /*
-   if( has_small_percent )
-   {
-      wlog( "Account affected by #453 registered in block ${n}:  ${na} reg=${reg} ref=${ref}:${refp} ltr=${ltr}:${ltrp}",
-         ("n", db().head_block_num()) ("na", new_acnt_object.id)
-         ("reg", o.registrar) ("ref", o.referrer) ("ltr", new_acnt_object.lifetime_referrer)
-         ("refp", new_acnt_object.referrer_rewards_percentage) ("ltrp", new_acnt_object.lifetime_referrer_fee_percentage) );
-      wlog( "Affected account object is ${o}", ("o", new_acnt_object) );
-   }
-   */
 
    const auto& dynamic_properties = db().get_dynamic_global_properties();
    db().modify(dynamic_properties, [](dynamic_global_property_object& p) {
@@ -284,8 +266,7 @@ void_result account_upgrade_evaluator::do_apply(const account_upgrade_evaluator:
          // Upgrade to lifetime member. I don't care what the account was before.
          a.statistics(d).process_fees(a, d);
          a.membership_expiration_date = time_point_sec::maximum();
-         a.referrer = a.registrar = a.lifetime_referrer = a.get_id();
-         a.lifetime_referrer_fee_percentage = GRAPHENE_100_PERCENT - a.network_fee_percentage;
+         a.registrar = a.get_id();
       } else if( a.is_annual_member(d.head_block_time()) ) {
          // Renew an annual subscription that's still in effect.
          FC_ASSERT( false, "Deprecated" );
@@ -297,7 +278,6 @@ void_result account_upgrade_evaluator::do_apply(const account_upgrade_evaluator:
          FC_ASSERT( false, "Deprecated" );
          a.statistics(d).process_fees(a, d);
          assert(a.is_basic_account(d.head_block_time()));
-         a.referrer = a.get_id();
          a.membership_expiration_date = d.head_block_time() + fc::days(365);
       }
    });

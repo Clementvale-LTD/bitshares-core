@@ -146,9 +146,6 @@ string database_fixture::generate_anon_acct_name()
 
 void database_fixture::verify_asset_supplies( const database& db )
 {
-   //wlog("*** Begin asset supply verification ***");
-   const asset_dynamic_data_object& core_asset_data = db.get_core_asset().dynamic_asset_data_id(db);
-
    const simple_index<account_statistics_object>& statistics_index = db.get_index_type<simple_index<account_statistics_object>>();
    const auto& balance_index = db.get_index_type<account_balance_index>().indices();
 
@@ -355,8 +352,6 @@ account_create_operation database_fixture::make_account(
 account_create_operation database_fixture::make_account(
    const std::string& name,
    const account_object& registrar,
-   const account_object& referrer,
-   uint8_t referrer_percent /* = 100 */,
    public_key_type key /* = public_key_type() */
    )
 {
@@ -365,8 +360,6 @@ account_create_operation database_fixture::make_account(
       account_create_operation          create_account;
 
       create_account.registrar          = registrar.id;
-      create_account.referrer           = referrer.id;
-      create_account.referrer_percent   = referrer_percent;
 
       create_account.name = name;
       create_account.owner = authority(123, key, 123);
@@ -390,7 +383,7 @@ account_create_operation database_fixture::make_account(
       create_account.fee = db.current_fee_schedule().calculate_fee( create_account );
       return create_account;
    }
-   FC_CAPTURE_AND_RETHROW((name)(referrer_percent))
+   FC_CAPTURE_AND_RETHROW((name))
 }
 
 const asset_object& database_fixture::get_asset( const string& symbol )const
@@ -510,30 +503,26 @@ const account_object& database_fixture::create_account(
 const account_object& database_fixture::create_account(
    const string& name,
    const account_object& registrar,
-   const account_object& referrer,
-   uint8_t referrer_percent /* = 100 */,
    const public_key_type& key /*= public_key_type()*/
    )
 {
    try
    {
       trx.operations.resize(1);
-      trx.operations.back() = (make_account(name, registrar, referrer, referrer_percent, key));
+      trx.operations.back() = (make_account(name, registrar, key));
       trx.validate();
       auto r = db.push_transaction(trx, ~0);
       const auto& result = db.get<account_object>(r.operation_results[0].get<object_id_type>());
       trx.operations.clear();
       return result;
    }
-   FC_CAPTURE_AND_RETHROW( (name)(registrar)(referrer) )
+   FC_CAPTURE_AND_RETHROW( (name)(registrar) )
 }
 
 const account_object& database_fixture::create_account(
    const string& name,
    const private_key_type& key,
-   const account_id_type& registrar_id /* = account_id_type() */,
-   const account_id_type& referrer_id /* = account_id_type() */,
-   uint8_t referrer_percent /* = 100 */
+   const account_id_type& registrar_id /* = account_id_type() */
    )
 {
    try
@@ -542,7 +531,6 @@ const account_object& database_fixture::create_account(
 
       account_create_operation account_create_op;
 
-      account_create_op.registrar = registrar_id;
       account_create_op.name = name;
       account_create_op.owner = authority(1234, public_key_type(key.get_public_key()), 1234);
       account_create_op.active = authority(5678, public_key_type(key.get_public_key()), 5678);
@@ -558,7 +546,7 @@ const account_object& database_fixture::create_account(
       trx.operations.clear();
       return result;
    }
-   FC_CAPTURE_AND_RETHROW( (name)(registrar_id)(referrer_id) )
+   FC_CAPTURE_AND_RETHROW( (name)(registrar_id) )
 }
 
 const committee_member_object& database_fixture::create_committee_member( const account_object& owner )

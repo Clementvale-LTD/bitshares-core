@@ -92,14 +92,6 @@ BOOST_AUTO_TEST_CASE( nonzero_fee_test )
 #define CHECK_UNVESTED_CASHBACK( actor_name, amount ) \
    BOOST_CHECK_EQUAL( actor_name ## _id(db).statistics(db).pending_fees.value, amount )
 
-#define GET_CASHBACK_BALANCE( account ) \
-   ( (account.cashback_vb.valid()) \
-   ? account.cashback_balance(db).balance.amount.value \
-   : 0 )
-
-#define CHECK_CASHBACK_VBO( actor_name, _amount ) \
-   BOOST_CHECK_EQUAL( GET_CASHBACK_BALANCE( actor_name ## _id(db) ), _amount )
-
 #define P100 GRAPHENE_100_PERCENT
 #define P1 GRAPHENE_1_PERCENT
 
@@ -199,12 +191,10 @@ BOOST_AUTO_TEST_CASE( cashback_test )
    BOOST_TEST_MESSAGE("Enable fees");
    const auto& fees = db.get_global_properties().parameters.current_fees;
 
-#define CustomRegisterActor(actor_name, registrar_name, referrer_name, referrer_rate) \
+#define CustomRegisterActor(actor_name, registrar_name) \
    { \
       account_create_operation op; \
       op.registrar = registrar_name ## _id; \
-      op.referrer = referrer_name ## _id; \
-      op.referrer_percent = referrer_rate*GRAPHENE_1_PERCENT; \
       op.name = BOOST_PP_STRINGIZE(actor_name); \
       op.options.memo_key = actor_name ## _private_key.get_public_key(); \
       op.active = authority(1, public_key_type(actor_name ## _private_key.get_public_key()), 1); \
@@ -221,7 +211,6 @@ BOOST_AUTO_TEST_CASE( cashback_test )
       CHECK_BALANCE( actor_name, a ## actor_name.bal );             \
       CHECK_VESTED_CASHBACK( actor_name, a ## actor_name.vcb );     \
       CHECK_UNVESTED_CASHBACK( actor_name, a ## actor_name.ucb );   \
-      CHECK_CASHBACK_VBO( actor_name, a ## actor_name.ubal );       \
    }
 
 #define CustomAudit()                                \
@@ -245,7 +234,7 @@ BOOST_AUTO_TEST_CASE( cashback_test )
 
    BOOST_TEST_MESSAGE("Register and upgrade Ann");
    {
-      CustomRegisterActor(ann, life, life, 75);
+      CustomRegisterActor(ann, life);
       alife.vcb += reg_fee; alife.bal += -reg_fee;
       CustomAudit();
 
@@ -264,11 +253,11 @@ BOOST_AUTO_TEST_CASE( cashback_test )
    }
 
    BOOST_TEST_MESSAGE("Register dumy and stud");
-   CustomRegisterActor(dumy, rog, life, 75);
+   CustomRegisterActor(dumy, rog);
    arog.vcb += reg_fee; arog.bal += -reg_fee;
    CustomAudit();
 
-   CustomRegisterActor(stud, rog, ann, 80);
+   CustomRegisterActor(stud, rog);
    arog.vcb += reg_fee; arog.bal += -reg_fee;
    CustomAudit();
 
@@ -302,11 +291,11 @@ REG : net' ltm' ref'
 
    BOOST_TEST_MESSAGE("Register pleb and scud");
 
-   CustomRegisterActor(pleb, rog, stud, 95);
+   CustomRegisterActor(pleb, rog);
    arog.vcb += reg_fee; arog.bal += -reg_fee;
    CustomAudit();
 
-   CustomRegisterActor(scud, stud, ann, 80);
+   CustomRegisterActor(scud, stud);
    astud.vcb += reg_fee; astud.bal += -reg_fee;
    CustomAudit();
 

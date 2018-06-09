@@ -188,7 +188,6 @@ void account_create_operation::validate()const
 {
    FC_ASSERT( fee.amount >= 0 );
    FC_ASSERT( is_valid_name( name ) );
-   FC_ASSERT( referrer_percent <= GRAPHENE_100_PERCENT );
    FC_ASSERT( owner.num_auths() != 0 );
    FC_ASSERT( owner.address_auths.size() == 0 );
    FC_ASSERT( active.num_auths() != 0 );

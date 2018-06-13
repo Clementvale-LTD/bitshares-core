@@ -51,6 +51,8 @@ namespace graphene { namespace chain {
             limit_order_create_operation,
             limit_order_cancel_operation,
             fill_order_operation,           // VIRTUAL
+            limit_order_accept_operation,
+            limit_order_accepted_operation,   //VIRTUAL 
             account_create_operation,
             account_update_operation,
             account_upgrade_operation,
@@ -78,9 +80,7 @@ namespace graphene { namespace chain {
             override_transfer_operation,
             transfer_to_blind_operation,
             blind_transfer_operation,
-            transfer_from_blind_operation,
-            limit_order_accept_operation,
-            limit_order_accepted_operation   //VIRTUAL 
+            transfer_from_blind_operation
          > operation;
 
    /// @} // operations group

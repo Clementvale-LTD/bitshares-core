@@ -20,44 +20,42 @@
           3,{}
         ],[
           4,{
+            "fee": 0
+          }
+        ],[
+          5,{}
+        ],[
+          6,{
             "basic_fee": 1000000,
             "premium_fee": 1000000,
             "price_per_kbyte": 0
           }
         ],[
-          5,{
+          7,{
             "fee": 0,
             "price_per_kbyte": 0
           }
         ],[
-          6,{
+          8,{
             "membership_annual_fee": 0,
             "membership_lifetime_fee": 50000000
           }
         ],[
-          7,{
+          9,{
             "symbol3": "0",
             "symbol4": "0",
             "long_symbol": 0,
             "price_per_kbyte": 0
           }
         ],[
-          8,{
-            "fee": 0,
-            "price_per_kbyte": 0
-          }
-        ],[
-          9,{
-            "fee": 0,
-            "price_per_kbyte": 0
-          }
-        ],[
           10,{
-            "fee": 0
+            "fee": 0,
+            "price_per_kbyte": 0
           }
         ],[
           11,{
-            "fee": 100000000
+            "fee": 0,
+            "price_per_kbyte": 0
           }
         ],[
           12,{
@@ -65,21 +63,21 @@
           }
         ],[
           13,{
-            "fee": 0,
-            "price_per_kbyte": 0
+            "fee": 100000000
           }
         ],[
           14,{
+            "fee": 0
+          }
+        ],[
+          15,{
             "fee": 0,
             "price_per_kbyte": 0
           }
         ],[
-          15,{
-            "fee": 0
-          }
-        ],[
           16,{
-            "fee": 0
+            "fee": 0,
+            "price_per_kbyte": 0
           }
         ],[
           17,{
@@ -87,8 +85,7 @@
           }
         ],[
           18,{
-            "fee": 0,
-            "price_per_kbyte": 0
+            "fee": 0
           }
         ],[
           19,{
@@ -96,7 +93,8 @@
           }
         ],[
           20,{
-            "fee": 100000000
+            "fee": 0,
+            "price_per_kbyte": 0
           }
         ],[
           21,{
@@ -104,7 +102,7 @@
           }
         ],[
           22,{
-            "fee": 0
+            "fee": 100000000
           }
         ],[
           23,{
@@ -116,40 +114,42 @@
           }
         ],[
           25,{
-            "fee": 0,
-            "price_per_kbyte": 0
+            "fee": 0
           }
         ],[
           26,{
             "fee": 0
           }
         ],[
-          27,{}
-        ],[
-          28,{
+          27,{
             "fee": 0,
             "price_per_kbyte": 0
           }
         ],[
-          29,{
-            "fee": 0,
-            "price_per_output": 0
+          28,{
+            "fee": 0
           }
+        ],[
+          29,{}
         ],[
           30,{
             "fee": 0,
-            "price_per_output": 0
+            "price_per_kbyte": 0
           }
         ],[
           31,{
-            "fee": 0
+            "fee": 0,
+            "price_per_output": 0
           }
         ],[
           32,{
-            "fee": 0
+            "fee": 0,
+            "price_per_output": 0
           }
         ],[
-          33,{}
+          33,{
+            "fee": 0
+          }
         ]
       ],
       "scale": 10000

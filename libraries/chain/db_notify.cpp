@@ -166,6 +166,7 @@ struct get_impacted_account_visitor
    }
 
    void operator()( const service_create_operation& op ) {}
+   void operator()( const service_update_operation& op ) {}
 };
 
 static void operation_get_impacted_accounts( const operation& op, flat_set<account_id_type>& result )

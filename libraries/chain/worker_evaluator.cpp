@@ -59,4 +59,31 @@ object_id_type service_create_evaluator::do_apply(const service_create_evaluator
 
 } FC_CAPTURE_AND_RETHROW( (o) ) }  
 
+void_result service_update_evaluator::do_evaluate(const service_update_evaluator::operation_type& o)
+{ try {
+   database& d = db();
+
+   const service_object& so = o.service_to_update(d);
+   
+   service_to_update = &so;
+
+   FC_ASSERT( o.owner == so.owner, "", ("o.owner", o.owner)("so.owner", so.owner) );
+   
+   const auto& chain_parameters = d.get_global_properties().parameters;
+   FC_ASSERT( o.p_memo.gto.size() < chain_parameters.maximum_asset_whitelist_authorities );
+   
+   return void_result();
+} FC_CAPTURE_AND_RETHROW( (o) ) }
+
+object_id_type service_update_evaluator::do_apply(const service_update_evaluator::operation_type& o)
+{ try {
+
+   database& d = db();
+
+   d.modify(*service_to_update, [&](service_object& so) {
+      so.p_memo = o.p_memo;
+   });
+
+} FC_CAPTURE_AND_RETHROW( (o) ) }  
+
 } } // graphene::chain

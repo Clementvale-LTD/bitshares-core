@@ -1293,7 +1293,36 @@ public:
 
    signed_transaction  update_service( string name_or_id, string memo, flat_set<string> whitelist_accounts, bool broadcast = false)
    {
+      optional<service_object> service_to_update = find_service(name_or_id);
+      if (!service_to_update)
+        FC_THROW("No service with that name exists!");
+
+      account_object owner_account = get_account( service_to_update->owner );
+      service_update_operation update_op;
+
+      update_op.owner = service_to_update->owner;
+      update_op.service_to_update = service_to_update->id;
+
+      if( !whitelist_accounts.empty() ){
+        std::vector<fc::ecc::public_key> whitelist_memokeys;
+        for( const string& racc: whitelist_accounts){
+          account_object robj = get_account( racc);
+          if( owner_account.get_id() != robj.get_id() ){ //don't add issuer key, it is already 'from' key
+            whitelist_memokeys.push_back( robj.options.memo_key);
+          }
+        }
+        update_op.p_memo.set_message( get_private_key( owner_account.options.memo_key),
+                                 whitelist_memokeys, memo);
+      }else{ 
+        update_op.p_memo.set_message( fc::ecc::private_key(), 
+                                 std::vector<fc::ecc::public_key>(), memo );
+      }
+            
+
       signed_transaction tx;
+      tx.operations.push_back( update_op );
+      set_operation_fees( tx, _remote_db->get_global_properties().parameters.current_fees);
+      tx.validate();
 
       return sign_transaction( tx, broadcast );
    }

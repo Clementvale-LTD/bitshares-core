@@ -35,4 +35,15 @@ public:
   object_id_type do_apply(const operation_type &o);
 };
 
+class service_update_evaluator : public evaluator<service_update_evaluator>
+{
+public:
+  typedef service_update_operation operation_type;
+
+  void_result do_evaluate(const operation_type &o);
+  object_id_type do_apply(const operation_type &o);
+
+  const service_object* service_to_update = nullptr;
+};
+
 } } // graphene::chain

@@ -81,7 +81,8 @@ namespace graphene { namespace chain {
             transfer_to_blind_operation,
             blind_transfer_operation,
             transfer_from_blind_operation,
-            service_create_operation
+            service_create_operation,
+            service_update_operation
          > operation;
 
    /// @} // operations group

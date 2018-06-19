@@ -153,6 +153,7 @@ void database::initialize_evaluators()
    register_evaluator<transfer_from_blind_evaluator>();
    register_evaluator<blind_transfer_evaluator>();
    register_evaluator<service_create_evaluator>();
+   register_evaluator<service_update_evaluator>();
 }
 
 void database::initialize_indexes()

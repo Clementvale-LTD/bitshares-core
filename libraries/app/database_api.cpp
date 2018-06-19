@@ -103,6 +103,11 @@ class database_api_impl : public std::enable_shared_from_this<database_api_impl>
       vector<asset_object>           list_assets(const string& lower_bound_symbol, uint32_t last_seconds, uint32_t limit)const;
       vector<optional<asset_object>> lookup_asset_symbols(const vector<string>& symbols_or_ids)const;
 
+      //Services
+      vector<optional<service_object>> get_services(const vector<service_id_type>& service_ids)const;
+      vector<service_object> list_services(const string& lower_bound_name, uint32_t limit)const;
+      vector<optional<service_object>> lookup_service_names(const vector<string>& names_or_ids)const;
+
       // Markets / feeds
       vector<limit_order_object>         get_limit_orders(asset_id_type a, asset_id_type b, uint32_t limit)const;
       vector<limit_order_object>         get_account_limit_orders( account_id_type account_id, uint32_t limit)const;
@@ -966,6 +971,75 @@ vector<optional<asset_object>> database_api_impl::lookup_asset_symbols(const vec
       }
       auto itr = assets_by_symbol.find(symbol_or_id);
       return itr == assets_by_symbol.end()? optional<asset_object>() : *itr;
+   });
+   return result;
+}
+
+vector<optional<service_object>> database_api::get_services(const vector<service_id_type>& service_ids)const
+{
+   return my->get_services( service_ids );
+}
+
+vector<optional<service_object>> database_api_impl::get_services(const vector<service_id_type>& service_ids)const
+{
+   vector<optional<service_object>> result; result.reserve(service_ids.size());
+   std::transform(service_ids.begin(), service_ids.end(), std::back_inserter(result),
+                  [this](service_id_type id) -> optional<service_object> {
+      if(auto o = _db.find(id))
+      {
+         subscribe_to_item( id );
+         return *o;
+      }
+      return {};
+   });
+   return result;
+}
+
+vector<service_object> database_api::list_services(const string& lower_bound_name, uint32_t limit)const
+{
+   return my->list_services( lower_bound_name, limit);
+}
+
+vector<service_object> database_api_impl::list_services(const string& lower_bound_name, uint32_t limit)const
+{
+   FC_ASSERT( limit <= 1000 );
+   const auto& service_by_name = _db.get_index_type<service_index>().indices().get<by_name>();
+   vector<service_object> result;
+   result.reserve(limit);
+
+
+   auto itr = service_by_name.lower_bound(lower_bound_name);
+
+   if( lower_bound_name == "" )
+      itr = service_by_name.begin();
+
+   for( ; limit && itr != service_by_name.end(); itr++ ){
+      result.emplace_back(*itr);
+      limit--;
+   }
+
+   return result;
+}
+
+vector<optional<service_object>> database_api::lookup_service_names(const vector<string>& names_or_ids)const
+{
+   return my->lookup_service_names( names_or_ids);
+}
+
+vector<optional<service_object>> database_api_impl::lookup_service_names(const vector<string>& names_or_ids)const
+{
+   const auto& services_by_names = _db.get_index_type<service_index>().indices().get<by_name>();
+   vector<optional<service_object> > result;
+   result.reserve(names_or_ids.size());
+   std::transform(names_or_ids.begin(), names_or_ids.end(), std::back_inserter(result),
+                  [this, &services_by_names](const string& name_or_id) -> optional<service_object> {
+      if( !name_or_id.empty() && std::isdigit(name_or_id[0]) )
+      {
+         auto ptr = _db.find(variant(name_or_id).as<service_id_type>());
+         return ptr == nullptr? optional<service_object>() : *ptr;
+      }
+      auto itr = services_by_names.find(name_or_id);
+      return itr == services_by_names.end()? optional<service_object>() : *itr;
    });
    return result;
 }

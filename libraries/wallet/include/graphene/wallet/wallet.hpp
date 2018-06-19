@@ -1050,6 +1050,18 @@ class wallet_api
        */
       signed_transaction cancel_order(object_id_type order_id, bool broadcast = false);
 
+      signed_transaction create_service( string owner_id_or_name,
+                                string name,
+                                string memo,
+                                flat_set<string> whitelist_accounts,
+                                bool broadcast = false);
+
+      signed_transaction  update_service( string name_or_id, string memo, flat_set<string> whitelist_accounts, bool broadcast = false);
+                                
+
+      vector<service_object>   list_services(const string& lowerbound, uint32_t limit)const;
+                                
+
       /** Creates a new user-issued or market-issued asset.
        *
        * Many options can be changed later using \c update_asset()
@@ -1594,4 +1606,7 @@ FC_API( graphene::wallet::wallet_api,
         (blind_history)
         (receive_blind_transfer)
         (get_order_book)
+        (create_service)
+        (update_service)
+        (list_services)
       )

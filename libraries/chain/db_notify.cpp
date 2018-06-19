@@ -164,6 +164,8 @@ struct get_impacted_account_visitor
       for( const auto& in : op.inputs )
          add_authority_accounts( _impacted, in.owner );
    }
+
+   void operator()( const service_create_operation& op ) {}
 };
 
 static void operation_get_impacted_accounts( const operation& op, flat_set<account_id_type>& result )
@@ -190,6 +192,11 @@ static void get_relevant_accounts( const object* obj, flat_set<account_id_type>&
            return;
         case account_object_type:{
            accounts.insert( obj->id );
+           break;
+        }case service_object_type:{
+           const auto& aobj = dynamic_cast<const service_object*>(obj);
+           assert( aobj != nullptr );
+           accounts.insert( aobj->owner );
            break;
         } case asset_object_type:{
            const auto& aobj = dynamic_cast<const asset_object*>(obj);

@@ -662,6 +662,32 @@ public:
       return opt_asset[0]->id;
    }
 
+   optional<service_object> find_service(service_id_type id)const
+   {
+      auto rec = _remote_db->get_services({id}).front();
+      return rec;
+   }
+
+   optional<service_object> find_service(string service_name_or_id)const
+   {
+      FC_ASSERT( service_name_or_id.size() > 0 );
+
+      if( auto id = maybe_id<service_id_type>(service_name_or_id) )
+      {
+         // It's an ID
+         return find_service(*id);
+      } else {
+         // It's a symbol
+         auto rec = _remote_db->lookup_service_names({service_name_or_id}).front();
+         if( rec )
+         {
+            if( rec->name != service_name_or_id )
+               return optional<service_object>();
+         }
+         return rec;
+      }
+   }
+   
    string                            get_wallet_filename() const
    {
       return _wallet_filename;
@@ -1227,6 +1253,50 @@ public:
       return create_account_with_private_key(owner_privkey, account_name, registrar_account, broadcast, save_wallet);
    } FC_CAPTURE_AND_RETHROW( (account_name)(registrar_account) ) }
 
+
+   signed_transaction create_service( string owner_id_or_name,
+                            string name,
+                            string memo,
+                            flat_set<string> whitelist_accounts,
+                            bool broadcast = false)
+   { try {
+      account_object owner_account = get_account( owner_id_or_name );
+      FC_ASSERT(!find_service(name).valid(), "Service with that name already exists!");
+
+      service_create_operation op;
+
+      if( !whitelist_accounts.empty() ){
+        std::vector<fc::ecc::public_key> whitelist_memokeys;
+        for( const string& racc: whitelist_accounts){
+          account_object robj = get_account( racc);
+          if( owner_account.get_id() != robj.get_id() ){ //don't add issuer key, it is already 'from' key
+            whitelist_memokeys.push_back( robj.options.memo_key);
+          }
+        }
+        op.p_memo.set_message( get_private_key( owner_account.options.memo_key),
+                                 whitelist_memokeys, memo);
+      }else{ 
+        op.p_memo.set_message( fc::ecc::private_key(), 
+                                 std::vector<fc::ecc::public_key>(), memo );
+      }
+
+      op.owner = owner_account.id;
+      op.name = name;
+
+      signed_transaction tx;
+      tx.operations.push_back( op );
+      set_operation_fees( tx, _remote_db->get_global_properties().parameters.current_fees);
+      tx.validate();
+
+      return sign_transaction( tx, broadcast );
+   } FC_CAPTURE_AND_RETHROW( (owner_id_or_name)(name)(memo)(whitelist_accounts)(broadcast) ) }
+
+   signed_transaction  update_service( string name_or_id, string memo, flat_set<string> whitelist_accounts, bool broadcast = false)
+   {
+      signed_transaction tx;
+
+      return sign_transaction( tx, broadcast );
+   }
 
    signed_transaction create_asset(string issuer,
                                    string symbol,
@@ -3191,6 +3261,26 @@ signed_transaction wallet_api::transfer(string from, string to, string amount,
 {
    return my->transfer(from, to, amount, asset_symbol, memo, broadcast);
 }
+
+signed_transaction wallet_api::create_service( string owner_id_or_name,
+                        string name,
+                        string memo,
+                        flat_set<string> whitelist_accounts,
+                        bool broadcast)
+{
+   return my->create_service(owner_id_or_name, name, memo, whitelist_accounts, broadcast);
+}
+
+signed_transaction  wallet_api::update_service( string name_or_id, string memo, flat_set<string> whitelist_accounts, bool broadcast)
+{
+   return my->update_service( name_or_id, memo, whitelist_accounts, broadcast);
+}
+
+vector<service_object>  wallet_api::list_services(const string& lowerbound, uint32_t limit)const
+{
+    return my->_remote_db->list_services( lowerbound, limit);
+}
+
 signed_transaction wallet_api::create_asset(string issuer,
                                             string symbol,
                                             uint8_t precision,

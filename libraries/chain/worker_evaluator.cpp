@@ -32,4 +32,31 @@
 
 namespace graphene { namespace chain {
 
+void_result service_create_evaluator::do_evaluate(const service_create_evaluator::operation_type& o)
+{ try {
+   database& d = db();
+
+   const auto& chain_parameters = d.get_global_properties().parameters;
+   FC_ASSERT( o.p_memo.gto.size() < chain_parameters.maximum_asset_whitelist_authorities );
+   
+   return void_result();
+} FC_CAPTURE_AND_RETHROW( (o) ) }
+
+object_id_type service_create_evaluator::do_apply(const service_create_evaluator::operation_type& o)
+{ try {
+   database& d = db();
+
+   auto next_service_id = db().get_index_type<service_index>().get_next_id();
+
+   const service_object& new_service =
+    d.create<service_object>([&](service_object& w) {
+      w.owner = o.owner;
+      w.name = o.name;
+      w.p_memo = o.p_memo;
+   });
+
+   assert( new_service.id == next_service_id );
+
+} FC_CAPTURE_AND_RETHROW( (o) ) }  
+
 } } // graphene::chain

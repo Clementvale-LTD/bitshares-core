@@ -25,4 +25,8 @@
 
 namespace graphene { namespace chain {
 
+void  service_create_operation::validate()const
+{
+}
+  
 } }

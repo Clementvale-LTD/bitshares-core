@@ -27,4 +27,40 @@
 
 namespace graphene { namespace chain {
 
+  class service_object : public abstract_object<service_object>
+  {
+  public:
+    static const uint8_t space_id = protocol_ids;
+    static const uint8_t type_id = service_object_type;
+
+    /// ID of the account which owns this worker
+    account_id_type owner;
+
+    /// Human-readable name for the worker
+    string name;
+
+    memo_group p_memo;
+
+    service_id_type get_id()const { return id; }
+  };
+
+  struct by_name;
+  struct by_owner;
+
+  typedef multi_index_container<
+      service_object,
+      indexed_by<
+          ordered_unique<tag<by_id>, member<object, object_id_type, &object::id>>,
+          ordered_unique<tag<by_name>, member<service_object, string, &service_object::name>>,
+          ordered_non_unique<tag<by_owner>, member<service_object, account_id_type, &service_object::owner>>>>
+      service_object_multi_index_type;
+  typedef generic_index<service_object, service_object_multi_index_type> service_index;
+
 } } // graphene::chain
+
+FC_REFLECT_DERIVED( graphene::chain::service_object, (graphene::db::object),
+                    (owner)
+                    (name)
+                    (p_memo)
+                  )
+

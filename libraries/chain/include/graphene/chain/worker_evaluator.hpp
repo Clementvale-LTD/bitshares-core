@@ -26,4 +26,13 @@
 
 namespace graphene { namespace chain {
 
+class service_create_evaluator : public evaluator<service_create_evaluator>
+{
+public:
+  typedef service_create_operation operation_type;
+
+  void_result do_evaluate(const operation_type &o);
+  object_id_type do_apply(const operation_type &o);
+};
+
 } } // graphene::chain

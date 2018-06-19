@@ -341,6 +341,10 @@ class database_api
        */
       vector<optional<asset_object>> lookup_asset_symbols(const vector<string>& symbols_or_ids)const;
 
+      vector<optional<service_object>> get_services(const vector<service_id_type>& service_ids)const;
+      vector<service_object> list_services(const string& lower_bound_name, uint32_t limit)const;
+      vector<optional<service_object>> lookup_service_names(const vector<string>& names_or_ids)const;
+
       /////////////////////
       // Markets / feeds //
       /////////////////////
@@ -633,6 +637,11 @@ FC_API(graphene::app::database_api,
    (get_assets)
    (list_assets)
    (lookup_asset_symbols)
+
+   //Services
+   (get_services)
+   (list_services)
+   (lookup_service_names)
 
    // Markets / feeds
    (get_order_book)

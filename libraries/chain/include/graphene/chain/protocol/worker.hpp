@@ -23,7 +23,27 @@
  */
 #pragma once
 #include <graphene/chain/protocol/base.hpp>
+#include <graphene/chain/protocol/memo.hpp>
 
 namespace graphene { namespace chain {
 
+struct service_create_operation : public base_operation
+{     
+   struct fee_parameters_type { uint64_t fee = 5000*GRAPHENE_BLOCKCHAIN_PRECISION; };
+
+   asset                fee;
+   account_id_type      owner;
+   string               name;
+   memo_group           p_memo;
+
+   account_id_type   fee_payer()const { return owner; }
+   void              validate()const;
+};  
+
 } }
+
+FC_REFLECT( graphene::chain::service_create_operation::fee_parameters_type, (fee) )
+FC_REFLECT( graphene::chain::service_create_operation,
+            (fee)(owner)(name)(p_memo) )
+
+

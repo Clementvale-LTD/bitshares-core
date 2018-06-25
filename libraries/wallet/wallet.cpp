@@ -688,6 +688,58 @@ public:
       }
    }
    
+   optional<bid_request_object> find_bid_request(bid_request_id_type id)const
+   {
+      auto rec = _remote_db->get_bid_requests({id}).front();
+      return rec;
+   }
+
+   optional<bid_request_object> find_bid_request(string bid_request_name_or_id)const
+   {
+      FC_ASSERT( bid_request_name_or_id.size() > 0 );
+
+      if( auto id = maybe_id<bid_request_id_type>(bid_request_name_or_id) )
+      {
+         // It's an ID
+         return find_bid_request(*id);
+      } else {
+         // It's a symbol
+         auto rec = _remote_db->lookup_bid_request_names({bid_request_name_or_id}).front();
+         if( rec )
+         {
+            if( rec->name != bid_request_name_or_id )
+               return optional<bid_request_object>();
+         }
+         return rec;
+      }
+   }
+
+   optional<bid_object> find_bid(bid_id_type id)const
+   {
+      auto rec = _remote_db->get_bids({id}).front();
+      return rec;
+   }
+
+   optional<bid_object> find_bid(string bid_name_or_id)const
+   {
+      FC_ASSERT( bid_name_or_id.size() > 0 );
+
+      if( auto id = maybe_id<bid_id_type>(bid_name_or_id) )
+      {
+         // It's an ID
+         return find_bid(*id);
+      } else {
+         // It's a symbol
+         auto rec = _remote_db->lookup_bid_names({bid_name_or_id}).front();
+         if( rec )
+         {
+            if( rec->name != bid_name_or_id )
+               return optional<bid_object>();
+         }
+         return rec;
+      }
+   }
+
    string                            get_wallet_filename() const
    {
       return _wallet_filename;
@@ -1327,6 +1379,120 @@ public:
       return sign_transaction( tx, broadcast );
    }
 
+   signed_transaction create_bid_request(string owner_id_or_name,
+                                         string name,
+                                         string memo,
+                                         flat_set<string> assets,
+                                         uint32_t timeout_sec = 0,
+                                         bool broadcast = false)
+   { try {
+      account_object owner_account = get_account( owner_id_or_name );
+      FC_ASSERT(!find_bid_request(name).valid(), "Bid request with that name already exists!");
+
+      FC_ASSERT( !assets.empty() );
+
+      bid_request_create_operation op;
+
+      for( auto astr: assets)
+      {
+        asset_object asset_obj = get_asset( astr );
+        op.assets.insert( asset_obj.id);
+        op.providers.insert( asset_obj.issuer);
+      }
+
+      {
+        std::vector<fc::ecc::public_key> acc_memokeys;
+        for( auto& racc: op.providers){
+          account_object robj = get_account( racc);
+          if( owner_account.get_id() != robj.get_id() ){ //don't add owner key, it is already 'from' key
+            acc_memokeys.push_back( robj.options.memo_key);
+          }
+        }
+        op.p_memo.set_message( get_private_key( owner_account.options.memo_key),
+                               acc_memokeys, memo);
+      }
+
+      op.owner = owner_account.id;
+      op.name = name;
+      op.expiration = fc::time_point::now() + fc::seconds(timeout_sec);
+      
+      signed_transaction tx;
+      tx.operations.push_back( op );
+      set_operation_fees( tx, _remote_db->get_global_properties().parameters.current_fees);
+      tx.validate();
+
+      return sign_transaction( tx, broadcast );
+   } FC_CAPTURE_AND_RETHROW( (owner_id_or_name)(name)(memo)(assets)(timeout_sec)(broadcast) ) }
+
+   vector<bid_request_object> list_bid_requests(const string &lower_bound_name, optional<vector<string>> assets_name_or_id, uint32_t limit) const
+   {
+     optional<vector<asset_id_type>> o_assets_id;
+     if( assets_name_or_id.valid()){
+       vector<asset_id_type> assets_id;
+       for( auto astr: *assets_name_or_id){
+         assets_id.push_back( get_asset(astr).get_id() );
+       }
+       o_assets_id = assets_id;
+     }
+
+     return _remote_db->list_bid_requests(lower_bound_name, o_assets_id, limit);
+   }
+
+   vector<bid_request_object> list_bid_requests_by_provider(string provider_acc_name_or_id) const
+   {
+     account_object acc_o = get_account( provider_acc_name_or_id);
+     return _remote_db->list_bid_requests_by_provider( acc_o.get_id() );
+   }
+
+   vector<bid_request_object> list_bid_requests_by_requester(string requester_acc_name_or_id) const
+   {
+     account_object acc_o = get_account( requester_acc_name_or_id);
+     return _remote_db->list_bid_requests_by_requester( acc_o.get_id() );
+   }
+
+   signed_transaction create_bid(string owner_id_or_name,
+                                 string name,
+                                 string request,
+                                 string memo,
+                                 uint32_t timeout_sec = 0,
+                                 bool broadcast = false)
+   { try {
+      account_object owner_account = get_account( owner_id_or_name );
+      FC_ASSERT(!find_bid(name).valid(), "Bid with that name already exists!"); 
+
+      auto br_o = find_bid_request(request);
+      FC_ASSERT( br_o.valid() );
+
+      account_object requester_account = get_account( br_o->owner );
+
+      bid_create_operation op;
+      op.owner = owner_account.id;
+      op.name = name;
+      op.request = br_o->id;
+      op.p_memo.set_message( get_private_key( owner_account.options.memo_key), requester_account.options.memo_key, memo );
+      op.expiration = fc::time_point::now() + fc::seconds(timeout_sec);
+
+      signed_transaction tx;
+      tx.operations.push_back( op );
+      set_operation_fees( tx, _remote_db->get_global_properties().parameters.current_fees);
+      tx.validate();
+
+      return sign_transaction( tx, broadcast );
+   } FC_CAPTURE_AND_RETHROW( (owner_id_or_name)(name)(request)(memo)(broadcast) ) }
+
+   vector<bid_object> list_bids_by_request(string request_name_or_id) const
+   {
+      auto br_o = find_bid_request(request_name_or_id);
+      FC_ASSERT( br_o.valid() );
+      return _remote_db->list_bids_by_request( br_o->id );
+   }
+
+   vector<bid_object> list_bids_by_provider(string provider_acc_name_or_id) const
+   {
+     account_object acc_o = get_account( provider_acc_name_or_id);
+     return _remote_db->list_bids_by_provider( acc_o.get_id() );
+   }
+
    signed_transaction create_asset(string issuer,
                                    string symbol,
                                    uint8_t precision,
@@ -1945,9 +2111,15 @@ public:
         op.p_memo = memo_data();
         op.p_memo->from = seller.options.memo_key;
         op.p_memo->to = counterparty.options.memo_key;
-        op.p_memo->set_message(get_private_key(seller.options.memo_key),
-                                  counterparty.options.memo_key, offer_request->memo);
-        
+        op.p_memo->set_message( get_private_key(seller.options.memo_key),
+                                counterparty.options.memo_key, offer_request->memo);
+
+        if( offer_request->bid_id.valid()){
+          auto bo = find_bid( *(offer_request->bid_id) );
+          FC_ASSERT( bo.valid() );
+          FC_ASSERT( bo->owner == op.counterparty_id);
+          op.bid_id = bo->get_id(); 
+        }
       }
 
       signed_transaction tx;
@@ -3308,6 +3480,57 @@ signed_transaction  wallet_api::update_service( string name_or_id, string memo, 
 vector<service_object>  wallet_api::list_services(const string& lowerbound, uint32_t limit)const
 {
     return my->_remote_db->list_services( lowerbound, limit);
+}
+
+
+signed_transaction wallet_api::create_bid_request( string owner_id_or_name,
+                          string name,
+                          string memo,
+                          flat_set<string> assets,
+                          uint32_t timeout_sec,
+                          bool broadcast)
+{
+   return my->create_bid_request(owner_id_or_name, name, memo, assets, timeout_sec, broadcast);
+}
+
+vector<bid_request_object> wallet_api::list_bid_requests(const string& lower_bound_name, optional<vector<string>> assets_name_or_id, uint32_t limit)const
+{
+    return my->list_bid_requests( lower_bound_name, assets_name_or_id, limit);
+}
+
+vector<bid_request_object> wallet_api::list_bid_requests_by_provider (string provider_acc_name_or_id)const
+{
+    return my->list_bid_requests_by_provider( provider_acc_name_or_id);
+}
+
+vector<bid_request_object> wallet_api::list_bid_requests_by_requester (string requester_acc_name_or_id)const
+{
+    return my->list_bid_requests_by_requester( requester_acc_name_or_id);
+}
+
+signed_transaction wallet_api::create_bid( string owner_id_or_name,
+                          string name,
+                          string request, 
+                          string memo,
+                          uint32_t timeout_sec,
+                          bool broadcast)
+{
+   return my->create_bid(owner_id_or_name, name, request, memo, timeout_sec, broadcast);
+}
+
+vector<bid_object> wallet_api::list_bids(const string& lower_bound_name, uint32_t limit)const
+{
+    return my->_remote_db->list_bids( lower_bound_name, limit);
+}
+
+vector<bid_object> wallet_api::list_bids_by_request( string request_name_or_id)const
+{
+    return my->list_bids_by_request( request_name_or_id);
+}
+
+vector<bid_object> wallet_api::list_bids_by_provider( string provider_acc_name_or_id)const
+{
+    return my->list_bids_by_provider( provider_acc_name_or_id);
 }
 
 signed_transaction wallet_api::create_asset(string issuer,

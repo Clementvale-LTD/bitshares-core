@@ -59,6 +59,8 @@ object_id_type service_create_evaluator::do_apply(const service_create_evaluator
 
 } FC_CAPTURE_AND_RETHROW( (o) ) }  
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void_result service_update_evaluator::do_evaluate(const service_update_evaluator::operation_type& o)
 { try {
    database& d = db();
@@ -83,6 +85,76 @@ object_id_type service_update_evaluator::do_apply(const service_update_evaluator
    d.modify(*service_to_update, [&](service_object& so) {
       so.p_memo = o.p_memo;
    });
+
+} FC_CAPTURE_AND_RETHROW( (o) ) }  
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void_result bid_request_create_evaluator::do_evaluate(const bid_request_create_evaluator::operation_type& o)
+{ try {
+   database& d = db();
+
+   FC_ASSERT( o.expiration >= d.head_block_time() );
+
+   const auto& chain_parameters = d.get_global_properties().parameters;
+   FC_ASSERT( o.p_memo.gto.size() < chain_parameters.maximum_asset_whitelist_authorities );
+
+   for( auto a : o.assets ){
+     const asset_object& ao = a(d);
+     auto acc_itr = o.providers.find( ao.issuer );
+     FC_ASSERT( acc_itr != o.providers.end() );     
+   }
+   
+   return void_result();
+} FC_CAPTURE_AND_RETHROW( (o) ) }
+
+object_id_type bid_request_create_evaluator::do_apply(const bid_request_create_evaluator::operation_type& o)
+{ try {
+   database& d = db();
+
+   auto next_bid_request_id = db().get_index_type<bid_request_index>().get_next_id();
+
+   const bid_request_object& new_bid_request =
+    d.create<bid_request_object>([&](bid_request_object& w) {
+      w.owner = o.owner;
+      w.name = o.name;
+      w.assets = o.assets;
+      w.providers = o.providers;
+      w.p_memo = o.p_memo;
+      w.expiration = o.expiration;
+   });
+
+   assert( new_bid_request.id == next_bid_request_id );
+
+} FC_CAPTURE_AND_RETHROW( (o) ) }  
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void_result bid_create_evaluator::do_evaluate(const bid_create_evaluator::operation_type& o)
+{ try {
+   database& d = db();
+
+   FC_ASSERT( o.expiration >= d.head_block_time() );
+
+   return void_result();
+} FC_CAPTURE_AND_RETHROW( (o) ) }
+
+object_id_type bid_create_evaluator::do_apply(const bid_create_evaluator::operation_type& o)
+{ try {
+   database& d = db();
+
+   auto next_bid_id = db().get_index_type<bid_index>().get_next_id();
+
+   const bid_object& new_bid =
+    d.create<bid_object>([&](bid_object& w) {
+      w.owner = o.owner;
+      w.name = o.name;
+      w.request = o.request;
+      w.p_memo = o.p_memo;
+      w.expiration = o.expiration;
+   });
+
+   assert( new_bid.id == next_bid_id );
 
 } FC_CAPTURE_AND_RETHROW( (o) ) }  
 

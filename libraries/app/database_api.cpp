@@ -108,6 +108,20 @@ class database_api_impl : public std::enable_shared_from_this<database_api_impl>
       vector<service_object> list_services(const string& lower_bound_name, uint32_t limit)const;
       vector<optional<service_object>> lookup_service_names(const vector<string>& names_or_ids)const;
 
+      //Bid requests
+      vector<optional<bid_request_object>> get_bid_requests(const vector<bid_request_id_type>& bid_request_ids)const;
+      vector<bid_request_object> list_bid_requests(const string& lower_bound_name, optional<vector<asset_id_type>> assets, uint32_t limit)const;
+      vector<bid_request_object> list_bid_requests_by_provider (account_id_type provider_acc)const;
+      vector<bid_request_object> list_bid_requests_by_requester (account_id_type requester_acc)const;
+      vector<optional<bid_request_object>> lookup_bid_request_names(const vector<string>& names_or_ids)const;
+
+      //Bids
+      vector<optional<bid_object>> get_bids(const vector<bid_id_type>& bid_ids)const;
+      vector<bid_object> list_bids(const string& lower_bound_name, uint32_t limit)const;
+      vector<bid_object> list_bids_by_request( bid_request_id_type request)const;
+      vector<bid_object> list_bids_by_provider( account_id_type provider_acc)const;
+      vector<optional<bid_object>> lookup_bid_names(const vector<string>& names_or_ids)const;
+
       // Markets / feeds
       vector<limit_order_object>         get_limit_orders(asset_id_type a, asset_id_type b, uint32_t limit)const;
       vector<limit_order_object>         get_account_limit_orders( account_id_type account_id, uint32_t limit)const;
@@ -975,6 +989,8 @@ vector<optional<asset_object>> database_api_impl::lookup_asset_symbols(const vec
    return result;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 vector<optional<service_object>> database_api::get_services(const vector<service_id_type>& service_ids)const
 {
    return my->get_services( service_ids );
@@ -1040,6 +1056,242 @@ vector<optional<service_object>> database_api_impl::lookup_service_names(const v
       }
       auto itr = services_by_names.find(name_or_id);
       return itr == services_by_names.end()? optional<service_object>() : *itr;
+   });
+   return result;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+vector<optional<bid_request_object>>  database_api::get_bid_requests(const vector<bid_request_id_type>& bid_request_ids)const
+{
+   return my->get_bid_requests( bid_request_ids );
+}
+
+vector<optional<bid_request_object>>  database_api_impl::get_bid_requests(const vector<bid_request_id_type>& bid_request_ids)const
+{
+   vector<optional<bid_request_object>> result; result.reserve(bid_request_ids.size());
+   std::transform(bid_request_ids.begin(), bid_request_ids.end(), std::back_inserter(result),
+                  [this](bid_request_id_type id) -> optional<bid_request_object> {
+      if(auto o = _db.find(id))
+      {
+         subscribe_to_item( id );
+         return *o;
+      }
+      return {};
+   });
+   return result;
+}
+
+vector<bid_request_object> database_api::list_bid_requests(const string& lower_bound_name, optional<vector<asset_id_type>> assets, uint32_t limit)const
+{
+   return my->list_bid_requests( lower_bound_name, assets, limit);
+}
+
+vector<bid_request_object> database_api_impl::list_bid_requests(const string& lower_bound_name, optional<vector<asset_id_type>> assets, uint32_t limit)const
+{
+    FC_ASSERT(limit <= 1000);
+    const auto &bid_request_by_name = _db.get_index_type<bid_request_index>().indices().get<by_name>();
+    vector<bid_request_object> result;
+    result.reserve(limit);
+
+    auto itr = bid_request_by_name.lower_bound(lower_bound_name);
+
+    if (lower_bound_name == "")
+        itr = bid_request_by_name.begin();
+
+    if (assets.valid())
+    {
+        for (; limit && itr != bid_request_by_name.end(); itr++)
+        {
+            for( auto aid : *assets )
+            {
+                if(  itr->assets.find( aid) != itr->assets.end() )
+                {
+                    result.emplace_back(*itr);
+                    limit--;
+                }
+            }
+        }
+    }
+    else
+    {
+        for (; limit && itr != bid_request_by_name.end(); itr++)
+        {
+            result.emplace_back(*itr);
+            limit--;
+        }
+    }
+
+    return result;
+}
+
+vector<bid_request_object> database_api::list_bid_requests_by_provider (account_id_type provider_acc)const
+{
+   return my->list_bid_requests_by_provider( provider_acc);
+}
+
+vector<bid_request_object> database_api_impl::list_bid_requests_by_provider (account_id_type provider_acc)const
+{
+    const auto &bid_request_by_id = _db.get_index_type<bid_request_index>().indices().get<by_id>();
+    vector<bid_request_object> result;
+
+    auto itr = bid_request_by_id.begin();;
+    for (; itr != bid_request_by_id.end(); itr++)
+    {
+        if(itr->providers.find(provider_acc) != itr->providers.end() )
+        {
+            result.emplace_back(*itr);
+        }
+    }
+
+    return result;
+}
+
+vector<bid_request_object> database_api::list_bid_requests_by_requester (account_id_type requester_acc)const
+{
+   return my->list_bid_requests_by_requester( requester_acc);
+
+}
+
+vector<bid_request_object> database_api_impl::list_bid_requests_by_requester (account_id_type requester_acc)const
+{
+     vector<bid_request_object> result;
+    
+    auto bid_requests_range = _db.get_index_type<bid_request_index>().indices().get<by_owner>().equal_range(requester_acc);
+    std::for_each(bid_requests_range.first, bid_requests_range.second,
+                [&result] (const bid_request_object& bro) {
+                    result.emplace_back(bro);
+                });
+    
+    return result;
+}
+
+vector<optional<bid_request_object>> database_api::lookup_bid_request_names(const vector<string>& names_or_ids)const
+{
+   return my->lookup_bid_request_names( names_or_ids);
+}
+
+vector<optional<bid_request_object>> database_api_impl::lookup_bid_request_names(const vector<string>& names_or_ids)const
+{
+   const auto& bid_requests_by_names = _db.get_index_type<bid_request_index>().indices().get<by_name>();
+   vector<optional<bid_request_object> > result;
+   result.reserve(names_or_ids.size());
+   std::transform(names_or_ids.begin(), names_or_ids.end(), std::back_inserter(result),
+                  [this, &bid_requests_by_names](const string& name_or_id) -> optional<bid_request_object> {
+      if( !name_or_id.empty() && std::isdigit(name_or_id[0]) )
+      {
+         auto ptr = _db.find(variant(name_or_id).as<bid_request_id_type>());
+         return ptr == nullptr? optional<bid_request_object>() : *ptr;
+      }
+      auto itr = bid_requests_by_names.find(name_or_id);
+      return itr == bid_requests_by_names.end()? optional<bid_request_object>() : *itr;
+   });
+   return result;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+vector<optional<bid_object>> database_api::get_bids(const vector<bid_id_type>& bid_ids)const
+{
+   return my->get_bids( bid_ids );
+}
+
+vector<optional<bid_object>> database_api_impl::get_bids(const vector<bid_id_type>& bid_ids)const
+{
+   vector<optional<bid_object>> result; result.reserve(bid_ids.size());
+   std::transform(bid_ids.begin(), bid_ids.end(), std::back_inserter(result),
+                  [this](bid_id_type id) -> optional<bid_object> {
+      if(auto o = _db.find(id))
+      {
+         subscribe_to_item( id );
+         return *o;
+      }
+      return {};
+   });
+   return result;
+}
+
+vector<bid_object> database_api::list_bids(const string& lower_bound_name, uint32_t limit)const
+{
+   return my->list_bids( lower_bound_name, limit);
+}
+
+vector<bid_object> database_api_impl::list_bids(const string& lower_bound_name, uint32_t limit)const
+{
+   FC_ASSERT( limit <= 1000 );
+   const auto& bid_by_name = _db.get_index_type<bid_index>().indices().get<by_name>();
+   vector<bid_object> result;
+   result.reserve(limit);
+
+
+   auto itr = bid_by_name.lower_bound(lower_bound_name);
+
+   if( lower_bound_name == "" )
+      itr = bid_by_name.begin();
+
+   for( ; limit && itr != bid_by_name.end(); itr++ ){
+      result.emplace_back(*itr);
+      limit--;
+   }
+
+   return result;
+}
+
+vector<bid_object> database_api::list_bids_by_request( bid_request_id_type request)const
+{
+   return my->list_bids_by_request( request);
+}
+
+vector<bid_object> database_api_impl::list_bids_by_request( bid_request_id_type request)const
+{
+    vector<bid_object> result;
+    
+    auto bids_range = _db.get_index_type<bid_index>().indices().get<by_request>().equal_range( request);
+    std::for_each(bids_range.first, bids_range.second,
+                [&result] (const bid_object& bo) {
+                    result.emplace_back(bo);
+                });
+    
+    return result;
+}
+
+vector<bid_object> database_api::list_bids_by_provider( account_id_type provider_acc)const
+{
+   return my->list_bids_by_provider( provider_acc);
+}
+
+vector<bid_object> database_api_impl::list_bids_by_provider( account_id_type provider_acc)const
+{
+    vector<bid_object> result;
+    
+    auto bids_range = _db.get_index_type<bid_index>().indices().get<by_owner>().equal_range( provider_acc);
+    std::for_each(bids_range.first, bids_range.second,
+                [&result] (const bid_object& bo) {
+                    result.emplace_back(bo);
+                });
+    
+    return result;
+}
+
+vector<optional<bid_object>> database_api::lookup_bid_names(const vector<string>& names_or_ids)const
+{
+   return my->lookup_bid_names( names_or_ids);
+}
+
+vector<optional<bid_object>> database_api_impl::lookup_bid_names(const vector<string>& names_or_ids)const
+{
+   const auto& bids_by_names = _db.get_index_type<bid_index>().indices().get<by_name>();
+   vector<optional<bid_object> > result;
+   result.reserve(names_or_ids.size());
+   std::transform(names_or_ids.begin(), names_or_ids.end(), std::back_inserter(result),
+                  [this, &bids_by_names](const string& name_or_id) -> optional<bid_object> {
+      if( !name_or_id.empty() && std::isdigit(name_or_id[0]) )
+      {
+         auto ptr = _db.find(variant(name_or_id).as<bid_id_type>());
+         return ptr == nullptr? optional<bid_object>() : *ptr;
+      }
+      auto itr = bids_by_names.find(name_or_id);
+      return itr == bids_by_names.end()? optional<bid_object>() : *itr;
    });
    return result;
 }

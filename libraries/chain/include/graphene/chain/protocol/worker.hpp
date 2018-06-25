@@ -54,6 +54,41 @@ struct service_update_operation : public base_operation
    void              validate()const;
 };  
 
+struct bid_request_create_operation : public base_operation
+{     
+   struct fee_parameters_type { uint64_t fee = 5000*GRAPHENE_BLOCKCHAIN_PRECISION; };
+
+   asset                fee;
+   account_id_type      owner;
+   string               name;
+
+   flat_set<asset_id_type> assets;
+   flat_set<account_id_type> providers;
+   memo_group           p_memo;
+
+   time_point_sec expiration = time_point_sec::maximum();
+
+   account_id_type   fee_payer()const { return owner; }
+   void              validate()const;
+};  
+
+struct bid_create_operation : public base_operation
+{     
+   struct fee_parameters_type { uint64_t fee = 5000*GRAPHENE_BLOCKCHAIN_PRECISION; };
+
+   asset                fee;
+   account_id_type      owner;
+   string               name;
+
+   bid_request_id_type  request;
+   memo_data            p_memo;
+
+   time_point_sec expiration = time_point_sec::maximum();
+   
+   account_id_type   fee_payer()const { return owner; }
+   void              validate()const;
+};  
+
 } }
 
 FC_REFLECT( graphene::chain::service_create_operation::fee_parameters_type, (fee) )
@@ -64,3 +99,11 @@ FC_REFLECT( graphene::chain::service_update_operation::fee_parameters_type, (fee
 FC_REFLECT( graphene::chain::service_update_operation,
             (fee)(owner)(service_to_update)(p_memo) )
 
+
+FC_REFLECT( graphene::chain::bid_request_create_operation::fee_parameters_type, (fee) )
+FC_REFLECT( graphene::chain::bid_request_create_operation,
+            (fee)(owner)(assets)(providers)(p_memo)(expiration) )
+
+FC_REFLECT( graphene::chain::bid_create_operation::fee_parameters_type, (fee) )
+FC_REFLECT( graphene::chain::bid_create_operation,
+            (fee)(owner)(request)(p_memo)(expiration) )

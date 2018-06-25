@@ -280,6 +280,7 @@ struct offer_request_detail {
       uint64_t user_id;
       string counterparty_id;
       string memo;
+      optional<string> bid_id;
 };
 
 class limit_order_objviewer : public graphene::chain::limit_order_object
@@ -1060,8 +1061,31 @@ class wallet_api
                                 
 
       vector<service_object>   list_services(const string& lowerbound, uint32_t limit)const;
-                                
 
+
+      signed_transaction create_bid_request( string owner_id_or_name,
+                                string name,
+                                string memo,
+                                flat_set<string> assets,
+                                uint32_t timeout_sec = 0,
+                                bool broadcast = false);
+
+      vector<bid_request_object> list_bid_requests(const string& lower_bound_name, optional<vector<string>> assets_name_or_id, uint32_t limit)const;
+      vector<bid_request_object> list_bid_requests_by_provider (string provider_acc_name_or_id)const;
+      vector<bid_request_object> list_bid_requests_by_requester (string requester_acc_name_or_id)const;
+
+      signed_transaction create_bid( string owner_id_or_name,
+                                string name,
+                                string request, 
+                                string memo,
+                                uint32_t timeout_sec = 0,
+                                bool broadcast = false);
+
+      vector<bid_object> list_bids(const string& lower_bound_name, uint32_t limit)const;
+      vector<bid_object> list_bids_by_request( string request_name_or_id)const;
+      vector<bid_object> list_bids_by_provider( string provider_acc_name_or_id)const;
+
+                                
       /** Creates a new user-issued or market-issued asset.
        *
        * Many options can be changed later using \c update_asset()
@@ -1487,7 +1511,7 @@ FC_REFLECT( graphene::wallet::operation_detail,
             (memo)(description)(op) )
 
 FC_REFLECT( graphene::wallet::offer_request_detail, 
-            (request_id)(user_id)(counterparty_id)(memo) )
+            (request_id)(user_id)(counterparty_id)(memo)(bid_id) )
 
 FC_REFLECT_DERIVED( graphene::wallet::limit_order_objviewer,
                     (graphene::chain::limit_order_object),

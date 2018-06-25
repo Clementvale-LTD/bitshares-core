@@ -154,6 +154,8 @@ void database::initialize_evaluators()
    register_evaluator<blind_transfer_evaluator>();
    register_evaluator<service_create_evaluator>();
    register_evaluator<service_update_evaluator>();
+   register_evaluator<bid_request_create_evaluator>();
+   register_evaluator<bid_create_evaluator>();
 }
 
 void database::initialize_indexes()
@@ -181,6 +183,8 @@ void database::initialize_indexes()
    add_index< primary_index<blinded_balance_index> >();
 
    add_index< primary_index<service_index> >();
+   add_index< primary_index<bid_request_index> >();
+   add_index< primary_index<bid_index> >();
 
    //Implementation object indexes
    add_index< primary_index<transaction_index                             > >();

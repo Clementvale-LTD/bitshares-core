@@ -170,10 +170,12 @@ namespace graphene { namespace chain {
    class balance_object;
    class blinded_balance_object;
    class service_object;
+   class bid_request_object;
+   class bid_object;
 
    typedef object_id< protocol_ids, account_object_type,            account_object>               account_id_type;
    typedef object_id< protocol_ids, asset_object_type,              asset_object>                 asset_id_type;
-   typedef object_id< protocol_ids, committee_member_object_type,           committee_member_object>              committee_member_id_type;
+   typedef object_id< protocol_ids, committee_member_object_type,   committee_member_object>      committee_member_id_type;
    typedef object_id< protocol_ids, witness_object_type,            witness_object>               witness_id_type;
    typedef object_id< protocol_ids, limit_order_object_type,        limit_order_object>           limit_order_id_type;
    typedef object_id< protocol_ids, custom_object_type,             custom_object>                custom_id_type;
@@ -183,6 +185,8 @@ namespace graphene { namespace chain {
    typedef object_id< protocol_ids, vesting_balance_object_type,    vesting_balance_object>       vesting_balance_id_type;
    typedef object_id< protocol_ids, balance_object_type,            balance_object>               balance_id_type;
    typedef object_id< protocol_ids, service_object_type,            service_object>               service_id_type;
+   typedef object_id< protocol_ids, bid_request_object_type,        bid_request_object>           bid_request_id_type;
+   typedef object_id< protocol_ids, bid_object_type,                bid_object>                   bid_id_type;
 
    // implementation types
    class global_property_object;
@@ -370,6 +374,8 @@ FC_REFLECT_TYPENAME( graphene::chain::account_transaction_history_id_type )
 FC_REFLECT_TYPENAME( graphene::chain::budget_record_id_type )
 FC_REFLECT_TYPENAME( graphene::chain::special_authority_id_type )
 FC_REFLECT_TYPENAME( graphene::chain::service_id_type )
+FC_REFLECT_TYPENAME( graphene::chain::bid_request_id_type )
+FC_REFLECT_TYPENAME( graphene::chain::bid_id_type )
 
 FC_REFLECT( graphene::chain::void_t, )
 

@@ -33,4 +33,12 @@ void  service_update_operation::validate()const
 {
 }
 
+void  bid_request_create_operation::validate()const
+{
+}
+
+void  bid_create_operation::validate()const
+{
+}
+
 } }

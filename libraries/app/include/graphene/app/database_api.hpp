@@ -345,6 +345,18 @@ class database_api
       vector<service_object> list_services(const string& lower_bound_name, uint32_t limit)const;
       vector<optional<service_object>> lookup_service_names(const vector<string>& names_or_ids)const;
 
+      vector<optional<bid_request_object>> get_bid_requests(const vector<bid_request_id_type>& bid_request_ids)const;
+      vector<bid_request_object> list_bid_requests(const string& lower_bound_name, optional<vector<asset_id_type>> assets, uint32_t limit)const;
+      vector<bid_request_object> list_bid_requests_by_provider (account_id_type provider_acc)const;
+      vector<bid_request_object> list_bid_requests_by_requester (account_id_type requester_acc)const;
+      vector<optional<bid_request_object>> lookup_bid_request_names(const vector<string>& names_or_ids)const;
+
+      vector<optional<bid_object>> get_bids(const vector<bid_id_type>& bid_ids)const;
+      vector<bid_object> list_bids(const string& lower_bound_name, uint32_t limit)const;
+      vector<bid_object> list_bids_by_request( bid_request_id_type request)const;
+      vector<bid_object> list_bids_by_provider( account_id_type provider_acc)const;
+      vector<optional<bid_object>> lookup_bid_names(const vector<string>& names_or_ids)const;
+
       /////////////////////
       // Markets / feeds //
       /////////////////////
@@ -642,6 +654,20 @@ FC_API(graphene::app::database_api,
    (get_services)
    (list_services)
    (lookup_service_names)
+
+   //Bid requests
+   (get_bid_requests)
+   (list_bid_requests)
+   (list_bid_requests_by_provider)
+   (list_bid_requests_by_requester)
+   (lookup_bid_request_names)
+
+   //Bids
+   (get_bids)
+   (list_bids)
+   (list_bids_by_request)
+   (list_bids_by_provider)
+   (lookup_bid_names)
 
    // Markets / feeds
    (get_order_book)

@@ -87,7 +87,6 @@ object_id_type limit_order_create_evaluator::do_apply(const limit_order_create_o
       umt_fee = db().sdr_amount_to_umt_fee_to_reserve( op.amount_to_sell.amount );
       db().adjust_balance(op.seller, -umt_fee);
     }
-   
 
    const auto& new_order_object = db().create<limit_order_object>([&](limit_order_object& obj){
        obj.seller   = _seller->id;
@@ -101,6 +100,7 @@ object_id_type limit_order_create_evaluator::do_apply(const limit_order_create_o
        obj.user_id = op.user_id;
        obj.counterparty_id = op.counterparty_id;
        obj.p_memo = op.p_memo;
+       obj.bid_id = op.bid_id; 
 
        obj.deferred_fee = _deferred_fee;
    });

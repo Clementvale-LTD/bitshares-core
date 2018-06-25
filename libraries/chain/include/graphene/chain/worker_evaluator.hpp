@@ -46,4 +46,23 @@ public:
   const service_object* service_to_update = nullptr;
 };
 
+class bid_request_create_evaluator : public evaluator<bid_request_create_evaluator>
+{
+public:
+  typedef bid_request_create_operation operation_type;
+
+  void_result do_evaluate(const operation_type &o);
+  object_id_type do_apply(const operation_type &o);
+};
+
+class bid_create_evaluator : public evaluator<bid_create_evaluator>
+{
+public:
+  typedef bid_create_operation operation_type;
+
+  void_result do_evaluate(const operation_type &o);
+  object_id_type do_apply(const operation_type &o);
+};
+
+
 } } // graphene::chain

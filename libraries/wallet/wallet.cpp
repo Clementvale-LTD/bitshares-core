@@ -2081,6 +2081,26 @@ public:
       return clear_text;
    }
 
+   string read_memo_group(const memo_group& gmemo)
+   {
+      string clear_text;
+
+      if( gmemo.try_get_message( fc::ecc::private_key(), clear_text)){
+        return clear_text;
+      } else {
+        FC_ASSERT( !is_locked(), " -- Unlock wallet to see memo.");
+        for( auto& k : _keys){
+          auto pk = wif_to_key( k.second);
+          if( pk.valid() ){
+            if( gmemo.try_get_message( *pk, clear_text)){
+              return clear_text;
+            }
+          }
+        }
+        FC_THROW( " -- Could not decrypt memo. No decryption key.");
+      }
+   }
+
    signed_transaction sell_asset(string seller_account,
                                  string amount_to_sell,
                                  string symbol_to_sell,
@@ -4065,6 +4085,11 @@ string wallet_api::read_memo(const memo_data& memo)
 {
    FC_ASSERT(!is_locked());
    return my->read_memo(memo);
+}
+
+string wallet_api::read_memo_group(const memo_group& gmemo)
+{
+   return my->read_memo_group( gmemo);
 }
 
 string wallet_api::get_key_label( public_key_type key )const

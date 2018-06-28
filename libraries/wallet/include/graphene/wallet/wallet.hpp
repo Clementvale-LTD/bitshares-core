@@ -856,6 +856,7 @@ class wallet_api
        */
       string read_memo(const memo_data& memo);
 
+      string read_memo_group(const memo_group& gmemo);
 
       /** These methods are used for stealth transfers */
       ///@{
@@ -1617,6 +1618,7 @@ FC_API( graphene::wallet::wallet_api,
         (network_get_connected_peers)
         (sign_memo)
         (read_memo)
+        (read_memo_group)
         (set_key_label)
         (get_key_label)
         (get_public_key)

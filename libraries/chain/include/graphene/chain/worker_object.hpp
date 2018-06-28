@@ -78,13 +78,21 @@ namespace graphene { namespace chain {
     bid_request_id_type get_id()const { return id; }
   };
 
+  struct by_expiration;
+
   typedef multi_index_container<
       bid_request_object,
       indexed_by<
           ordered_unique<tag<by_id>, member<object, object_id_type, &object::id>>,
           ordered_unique<tag<by_name>, member<bid_request_object, string, &bid_request_object::name>>,
-          ordered_non_unique<tag<by_owner>, member<bid_request_object, account_id_type, &bid_request_object::owner>>>>
-      bid_request_object_multi_index_type;
+          ordered_unique< tag<by_expiration>,
+              composite_key< bid_request_object,
+              member< bid_request_object, time_point_sec, &bid_request_object::expiration>,
+              member< object, object_id_type, &object::id>
+              >
+          >,
+          ordered_non_unique<tag<by_owner>, member<bid_request_object, account_id_type, &bid_request_object::owner>>
+      >> bid_request_object_multi_index_type;
   typedef generic_index<bid_request_object, bid_request_object_multi_index_type> bid_request_index;
 
   class bid_object : public abstract_object<bid_object>
@@ -114,9 +122,20 @@ namespace graphene { namespace chain {
       indexed_by<
           ordered_unique<tag<by_id>, member<object, object_id_type, &object::id>>,
           ordered_unique<tag<by_name>, member<bid_object, string, &bid_object::name>>,
-          ordered_non_unique<tag<by_owner>, member<bid_object, account_id_type, &bid_object::owner>>,
-          ordered_non_unique<tag<by_request>, member<bid_object, bid_request_id_type, &bid_object::request>>>>
-      bid_object_multi_index_type;
+          ordered_unique< tag<by_expiration>,
+              composite_key< bid_object,
+              member< bid_object, time_point_sec, &bid_object::expiration>,
+              member< object, object_id_type, &object::id>
+              >
+          >,
+          ordered_unique< tag<by_request>,
+              composite_key< bid_object,
+              member< bid_object, bid_request_id_type, &bid_object::request>,
+              member< object, object_id_type, &object::id>
+              >
+          >,
+          ordered_non_unique<tag<by_owner>, member<bid_object, account_id_type, &bid_object::owner>>
+      >> bid_object_multi_index_type;
   typedef generic_index<bid_object, bid_object_multi_index_type> bid_index;
 
 } } // graphene::chain

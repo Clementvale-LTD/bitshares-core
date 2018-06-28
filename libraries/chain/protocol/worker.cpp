@@ -37,8 +37,15 @@ void  bid_request_create_operation::validate()const
 {
 }
 
+void  bid_request_cancel_operation::validate()const
+{
+}
+
 void  bid_create_operation::validate()const
 {
 }
 
+void  bid_cancel_operation::validate()const
+{
+}
 } }

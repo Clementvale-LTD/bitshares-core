@@ -70,7 +70,35 @@ struct bid_request_create_operation : public base_operation
 
    account_id_type   fee_payer()const { return owner; }
    void              validate()const;
-};  
+};
+
+struct bid_request_expired_operation : public base_operation
+{
+  struct fee_parameters_type { uint64_t fee = 0; };
+
+  asset               fee;
+  bid_request_id_type bid_request_id;
+  /** must be order->seller */
+  account_id_type     fee_paying_account;
+
+  account_id_type fee_payer()const { return fee_paying_account; }
+  void            validate()const { FC_ASSERT( !"virtual operation" ); }
+  /// This is a virtual operation; there is no fee
+  share_type      calculate_fee(const fee_parameters_type& k)const { return 0; }
+};
+
+struct bid_request_cancel_operation : public base_operation
+{
+  struct fee_parameters_type { uint64_t fee = 0; };
+
+  asset               fee;
+  bid_request_id_type bid_request_id;
+  /** must be order->seller */
+  account_id_type     fee_paying_account;
+
+  account_id_type fee_payer()const { return fee_paying_account; }
+  void            validate()const;
+};
 
 struct bid_create_operation : public base_operation
 {     
@@ -87,7 +115,35 @@ struct bid_create_operation : public base_operation
    
    account_id_type   fee_payer()const { return owner; }
    void              validate()const;
-};  
+};
+
+struct bid_expired_operation : public base_operation
+{
+  struct fee_parameters_type { uint64_t fee = 0; };
+
+  asset               fee;
+  bid_id_type         bid_id;
+  /** must be bid->owner */
+  account_id_type     fee_paying_account;
+
+  account_id_type fee_payer()const { return fee_paying_account; }
+  void            validate()const { FC_ASSERT( !"virtual operation" ); }
+  /// This is a virtual operation; there is no fee
+  share_type      calculate_fee(const fee_parameters_type& k)const { return 0; }
+};
+
+struct bid_cancel_operation : public base_operation
+{
+  struct fee_parameters_type { uint64_t fee = 0; };
+
+  asset               fee;
+  bid_id_type         bid_id;
+  /** must be bid->owner */
+  account_id_type     fee_paying_account;
+
+  account_id_type fee_payer()const { return fee_paying_account; }
+  void            validate()const;
+};
 
 } }
 
@@ -99,11 +155,22 @@ FC_REFLECT( graphene::chain::service_update_operation::fee_parameters_type, (fee
 FC_REFLECT( graphene::chain::service_update_operation,
             (fee)(owner)(service_to_update)(p_memo) )
 
-
 FC_REFLECT( graphene::chain::bid_request_create_operation::fee_parameters_type, (fee) )
 FC_REFLECT( graphene::chain::bid_request_create_operation,
-            (fee)(owner)(assets)(providers)(p_memo)(expiration) )
+            (fee)(owner)(name)(assets)(providers)(p_memo)(expiration) )
+
+FC_REFLECT( graphene::chain::bid_request_expired_operation::fee_parameters_type, (fee) )
+FC_REFLECT( graphene::chain::bid_request_expired_operation,(fee)(fee_paying_account)(bid_request_id) )
+            
+FC_REFLECT( graphene::chain::bid_request_cancel_operation::fee_parameters_type, (fee) )
+FC_REFLECT( graphene::chain::bid_request_cancel_operation,(fee)(fee_paying_account)(bid_request_id) )
 
 FC_REFLECT( graphene::chain::bid_create_operation::fee_parameters_type, (fee) )
 FC_REFLECT( graphene::chain::bid_create_operation,
-            (fee)(owner)(request)(p_memo)(expiration) )
+            (fee)(owner)(name)(request)(p_memo)(expiration) )
+
+FC_REFLECT( graphene::chain::bid_expired_operation::fee_parameters_type, (fee) )
+FC_REFLECT( graphene::chain::bid_expired_operation,(fee)(fee_paying_account)(bid_id) )
+
+FC_REFLECT( graphene::chain::bid_cancel_operation::fee_parameters_type, (fee) )
+FC_REFLECT( graphene::chain::bid_cancel_operation,(fee)(fee_paying_account)(bid_id) )

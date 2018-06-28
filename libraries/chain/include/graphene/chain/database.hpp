@@ -432,6 +432,8 @@ namespace graphene { namespace chain {
          void clear_expired_transactions();
          void clear_expired_proposals();
          void clear_expired_orders();
+         void clear_expired_bids();
+         void clear_expired_bid_requests();
          void update_maintenance_flag( bool new_maintenance_flag );
          void update_withdraw_permissions();
 

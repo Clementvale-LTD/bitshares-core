@@ -128,6 +128,25 @@ object_id_type bid_request_create_evaluator::do_apply(const bid_request_create_e
 
 } FC_CAPTURE_AND_RETHROW( (o) ) }  
 
+void_result bid_request_cancel_evaluator::do_evaluate(const bid_request_cancel_evaluator::operation_type& o)
+{ try {
+   database& d = db();
+
+   _refobj = &o.bid_request_id(d);
+   FC_ASSERT( _refobj->owner == o.fee_paying_account );
+
+   return void_result();
+} FC_CAPTURE_AND_RETHROW( (o) ) }
+
+void_result bid_request_cancel_evaluator::do_apply(const bid_request_cancel_evaluator::operation_type& o)
+{ try {
+   database& d = db();
+
+   d.remove( *_refobj);
+
+   return void_result();
+} FC_CAPTURE_AND_RETHROW( (o) ) }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void_result bid_create_evaluator::do_evaluate(const bid_create_evaluator::operation_type& o)
@@ -157,5 +176,25 @@ object_id_type bid_create_evaluator::do_apply(const bid_create_evaluator::operat
    assert( new_bid.id == next_bid_id );
 
 } FC_CAPTURE_AND_RETHROW( (o) ) }  
+
+void_result bid_cancel_evaluator::do_evaluate(const bid_cancel_evaluator::operation_type& o)
+{ try {
+   database& d = db();
+
+   _refobj = &o.bid_id(d);
+   FC_ASSERT( _refobj->owner == o.fee_paying_account );
+
+   return void_result();
+} FC_CAPTURE_AND_RETHROW( (o) ) }
+
+void_result bid_cancel_evaluator::do_apply(const bid_cancel_evaluator::operation_type& o)
+{ try {
+   database& d = db();
+
+   d.remove( *_refobj);
+
+   return void_result();
+} FC_CAPTURE_AND_RETHROW( (o) ) }
+
 
 } } // graphene::chain

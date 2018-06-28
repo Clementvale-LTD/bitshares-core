@@ -220,6 +220,79 @@ void database::clear_expired_orders()
 
 } FC_CAPTURE_AND_RETHROW() }
 
+void database::clear_expired_bids()
+{ try {
+    const auto& all_objects = get_index_type<bid_index>().indices();
+
+    vector<bid_id_type> to_remove;
+    to_remove.reserve(all_objects.size());
+
+    auto& bid_idx = all_objects.get<by_expiration>();
+    for( auto it = bid_idx.begin(); it != bid_idx.end(); ++it )
+    {
+      if( it->expiration > head_block_time() )
+        break;
+
+      int orders_num = get_index_type<limit_order_index>().indices().get<by_bid>().count(it->id);
+
+      if( 0 == orders_num){
+        to_remove.push_back( it->id);
+      }
+    }
+
+    for( const auto id: to_remove ){
+      auto itr = all_objects.get<by_id>().find(id);
+
+      if( itr != all_objects.get<by_id>().end()){
+        const bid_object& bid = *itr;
+
+        bid_expired_operation canceler;
+        canceler.fee_paying_account = bid.owner;
+        canceler.bid_id = bid.id;
+        canceler.fee = current_fee_schedule().calculate_fee( canceler );
+
+        push_applied_operation( canceler );
+        remove( bid);
+      }
+    }
+} FC_CAPTURE_AND_RETHROW() }
+
+void database::clear_expired_bid_requests()
+{ try {
+    const auto& all_objects = get_index_type<bid_request_index>().indices();
+
+    vector<bid_request_id_type> to_remove;
+    to_remove.reserve(all_objects.size());
+
+    auto& bid_request_idx = all_objects.get<by_expiration>();
+    for( auto it = bid_request_idx.begin(); it != bid_request_idx.end(); ++it )
+    {
+      if( it->expiration > head_block_time() )
+        break;
+
+      int bids_num = get_index_type<bid_index>().indices().get<by_request>().count( it->id);
+
+      if( 0 == bids_num){
+        to_remove.push_back( it->id);
+      }
+    }
+
+    for( const auto id: to_remove ){
+      auto itr = all_objects.get<by_id>().find(id);
+
+      if( itr != all_objects.get<by_id>().end()){
+        const bid_request_object& bid_request = *itr;
+        bid_request_expired_operation canceler;
+        canceler.fee_paying_account = bid_request.owner;
+        canceler.bid_request_id = bid_request.id;
+        canceler.fee = current_fee_schedule().calculate_fee( canceler );
+
+        push_applied_operation( canceler );
+        remove( bid_request);
+      }
+    }
+} FC_CAPTURE_AND_RETHROW() }
+
 void database::update_maintenance_flag( bool new_maintenance_flag )
 {
    modify( get_dynamic_global_properties(), [&]( dynamic_global_property_object& dpo )

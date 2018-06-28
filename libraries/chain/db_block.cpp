@@ -515,6 +515,8 @@ void database::_apply_block( const signed_block& next_block )
    clear_expired_transactions();
    clear_expired_proposals();
    clear_expired_orders();
+   clear_expired_bids();
+   clear_expired_bid_requests();
    update_withdraw_permissions();
 
    // n.b., update_maintenance_flag() happens this late

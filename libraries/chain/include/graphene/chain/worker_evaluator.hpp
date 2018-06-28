@@ -55,6 +55,18 @@ public:
   object_id_type do_apply(const operation_type &o);
 };
 
+class bid_request_cancel_evaluator : public evaluator<bid_request_cancel_evaluator>
+{
+public:
+  typedef bid_request_cancel_operation operation_type;
+
+  void_result do_evaluate(const operation_type &o);
+  void_result do_apply(const operation_type &o);
+
+private:
+  const bid_request_object* _refobj;
+};
+
 class bid_create_evaluator : public evaluator<bid_create_evaluator>
 {
 public:
@@ -64,5 +76,16 @@ public:
   object_id_type do_apply(const operation_type &o);
 };
 
+class bid_cancel_evaluator : public evaluator<bid_cancel_evaluator>
+{
+public:
+  typedef bid_cancel_operation operation_type;
+
+  void_result do_evaluate(const operation_type &o);
+  void_result do_apply(const operation_type &o);
+
+private:
+  const bid_object* _refobj;
+};
 
 } } // graphene::chain

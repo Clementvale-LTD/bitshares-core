@@ -79,6 +79,9 @@ struct by_id;
 struct by_price;
 struct by_expiration;
 struct by_account;
+struct by_bid;
+struct by_counterparty;
+
 typedef multi_index_container<
    limit_order_object,
    indexed_by<
@@ -99,6 +102,18 @@ typedef multi_index_container<
       ordered_unique< tag<by_account>,
          composite_key< limit_order_object,
             member<limit_order_object, account_id_type, &limit_order_object::seller>,
+            member<object, object_id_type, &object::id>
+         >
+      >,
+      ordered_unique< tag<by_counterparty>,
+         composite_key< limit_order_object,
+            member<limit_order_object, optional< account_id_type >, &limit_order_object::counterparty_id>,
+            member<object, object_id_type, &object::id>
+         >
+      >,
+      ordered_unique< tag<by_bid>,
+         composite_key< limit_order_object,
+            member<limit_order_object, optional< bid_id_type >, &limit_order_object::bid_id>,
             member<object, object_id_type, &object::id>
          >
       >

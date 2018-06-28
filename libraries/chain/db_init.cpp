@@ -155,7 +155,9 @@ void database::initialize_evaluators()
    register_evaluator<service_create_evaluator>();
    register_evaluator<service_update_evaluator>();
    register_evaluator<bid_request_create_evaluator>();
+   register_evaluator<bid_request_cancel_evaluator>();
    register_evaluator<bid_create_evaluator>();
+   register_evaluator<bid_cancel_evaluator>();
 }
 
 void database::initialize_indexes()

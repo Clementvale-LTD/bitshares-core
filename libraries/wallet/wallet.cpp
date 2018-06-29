@@ -117,16 +117,11 @@ public:
    template<typename T>
    std::string operator()(const T& op)const;
 
-   std::string operator()(const transfer_operation& op)const;
    std::string operator()(const transfer_from_blind_operation& op)const;
    std::string operator()(const transfer_to_blind_operation& op)const;
    std::string operator()(const account_create_operation& op)const;
    std::string operator()(const account_update_operation& op)const;
    std::string operator()(const asset_create_operation& op)const;
-   std::string operator()(const limit_order_create_operation& op) const;
-   std::string operator()(const fill_order_operation& op) const;
-   std::string operator()(const limit_order_accept_operation& op) const;
-   std::string operator()(const limit_order_accepted_operation& op) const;
 };
 
 template<class T>
@@ -1497,6 +1492,7 @@ public:
                                    string symbol,
                                    uint8_t precision,
                                    asset_details common,
+                                   optional<string> service_id,
                                    bool broadcast = false)
    { try {
       account_object issuer_account = get_account( issuer );
@@ -1542,6 +1538,12 @@ public:
       create_op.symbol = symbol;
       create_op.precision = precision;
       create_op.common_options = aopt;
+
+      if( service_id.valid()){
+        optional<service_object> ref_srv = find_service( *service_id);
+        FC_ASSERT( ref_srv.valid() );
+        create_op.service_id = ref_srv->get_id();
+      }
 
       signed_transaction tx;
       tx.operations.push_back( create_op );
@@ -2800,113 +2802,6 @@ std::string operation_printer::operator()(const transfer_to_blind_operation& op)
    << " fee: " << fa.amount_to_pretty_string( op.fee );
    return "";
 }
-string operation_printer::operator()(const transfer_operation& op) const
-{
-   out << "Transfer " << wallet.get_asset(op.amount.asset_id).amount_to_pretty_string(op.amount)
-       << " from " << wallet.get_account(op.from).name << " to " << wallet.get_account(op.to).name;
-   std::string memo;
-   if( op.memo )
-   {
-      if( wallet.is_locked() )
-      {
-         out << " -- Unlock wallet to see memo.";
-      } else {
-         try {
-            FC_ASSERT(wallet._keys.count(op.memo->to) || wallet._keys.count(op.memo->from), "Memo is encrypted to a key ${to} or ${from} not in this wallet.", ("to", op.memo->to)("from",op.memo->from));
-            if( wallet._keys.count(op.memo->to) ) {
-               auto my_key = wif_to_key(wallet._keys.at(op.memo->to));
-               FC_ASSERT(my_key, "Unable to recover private key to decrypt memo. Wallet may be corrupted.");
-               memo = op.memo->get_message(*my_key, op.memo->from);
-               out << " -- Memo: " << memo;
-            } else {
-               auto my_key = wif_to_key(wallet._keys.at(op.memo->from));
-               FC_ASSERT(my_key, "Unable to recover private key to decrypt memo. Wallet may be corrupted.");
-               memo = op.memo->get_message(*my_key, op.memo->to);
-               out << " -- Memo: " << memo;
-            }
-         } catch (const fc::exception& e) {
-            out << " -- could not decrypt memo";
-            elog("Error when decrypting memo: ${e}", ("e", e.to_detail_string()));
-         }
-      }
-   }
-   fee(op.fee);
-   return memo;
-}
-
-string operation_printer::decode_memo( const memo_data& x_memo) const
-{
-  std::string memo;
-  if( wallet.is_locked() )
-  {
-      out << " -- Unlock wallet to see memo.";
-  } else {
-      try {
-        FC_ASSERT(wallet._keys.count(x_memo.to) || wallet._keys.count(x_memo.from), "Memo is encrypted to a key ${to} or ${from} not in this wallet.", ("to", x_memo.to)("from",x_memo.from));
-        if( wallet._keys.count(x_memo.to) ) {
-            auto my_key = wif_to_key(wallet._keys.at(x_memo.to));
-            FC_ASSERT(my_key, "Unable to recover private key to decrypt memo. Wallet may be corrupted.");
-            memo = x_memo.get_message(*my_key, x_memo.from);
-        } else {
-            auto my_key = wif_to_key(wallet._keys.at(x_memo.from));
-            FC_ASSERT(my_key, "Unable to recover private key to decrypt memo. Wallet may be corrupted.");
-            memo = x_memo.get_message(*my_key, x_memo.to);
-        }
-      } catch (const fc::exception& e) {
-        out << " -- could not decrypt memo";
-        elog("Error when decrypting memo: ${e}", ("e", e.to_detail_string()));
-      }
-  }
-  return memo;
-}
-
-string operation_printer::operator()(const limit_order_create_operation& op) const
-{
-   out << fc::get_typename<limit_order_create_operation>::name();
-   
-   std::string memo;
-   if( op.p_memo ){
-     memo = decode_memo( *(op.p_memo) );
-   }
-   fee(op.fee);
-   return memo;
-}
-
-string operation_printer::operator()(const fill_order_operation& op) const
-{
-   out << fc::get_typename<fill_order_operation>::name();
-   
-   std::string memo;
-   if( op.p_memo ){
-     memo = decode_memo( *(op.p_memo) );
-   }
-   fee(op.fee);
-   return memo;
-}
-
-string operation_printer::operator()(const limit_order_accept_operation& op) const
-{
-   out << fc::get_typename<limit_order_create_operation>::name();
-   
-   std::string memo;
-
-   memo = decode_memo( op.p_memo );
-
-   fee(op.fee);
-   return memo;
-}
-
-string operation_printer::operator()(const limit_order_accepted_operation& op) const
-{
-   out << fc::get_typename<limit_order_accepted_operation>::name();
-   
-   std::string memo;
-
-   memo = decode_memo( op.p_accepted_memo );
-
-   fee(op.fee);
-   return memo;
-}
 
 std::string operation_printer::operator()(const account_create_operation& op) const
 {
@@ -3012,20 +2907,9 @@ vector<asset> wallet_api::list_account_balances(const string& id)
    return my->_remote_db->get_account_balances(get_account(id).id, flat_set<asset_id_type>());
 }
 
-vector<asset_objviewer> wallet_api::list_assets(const string& lowerbound, uint32_t last_seconds, uint32_t limit)const
+vector<asset_object> wallet_api::list_assets(const string& lowerbound, uint32_t last_seconds, uint32_t limit)const
 {
-
-  vector<asset_object>  raw_asset_objects = 
-    my->_remote_db->list_assets( lowerbound, last_seconds, limit);
-
-  vector<asset_objviewer>  view_assets;
-  view_assets.reserve( raw_asset_objects.size() );
-  
-  for( const asset_object& o : raw_asset_objects ){
-    view_assets.push_back( asset_objviewer( o, *my) );
-  }
-  
-  return view_assets;
+   return my->_remote_db->list_assets( lowerbound, last_seconds, limit);
 }
 
 vector<operation_detail> wallet_api::get_account_history(string name, int limit)const
@@ -3120,34 +3004,14 @@ vector<bucket_object> wallet_api::get_market_history( string symbol1, string sym
    return my->_remote_hist->get_market_history( get_asset_id(symbol1), get_asset_id(symbol2), bucket, start, end );
 }
 
-vector<limit_order_objviewer> wallet_api::get_limit_orders(string a, string b, uint32_t limit)const
+vector<limit_order_object> wallet_api::get_limit_orders(string a, string b, uint32_t limit)const
 {
-  vector<limit_order_object>  raw_limit_orders = 
-    my->_remote_db->get_limit_orders(get_asset(a).id, get_asset(b).id, limit);
-
-  vector<limit_order_objviewer>  view_limit_orders;
-  view_limit_orders.reserve( raw_limit_orders.size() );
-  
-  for( const limit_order_object& o : raw_limit_orders ){
-    view_limit_orders.push_back( limit_order_objviewer( o, *my) );
-  }
-  
-  return view_limit_orders;
+  return my->_remote_db->get_limit_orders(get_asset(a).id, get_asset(b).id, limit);
 }
 
-vector<limit_order_objviewer> wallet_api::get_account_limit_orders(string aname, uint32_t limit)const
+vector<limit_order_object> wallet_api::get_account_limit_orders(string aname, uint32_t limit)const
 {
-  vector<limit_order_object>  raw_limit_orders = 
-    my->_remote_db->get_account_limit_orders( get_account(aname).get_id(), limit);
-      
-  vector<limit_order_objviewer>  view_limit_orders;
-  view_limit_orders.reserve( raw_limit_orders.size() );
-  
-  for( const limit_order_object& o : raw_limit_orders ){
-    view_limit_orders.push_back( limit_order_objviewer( o, *my) );
-}
-
-  return view_limit_orders;
+  return my->_remote_db->get_account_limit_orders( get_account(aname).get_id(), limit);
 }
 
 brain_key_info wallet_api::suggest_brain_key()const
@@ -3266,11 +3130,11 @@ account_object wallet_api::get_account(string account_name_or_id) const
    return my->get_account(account_name_or_id);
 }
 
-asset_objviewer wallet_api::get_asset(string asset_name_or_id) const
+asset_object wallet_api::get_asset(string asset_name_or_id) const
 {
    auto a = my->find_asset(asset_name_or_id);
    FC_ASSERT(a);
-   return asset_objviewer( *a, *my);
+   return *a;
 }
 
 account_id_type wallet_api::get_account_id(string account_name_or_id) const
@@ -3557,10 +3421,11 @@ signed_transaction wallet_api::create_asset(string issuer,
                                             string symbol,
                                             uint8_t precision,
                                             asset_details common,
+                                            optional<string> service_id,
                                             bool broadcast)
 
 {
-   return my->create_asset(issuer, symbol, precision, common, broadcast);
+   return my->create_asset(issuer, symbol, precision, common, service_id, broadcast);
 }
 
 signed_transaction wallet_api::update_asset(string symbol,
@@ -4639,84 +4504,6 @@ vesting_balance_object_with_info::vesting_balance_object_with_info( const vestin
 {
    allowed_withdraw = get_allowed_withdraw( now );
    allowed_withdraw_time = now;
-}
-
-limit_order_objviewer::limit_order_objviewer( const graphene::chain::limit_order_object& o, const detail::wallet_api_impl& wallet)
-{
-  graphene::chain::limit_order_object &me = *this;
-  me = o;
-
-  if( p_memo.valid() ){
-    string txt, err;
-    decode_memo( wallet, *p_memo, txt, err);
-    if( !txt.empty() ){
-      memo = txt;
-    }
-    if( !err.empty()){
-      memo_err = err;
-    }
-  }
-
-  if( p_accepted_memo.valid() ){
-    string txt, err;
-    decode_memo( wallet, *p_accepted_memo, txt, err);
-    if( !txt.empty() ){
-      accepted_memo = txt;
-    }
-    if( !err.empty()){
-      accepted_memo_err = err;
-    }
-  }
-}
-
-void limit_order_objviewer::decode_memo( const detail::wallet_api_impl& wallet, memo_data& encoded_memo, string& txt_memo, string& err_msg)
-{
-    if( wallet.is_locked() )
-    {
-        err_msg = " -- Unlock wallet to see memo.";
-    } else {
-        try {
-          FC_ASSERT(wallet._keys.count(encoded_memo.to) || wallet._keys.count(encoded_memo.from), "Memo is encrypted to a key ${to} or ${from} not in this wallet.", ("to", encoded_memo.to)("from",encoded_memo.from));
-          if( wallet._keys.count(encoded_memo.to) ) {
-              auto my_key = wif_to_key(wallet._keys.at(encoded_memo.to));
-              FC_ASSERT(my_key, "Unable to recover private key to decrypt memo. Wallet may be corrupted.");
-              txt_memo = encoded_memo.get_message(*my_key, encoded_memo.from);
-          } else {
-              auto my_key = wif_to_key(wallet._keys.at(encoded_memo.from));
-              FC_ASSERT(my_key, "Unable to recover private key to decrypt memo. Wallet may be corrupted.");
-              txt_memo = encoded_memo.get_message(*my_key, encoded_memo.to);
-          }
-        } catch (const fc::exception& e) {
-          err_msg = string( " -- Could not decrypt memo: ") + e.what();
-          elog("Error when decrypting memo: ${e}", ("e", e.to_detail_string()));
-        }
-    }
-}
-
-asset_objviewer::asset_objviewer( const graphene::chain::asset_object& o, const detail::wallet_api_impl& wallet)
-{
-  graphene::chain::asset_object& me = *this;
-  me = o;
-  string asset_memo;
-
-  if( options.p_memo.try_get_message( fc::ecc::private_key(), asset_memo)){
-    memo = asset_memo;
-  } else {
-    if( wallet.is_locked() ){
-        memo_err = " -- Unlock wallet to see memo.";
-    } else {
-        for( auto& k : wallet._keys){
-          auto pk = wif_to_key( k.second);
-          if( pk.valid() ){
-            if( options.p_memo.try_get_message( *pk, asset_memo)){
-              memo = asset_memo;
-              return;
-            }
-          }
-        }
-        memo_err = string( " -- Could not decrypt memo. No decryption key.");
-    }
-  }
 }
 
 } } // graphene::wallet

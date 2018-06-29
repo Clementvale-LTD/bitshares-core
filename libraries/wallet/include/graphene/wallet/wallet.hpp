@@ -283,33 +283,6 @@ struct offer_request_detail {
       optional<string> bid_id;
 };
 
-class limit_order_objviewer : public graphene::chain::limit_order_object
-{
-   public:
-
-      limit_order_objviewer( const graphene::chain::limit_order_object& o, const detail::wallet_api_impl& wallet);
-
-      optional< string > memo;
-      optional< string > memo_err;
-
-      optional< string > accepted_memo;
-      optional< string > accepted_memo_err;
-   private:
-      void decode_memo( const detail::wallet_api_impl& wallet, memo_data& encoded_memo, string& txt_memo, string& err_msg);
-};
-
-class asset_objviewer : public graphene::chain::asset_object
-{
-   public:
-
-      asset_objviewer( const graphene::chain::asset_object& o, const detail::wallet_api_impl& wallet);
-
-      optional< string > memo;
-      optional< string > memo_err;
-   private:
-      void decode_memo( const detail::wallet_api_impl& wallet, memo_group& encoded_memo, string& txt_memo, string& err_msg);
-};
-
 struct asset_details {
   /// The maximum supply of this asset which may exist at any given time. This can be as large as
   /// GRAPHENE_MAX_SHARE_SUPPLY
@@ -392,7 +365,7 @@ class wallet_api
        * @param limit the maximum number of assets to return (max: 100)
        * @returns the list of asset objects, ordered by symbol
        */
-      vector<asset_objviewer>              list_assets(const string& lowerbound, uint32_t last_seconds, uint32_t limit)const;
+      vector<asset_object>              list_assets(const string& lowerbound, uint32_t last_seconds, uint32_t limit)const;
       
       /** Returns the most recent operations on the named account.
        *
@@ -426,8 +399,8 @@ class wallet_api
      vector<operation_detail>  get_relative_account_history(string name, uint32_t stop, int limit, uint32_t start)const;
 
       vector<bucket_object>             get_market_history(string symbol, string symbol2, uint32_t bucket, fc::time_point_sec start, fc::time_point_sec end)const;
-      vector<limit_order_objviewer>     get_limit_orders(string a, string b, uint32_t limit)const;
-      vector<limit_order_objviewer>     get_account_limit_orders(string aname, uint32_t limit)const;
+      vector<limit_order_object>        get_limit_orders(string a, string b, uint32_t limit)const;
+      vector<limit_order_object>        get_account_limit_orders(string aname, uint32_t limit)const;
       
       /** Returns the block chain's slowly-changing settings.
        * This object contains all of the properties of the blockchain that are fixed
@@ -457,7 +430,7 @@ class wallet_api
        * @param asset_name_or_id the symbol or id of the asset in question
        * @returns the information about the asset stored in the block chain
        */
-      asset_objviewer                      get_asset(string asset_name_or_id) const;
+      asset_object                      get_asset(string asset_name_or_id) const;
 
       /** Lookup the id of a named account.
        * @param account_name_or_id the name of the account to look up
@@ -1111,6 +1084,7 @@ class wallet_api
                                       string symbol,
                                       uint8_t precision,
                                       asset_details common,
+                                      optional<string> service_id,
                                       bool broadcast = false);
 
       /** Issue new shares of an asset.
@@ -1513,16 +1487,6 @@ FC_REFLECT( graphene::wallet::operation_detail,
 
 FC_REFLECT( graphene::wallet::offer_request_detail, 
             (request_id)(user_id)(counterparty_id)(memo)(bid_id) )
-
-FC_REFLECT_DERIVED( graphene::wallet::limit_order_objviewer,
-                    (graphene::chain::limit_order_object),
-                    (memo)(memo_err)(accepted_memo)(accepted_memo_err)
-                  )
-            
-FC_REFLECT_DERIVED( graphene::wallet::asset_objviewer,
-                    (graphene::chain::asset_object),
-                    (memo)(memo_err)
-                  )
 
 FC_REFLECT( graphene::wallet::asset_details, 
             (max_supply)(whitelist_authorities)(blacklist_authorities)(memo) )

@@ -98,6 +98,8 @@ namespace graphene { namespace chain {
       /// ID 1, and the chain will overwrite it with the new asset's ID.
       asset_options              common_options;
 
+      optional<service_id_type>  service_id;
+
       extensions_type extensions;
 
       account_id_type fee_payer()const { return issuer; }
@@ -176,7 +178,7 @@ namespace graphene { namespace chain {
       struct fee_parameters_type { uint64_t fee = 20 * GRAPHENE_BLOCKCHAIN_PRECISION; };
 
       asset             fee;
-      account_id_type   payer;
+      account_id_type   payer;service_id
       asset             amount_to_reserve;
       extensions_type   extensions;
 
@@ -210,6 +212,7 @@ FC_REFLECT( graphene::chain::asset_create_operation,
             (symbol)
             (precision)
             (common_options)
+            (service_id)
             (extensions)
           )
 FC_REFLECT( graphene::chain::asset_update_operation,

@@ -53,6 +53,10 @@ void_result asset_create_evaluator::do_evaluate( const asset_create_operation& o
    auto asset_symbol_itr = asset_indx.find( op.symbol );
    FC_ASSERT( asset_symbol_itr == asset_indx.end() );
 
+   if( op.service_id.valid() ){
+     d.get_object( *(op.service_id));
+   }
+
    {
       auto dotpos = op.symbol.rfind( '.' );
       if( dotpos != std::string::npos )
@@ -84,6 +88,7 @@ object_id_type asset_create_evaluator::do_apply( const asset_create_operation& o
          a.symbol = op.symbol;
          a.precision = op.precision;
          a.options = op.common_options;
+         a.service_id = op.service_id;
          a.modification_timestamp = fc::time_point::now();
          a.dynamic_asset_data_id = dyn_asset.id;
       });

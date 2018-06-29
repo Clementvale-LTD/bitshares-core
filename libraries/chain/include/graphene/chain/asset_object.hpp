@@ -103,6 +103,7 @@ namespace graphene { namespace chain {
 
          asset_options options;
 
+         optional<service_id_type>  service_id;
 
          /// Current supply, fee pool, and collected fees are stored in a separate object as they change frequently.
          asset_dynamic_data_id_type  dynamic_asset_data_id;
@@ -150,6 +151,7 @@ FC_REFLECT_DERIVED( graphene::chain::asset_object, (graphene::db::object),
                     (precision)
                     (issuer)
                     (options)
+                    (service_id)
                     (dynamic_asset_data_id)
                     (modification_timestamp)
                   )

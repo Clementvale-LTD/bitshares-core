@@ -33,6 +33,7 @@
 #include <graphene/chain/is_authorized_asset.hpp>
 
 #include <graphene/chain/protocol/market.hpp>
+#include <graphene/chain/worker_object.hpp>
 
 #include <fc/uint128.hpp>
 #include <fc/smart_ref_impl.hpp>
@@ -52,6 +53,11 @@ void_result limit_order_create_evaluator::do_evaluate(const limit_order_create_o
       FC_ASSERT( _sell_asset->options.whitelist_markets.find(_receive_asset->id) != _sell_asset->options.whitelist_markets.end() );
    if( _sell_asset->options.blacklist_markets.size() )
       FC_ASSERT( _sell_asset->options.blacklist_markets.find(_receive_asset->id) == _sell_asset->options.blacklist_markets.end() );
+
+   if( op.bid_id.valid() ){
+     const bid_object&  bo = (*(op.bid_id))(d);
+     FC_ASSERT( bo.expiration >= d.head_block_time() );
+   }
 
    FC_ASSERT( is_authorized_asset( d, *_seller, *_sell_asset ) );
    FC_ASSERT( is_authorized_asset( d, *_seller, *_receive_asset ) );

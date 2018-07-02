@@ -378,6 +378,8 @@ class database_api
        */
       vector<limit_order_object> get_account_limit_orders( account_id_type account_id, uint32_t limit)const;
 
+      vector<limit_order_object> get_limit_orders_for( account_id_type account_id, uint32_t limit)const;
+
       /**
        * @brief Request notification when the active orders in the market between two assets changes
        * @param callback Callback method which is called when the market changes
@@ -673,6 +675,7 @@ FC_API(graphene::app::database_api,
    (get_order_book)
    (get_limit_orders)
    (get_account_limit_orders)
+   (get_limit_orders_for)
    (subscribe_to_market)
    (unsubscribe_from_market)
    (get_ticker)

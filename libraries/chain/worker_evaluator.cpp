@@ -155,6 +155,9 @@ void_result bid_create_evaluator::do_evaluate(const bid_create_evaluator::operat
 
    FC_ASSERT( o.expiration >= d.head_block_time() );
 
+   const bid_request_object& bro = o.request(d);
+   FC_ASSERT( bro.expiration >= d.head_block_time() );
+
    return void_result();
 } FC_CAPTURE_AND_RETHROW( (o) ) }
 

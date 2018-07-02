@@ -125,6 +125,7 @@ class database_api_impl : public std::enable_shared_from_this<database_api_impl>
       // Markets / feeds
       vector<limit_order_object>         get_limit_orders(asset_id_type a, asset_id_type b, uint32_t limit)const;
       vector<limit_order_object>         get_account_limit_orders( account_id_type account_id, uint32_t limit)const;
+      vector<limit_order_object>         get_limit_orders_for( account_id_type account_id, uint32_t limit)const;
       void subscribe_to_market(std::function<void(const variant&)> callback, asset_id_type a, asset_id_type b);
       void unsubscribe_from_market(asset_id_type a, asset_id_type b);
       market_ticker                      get_ticker( const string& base, const string& quote, bool skip_order_book = false )const;
@@ -1344,6 +1345,11 @@ vector<limit_order_object> database_api::get_account_limit_orders( account_id_ty
    return my->get_account_limit_orders( account_id, limit );
 }
 
+vector<limit_order_object> database_api::get_limit_orders_for( account_id_type account_id, uint32_t limit)const
+{
+   return my->get_limit_orders_for( account_id, limit );
+}
+
 /**
  *  @return the limit orders created by specified account.
  */
@@ -1351,6 +1357,28 @@ vector<limit_order_object> database_api_impl::get_account_limit_orders( account_
 {
   const auto& limit_order_idx = _db.get_index_type<limit_order_index>();
   const auto& range = limit_order_idx.indices().get<by_account>().equal_range( account_id );
+
+  vector<limit_order_object> result;
+
+  uint32_t count = 0;
+  for( const limit_order_object& o : boost::make_iterator_range( range.first, range.second ) )
+  {
+    result.push_back( o);
+    ++count;
+    if( count >= limit)
+      break;
+  }
+
+  return result;
+}
+
+/**
+ *  @return the limit orders created for specified counterparty account.
+ */
+vector<limit_order_object> database_api_impl::get_limit_orders_for( account_id_type account_id, uint32_t limit)const
+{
+  const auto& limit_order_idx = _db.get_index_type<limit_order_index>();
+  const auto& range = limit_order_idx.indices().get<by_counterparty>().equal_range( account_id );
 
   vector<limit_order_object> result;
 

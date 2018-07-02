@@ -55,7 +55,7 @@ cli_response = call_cli_wallet( jsonrpc_call )
 
 
 jsonrpc_call["method"] = "create_bid"
-jsonrpc_call["params"] = ["t1node", "t1node_bid_1", "t1node_br_1", "test bid 1", 120, True]
+jsonrpc_call["params"] = ["t1node", "t1node_bid_1", "t1node_br_1", "test bid 1", 300, True]
 cli_response = call_cli_wallet( jsonrpc_call )
 
 

@@ -401,6 +401,7 @@ class wallet_api
       vector<bucket_object>             get_market_history(string symbol, string symbol2, uint32_t bucket, fc::time_point_sec start, fc::time_point_sec end)const;
       vector<limit_order_object>        get_limit_orders(string a, string b, uint32_t limit)const;
       vector<limit_order_object>        get_account_limit_orders(string aname, uint32_t limit)const;
+      vector<limit_order_object>        get_limit_orders_for( string aname, uint32_t limit)const;
       
       /** Returns the block chain's slowly-changing settings.
        * This object contains all of the properties of the blockchain that are fixed
@@ -1567,6 +1568,7 @@ FC_API( graphene::wallet::wallet_api,
         (normalize_brain_key)
         (get_limit_orders)
         (get_account_limit_orders)
+        (get_limit_orders_for)
         (save_wallet_file)
         (serialize_transaction)
         (sign_transaction)

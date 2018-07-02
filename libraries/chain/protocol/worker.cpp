@@ -25,8 +25,35 @@
 
 namespace graphene { namespace chain {
 
+bool is_valid_srv_name( const string& sname )
+{
+    if( sname.size() < GRAPHENE_MIN_ASSET_SYMBOL_LENGTH )
+        return false;
+
+    if( sname.size() > GRAPHENE_MAX_ASSET_SYMBOL_LENGTH )
+        return false;
+
+    if( !isalpha( sname.front() ) )
+        return false;
+
+    for( const auto c : sname )
+    {
+        if( (isalpha( c ) && islower( c )) || isdigit(c) )
+            continue;
+
+        if( c == '.' || c == '-' || c == '_'  )
+            continue;
+
+        return false;
+    }
+
+    return true;
+}
+  
+
 void  service_create_operation::validate()const
 {
+   FC_ASSERT( is_valid_srv_name( name) );
 }
   
 void  service_update_operation::validate()const
@@ -35,6 +62,7 @@ void  service_update_operation::validate()const
 
 void  bid_request_create_operation::validate()const
 {
+   FC_ASSERT( is_valid_srv_name( name) );
 }
 
 void  bid_request_cancel_operation::validate()const
@@ -43,9 +71,11 @@ void  bid_request_cancel_operation::validate()const
 
 void  bid_create_operation::validate()const
 {
+   FC_ASSERT( is_valid_srv_name( name) );
 }
 
 void  bid_cancel_operation::validate()const
 {
 }
+
 } }

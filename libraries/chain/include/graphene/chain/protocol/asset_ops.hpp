@@ -178,7 +178,7 @@ namespace graphene { namespace chain {
       struct fee_parameters_type { uint64_t fee = 20 * GRAPHENE_BLOCKCHAIN_PRECISION; };
 
       asset             fee;
-      account_id_type   payer;service_id
+      account_id_type   payer;
       asset             amount_to_reserve;
       extensions_type   extensions;
 

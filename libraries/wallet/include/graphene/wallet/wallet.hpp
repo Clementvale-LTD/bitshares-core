@@ -276,10 +276,19 @@ struct operation_detail {
 };
 
 struct offer_request_detail {
+      //limit order matching parameter
       uint64_t request_id;
+
+      //limit order matching parameter
       uint64_t user_id;
+
+      //counterparty account name or id to address limit order to  
       string counterparty_id;
+
+      //text memo encrypted by shared key so that only author and counterparty can read it
       string memo;
+
+      //bid name or id to address limit order to 
       optional<string> bid_id;
 };
 
@@ -399,8 +408,37 @@ class wallet_api
      vector<operation_detail>  get_relative_account_history(string name, uint32_t stop, int limit, uint32_t start)const;
 
       vector<bucket_object>             get_market_history(string symbol, string symbol2, uint32_t bucket, fc::time_point_sec start, fc::time_point_sec end)const;
+ 
+       /**
+       * Returns a list of limit_order_object corresponded to a given asset pair.
+       * 
+       * @param a 	the symbol or id of the first asset
+       * @param b 	the symbol or id of the second asset
+       * @param limit 	restrict output by specified number of orders 
+       * @returns a list of \c operation_history_objects
+       */
       vector<limit_order_object>        get_limit_orders(string a, string b, uint32_t limit)const;
+
+       /**
+       * Returns a list of limit_order_object created by owner of specified account
+       *
+       * @see sell_asset() 
+       *  
+       * @param aname the name or id of the account
+       * @param limit the number of entries to return
+       * @returns a list of \c limit_order_object
+       */
       vector<limit_order_object>        get_account_limit_orders(string aname, uint32_t limit)const;
+
+       /**
+       * Returns a list of limit_order_object created for specified counterparty account
+       * 
+       * @see sell_asset()
+       * 
+       * @param aname the name or id of the counterparty account, see \c offer_request_detail
+       * @param limit the number of entries to return
+       * @returns a list of \c limit_order_object
+       */
       vector<limit_order_object>        get_limit_orders_for( string aname, uint32_t limit)const;
       
       /** Returns the block chain's slowly-changing settings.
@@ -1026,18 +1064,60 @@ class wallet_api
        */
       signed_transaction cancel_order(object_id_type order_id, bool broadcast = false);
 
+      /** Creates a new named service and registers it on the blockchain.
+       *
+       * @see create_asset()
+       *
+       * @param owner_id_or_name the name or id of the account, the owner of the service.
+       * @param name  the short name of the service; name must be unique (3-16 characters, lower case alpha-numeric, allowed ".-_" )
+       * @param memo  the full text description of the service; memo is encrypted if whitelist_accounts is not empty, so that only whitelisted accounts could read memo
+       * @param whitelist_accounts  the list of the accounts which can read memo from the blockchain; may be empty
+       * @param broadcast true to broadcast the transaction on the network
+       * @returns the signed transaction registering the service
+       */
       signed_transaction create_service( string owner_id_or_name,
                                 string name,
                                 string memo,
                                 flat_set<string> whitelist_accounts,
                                 bool broadcast = false);
 
+      /** Updates a named service
+       *
+       * @see create_service()
+       *
+       * @param name_or_id the name or id of the service. you must have private key of the service owner
+       * @param memo  the full text description of the service; memo is encrypted if whitelist_accounts is not empty, so that only whitelisted accounts could read memo
+       * @param whitelist_accounts  the list of the accounts which can read memo from the blockchain; may be empty
+       * @param broadcast true to broadcast the transaction on the network
+       * @returns the signed transaction updating the service
+       */
       signed_transaction  update_service( string name_or_id, string memo, flat_set<string> whitelist_accounts, bool broadcast = false);
                                 
-
+      /** Lists all services registered in the blockchain.
+       * This returns a list of all service objects, sorted by service name.
+       *
+       * Use the \c lowerbound and limit parameters to page through the list.  To retrieve all services,
+       * start by setting \c lowerbound to the empty string \c "", and then each iteration, pass
+       * the last service name returned as the \c lowerbound for the next \c list_services() call.
+       *
+       * @param lowerbound the name of the first service to return.  If the named service does not exist, 
+       *                   the list will start at the service that comes after \c lowerbound
+       * @param limit the maximum number of services to return (max: 1000)
+       * @returns a list of service objects
+       */
       vector<service_object>   list_services(const string& lowerbound, uint32_t limit)const;
 
 
+      /** Creates a new named bid request and registers it on the blockchain.
+       *
+       * @param owner_id_or_name the name or id of the account, the owner of the bid request.
+       * @param name  the short name of the bid request; name must be unique (3-16 characters, lower case alpha-numeric, allowed ".-_" )
+       * @param memo  the full text description of the bid; memo is encrypted, only accounts of assets issuers could read memo
+       * @param assets  the list of assets for this bid request
+       * @param timeout_sec this is the length of time the bid request will remain active and will accept bids
+       * @param broadcast true to broadcast the transaction on the network
+       * @returns the signed transaction registering the bid request
+       */
       signed_transaction create_bid_request( string owner_id_or_name,
                                 string name,
                                 string memo,
@@ -1045,10 +1125,51 @@ class wallet_api
                                 uint32_t timeout_sec = 0,
                                 bool broadcast = false);
 
+      /** Lists all bid requests registered in the blockchain.
+       * This returns a list of all bid_request objects, sorted by name.
+       *
+       * @see create_bid_request()
+       * 
+       * Use the \c lowerbound and limit parameters to page through the list.  To retrieve all bid requests,
+       * start by setting \c lowerbound to the empty string \c "", and then each iteration, pass
+       * the last bid request name returned as the \c lowerbound for the next \c list_bid_requests() call.
+       *
+       * @param lower_bound_name the name of the first bid request to return.  If the named bid request does not exist, 
+       *                   the list will start at the bid request that comes after \c lowerbound
+       * @param assets_name_or_id if not null, limit output by bid requests registered for specified assets 
+       * @param limit the maximum number of bid requests to return (max: 1000)
+       * @returns a list of bid request objects
+       */
       vector<bid_request_object> list_bid_requests(const string& lower_bound_name, optional<vector<string>> assets_name_or_id, uint32_t limit)const;
+
+      /** Lists all bid requests addressed to specified service provider.
+       *
+       * @see create_bid_request()
+       * 
+       * @param provider_acc_name_or_id account name or id of service provider; it must be an issuer of one of the asset specified in create_bid_request()
+       * @returns a list of bid request objects
+       */
       vector<bid_request_object> list_bid_requests_by_provider (string provider_acc_name_or_id)const;
+
+      /** Lists all bid requests registered by specified account.
+       *
+       * @see create_bid_request()
+       * 
+       * @param requester_acc_name_or_id the name or id of the account who registered the bid request 
+       * @returns a list of bid request objects
+       */
       vector<bid_request_object> list_bid_requests_by_requester (string requester_acc_name_or_id)const;
 
+      /** Creates a new named bid and registers it on the blockchain.
+       *
+       * @param owner_id_or_name the name or id of the account, the owner of the bid.
+       * @param name  the short name of the bid; name must be unique (3-16 characters, lower case alpha-numeric, allowed ".-_" )
+       * @param request bid request name or id to address this bid to
+       * @param memo  the full text description of the bid; memo is encrypted and visible only to bid creator and bid request creator
+       * @param timeout_sec this is the length of time the bid will remain active and will accept limit orders
+       * @param broadcast true to broadcast the transaction on the network
+       * @returns the signed transaction registering the bid
+       */
       signed_transaction create_bid( string owner_id_or_name,
                                 string name,
                                 string request, 
@@ -1056,11 +1177,41 @@ class wallet_api
                                 uint32_t timeout_sec = 0,
                                 bool broadcast = false);
 
+      /** Lists all bids registered in the blockchain.
+       * This returns a list of all bid objects, sorted by name.
+       *
+       * @see create_bid()
+       * 
+       * Use the \c lowerbound and limit parameters to page through the list.  To retrieve all bids,
+       * start by setting \c lowerbound to the empty string \c "", and then each iteration, pass
+       * the last bid name returned as the \c lowerbound for the next \c list_bids() call.
+       *
+       * @param lower_bound_name the name of the first bid to return.  If the named bid does not exist, 
+       *                   the list will start at the bid that comes after \c lowerbound
+       * @param limit the maximum number of bids to return (max: 1000)
+       * @returns a list of bids objects
+       */
       vector<bid_object> list_bids(const string& lower_bound_name, uint32_t limit)const;
+      
+      /** Lists all bids addressed to specified bid request.
+       *
+       * @see create_bid()
+       * 
+       * @param request_name_or_id name or id of bid request specified in create_bid()
+       * @returns a list of bids objects
+       */
       vector<bid_object> list_bids_by_request( string request_name_or_id)const;
+
+
+      /** Lists all bids created by specified service provider.
+       *
+       * @see create_bid_request()
+       * 
+       * @param provider_acc_name_or_id account name or id of service provider; it must be an owner of the bid specified in create_bid()
+       * @returns a list of bids objects
+       */
       vector<bid_object> list_bids_by_provider( string provider_acc_name_or_id)const;
 
-                                
       /** Creates a new user-issued or market-issued asset.
        *
        * Many options can be changed later using \c update_asset()
@@ -1078,6 +1229,7 @@ class wallet_api
        *               this new asset. Since this ID is not known at the time this operation is 
        *               created, create this price as though the new asset has instance ID 1, and
        *               the chain will overwrite it with the new asset's ID.
+       * @param service_id service name or id to refer this asset to, may be null (see create_service() ) 
        * @param broadcast true to broadcast the transaction on the network
        * @returns the signed transaction creating a new asset
        */

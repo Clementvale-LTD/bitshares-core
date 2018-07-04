@@ -341,20 +341,99 @@ class database_api
        */
       vector<optional<asset_object>> lookup_asset_symbols(const vector<string>& symbols_or_ids)const;
 
+      /**
+       * @brief Get a list of services by ID
+       * @param service_ids IDs of services to retrieve
+       * @return The list of service objects corresponding to the provided IDs
+       */
       vector<optional<service_object>> get_services(const vector<service_id_type>& service_ids)const;
+      
+      /**
+       * @brief Get services alphabetically by service name
+       * @param lower_bound_name Lower bound of service names to retrieve
+       * @param limit Maximum number of services to fetch
+       * @return The services found
+       */
       vector<service_object> list_services(const string& lower_bound_name, uint32_t limit)const;
+      
+      /**
+       * @brief Get a list of services by name or id
+       * @param names_or_ids names or stringified IDs of the services to retrieve
+       * @return The services corresponding to the provided names or IDs
+       */
       vector<optional<service_object>> lookup_service_names(const vector<string>& names_or_ids)const;
 
+      /**
+       * @brief Get a list of bid requests by ID
+       * @param bid_request_ids IDs of the bid requests to retrieve
+       * @return The bid requests corresponding to the provided IDs
+       */
       vector<optional<bid_request_object>> get_bid_requests(const vector<bid_request_id_type>& bid_request_ids)const;
+      
+      /**
+       * @brief Get  bid requests alphabetically by bid requests name
+       * @param lower_bound_name Lower bound of names to retrieve
+       * @param assets restrict output by bid requests addressed to specified assets
+       * @param limit Maximum number of  bid requests to fetch
+       * @return The bid requests found
+       */
       vector<bid_request_object> list_bid_requests(const string& lower_bound_name, optional<vector<asset_id_type>> assets, uint32_t limit)const;
+
+      /**
+       * @brief Get a list of bid requests addressed to specified service provider
+       * @param provider_acc account ID of service provider
+       * @return The bid requests found
+       */
       vector<bid_request_object> list_bid_requests_by_provider (account_id_type provider_acc)const;
+
+      /**
+       * @brief Get a list of bid requests created by specified user
+       * @param requester_acc account ID of bid request creator
+       * @return The bid requests found
+       */
       vector<bid_request_object> list_bid_requests_by_requester (account_id_type requester_acc)const;
+
+      /**
+       * @brief Get a list of bid request by name or id
+       * @param names_or_ids names or stringified IDs of the bid request to retrieve
+       * @return The bid request corresponding to the provided names or IDs
+       */
       vector<optional<bid_request_object>> lookup_bid_request_names(const vector<string>& names_or_ids)const;
 
+      /**
+       * @brief Get a list of bid by ID
+       * @param bid_ids IDs of the bids to retrieve
+       * @return The bids corresponding to the provided IDs
+       */
       vector<optional<bid_object>> get_bids(const vector<bid_id_type>& bid_ids)const;
+
+      /**
+       * @brief Get  bids alphabetically by bid name
+       * @param lower_bound_name Lower bound of names to retrieve
+       * @param limit Maximum number of  bids to fetch
+       * @return The bids found
+       */
       vector<bid_object> list_bids(const string& lower_bound_name, uint32_t limit)const;
+
+      /**
+       * @brief Get a list of bids addressed to specified bid request
+       * @param request bid request ID
+       * @return The bids found
+       */
       vector<bid_object> list_bids_by_request( bid_request_id_type request)const;
+
+      /**
+       * @brief Get a list of bids created by specified service provider
+       * @param provider_acc account ID of bid creator
+       * @return The bids found
+       */
       vector<bid_object> list_bids_by_provider( account_id_type provider_acc)const;
+
+      /**
+       * @brief Get a list of bids by name or id
+       * @param names_or_ids names or stringified IDs of the bids to retrieve
+       * @return The bids corresponding to the provided names or IDs
+       */
       vector<optional<bid_object>> lookup_bid_names(const vector<string>& names_or_ids)const;
 
       /////////////////////

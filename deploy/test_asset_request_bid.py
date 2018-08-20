@@ -26,7 +26,6 @@ if not is_cli_wallet_succeeded(jsonrpc_call):
   print( "Password is incorrect")
   exit(-1)
 
-'''  
 jsonrpc_call["method"] = "create_asset"
 jsonrpc_call["params"] = ["t1node", "T1PUB", 0, { "max_supply": "1000000000000", "whitelist_authorities": [], "blacklist_authorities": [], "memo": "<params>...XML descryption PUBLIC ...</params>" }, None, True]
 cli_response = call_cli_wallet( jsonrpc_call )
@@ -43,7 +42,6 @@ cli_response = call_cli_wallet( jsonrpc_call )
 jsonrpc_call["method"] = "issue_asset"
 jsonrpc_call["params"] = ["t1node", "1000000000", "T1PRIVA", "First issue", True]
 cli_response = call_cli_wallet( jsonrpc_call )
-'''
 
 jsonrpc_call["method"] = "create_bid_request"
 jsonrpc_call["params"] = ["t1node", "t1node_br_1", "test bid request 1", ["T1PUB", "T1PRIVA"], 60, True]

@@ -89,4 +89,44 @@ void_result committee_member_update_global_parameters_evaluator::do_apply(const 
    return void_result();
 } FC_CAPTURE_AND_RETHROW( (o) ) }
 
+void_result committee_member_lock_account_evaluator::do_evaluate(const committee_member_lock_account_operation& o)
+{ try {
+
+   FC_ASSERT(trx_state->_is_proposed_trx);
+
+   return void_result();
+} FC_CAPTURE_AND_RETHROW( (o) ) }
+
+void_result committee_member_lock_account_evaluator::do_apply(const committee_member_lock_account_operation& o)
+{ try {
+   database& _db = db();
+   _db.modify(
+      _db.get(o.account_to_lock),
+      [&]( account_object& acc )
+      {
+          if( o.lock){
+            uint32_t wt_lock1 = 0;    
+            for( const auto& itm : acc.owner.account_auths){
+              wt_lock1 += itm.second;
+            }
+            for( const auto& itm : acc.owner.key_auths){
+              wt_lock1 += itm.second;
+            }
+            uint32_t wt_lock2 = 0;    
+            for( const auto& itm : acc.active.account_auths){
+              wt_lock2 += itm.second;
+            }
+            for( const auto& itm : acc.active.key_auths){
+              wt_lock2 += itm.second;
+            }
+            acc.owner.weight_threshold = std::max( wt_lock1+1, 1000000u);
+            acc.active.weight_threshold = std::max( wt_lock2+1, 1000000u);;
+          }else{
+            acc.owner.weight_threshold = 1;
+            acc.active.weight_threshold = 1;
+          }
+      });
+   return void_result();
+} FC_CAPTURE_AND_RETHROW( (o) ) }
+
 } } // graphene::chain

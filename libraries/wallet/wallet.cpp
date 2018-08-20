@@ -2598,6 +2598,38 @@ public:
       return sign_transaction(tx, broadcast);
    }
 
+   signed_transaction propose_account_lock(
+        const string& proposing_account,
+        fc::time_point_sec expiration_time,
+        const string& account_to_lock,
+        bool lock,
+        bool broadcast = false)
+   {
+      account_object tolock = get_account(account_to_lock);
+
+      const chain_parameters& current_params = get_global_properties().parameters;
+
+      committee_member_lock_account_operation lock_op;
+      lock_op.account_to_lock = tolock.get_id();
+      lock_op.lock = lock;
+
+      proposal_create_operation prop_op;
+
+      prop_op.expiration_time = expiration_time;
+      prop_op.review_period_seconds = current_params.committee_proposal_review_period;
+      prop_op.fee_paying_account = get_account(proposing_account).id;
+
+      prop_op.proposed_ops.emplace_back( lock_op );
+      current_params.current_fees->set_fee( prop_op.proposed_ops.back().op );
+
+      signed_transaction tx;
+      tx.operations.push_back(prop_op);
+      set_operation_fees(tx, current_params.current_fees);
+      tx.validate();
+
+      return sign_transaction(tx, broadcast);
+   }
+
    signed_transaction approve_proposal(
       const string& fee_paying_account,
       const string& proposal_id,
@@ -3600,6 +3632,17 @@ signed_transaction wallet_api::propose_fee_change(
    )
 {
    return my->propose_fee_change( proposing_account, expiration_time, changed_fees, broadcast );
+}
+
+signed_transaction wallet_api::propose_account_lock(
+   const string& proposing_account,
+   fc::time_point_sec expiration_time,
+   const string& account_to_lock,
+   bool lock,
+   bool broadcast /* = false */
+   )
+{
+   return my->propose_account_lock( proposing_account, expiration_time, account_to_lock, lock, broadcast );
 }
 
 signed_transaction wallet_api::approve_proposal(

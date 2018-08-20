@@ -1542,6 +1542,13 @@ class wallet_api
          const variant_object& changed_values,
          bool broadcast = false);
 
+      signed_transaction propose_account_lock(
+         const string& proposing_account,
+         fc::time_point_sec expiration_time,
+         const string& account_to_lock,
+         bool lock,
+         bool broadcast = false);
+
       /** Approve or disapprove a proposal.
        *
        * @param fee_paying_account The account paying the fee for the op.
@@ -1726,6 +1733,7 @@ FC_API( graphene::wallet::wallet_api,
         (sign_transaction)
         (get_prototype_operation)
         (propose_parameter_change)
+        (propose_account_lock)
         (propose_fee_change)
         (approve_proposal)
         (dbg_push_blocks)

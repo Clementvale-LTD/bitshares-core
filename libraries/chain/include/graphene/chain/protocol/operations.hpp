@@ -72,6 +72,7 @@ namespace graphene { namespace chain {
             committee_member_create_operation,
             committee_member_update_operation,
             committee_member_update_global_parameters_operation,
+            committee_member_lock_account_operation,
             vesting_balance_create_operation,
             vesting_balance_withdraw_operation,
             custom_operation,

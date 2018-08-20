@@ -123,6 +123,50 @@ jsonrpc_call["method"] = "transfer"
 jsonrpc_call["params"] = ["bank", "t3node", 50000, "SDRT", "here is some umt", "true"]
 cli_response = call_cli_wallet( jsonrpc_call )
 
+jsonrpc_call["method"] = "vote_for_committee_member"
+jsonrpc_call["params"] = ["ptolemy", "init0", "true", "true"]
+cli_response = call_cli_wallet( jsonrpc_call )
+
+jsonrpc_call["method"] = "vote_for_committee_member"
+jsonrpc_call["params"] = ["ptolemy", "init1", "true", "true"]
+cli_response = call_cli_wallet( jsonrpc_call )
+
+jsonrpc_call["method"] = "vote_for_committee_member"
+jsonrpc_call["params"] = ["ptolemy", "init2", "true", "true"]
+cli_response = call_cli_wallet( jsonrpc_call )
+
+jsonrpc_call["method"] = "vote_for_committee_member"
+jsonrpc_call["params"] = ["ptolemy", "init3", "true", "true"]
+cli_response = call_cli_wallet( jsonrpc_call )
+
+jsonrpc_call["method"] = "vote_for_committee_member"
+jsonrpc_call["params"] = ["ptolemy", "init4", "true", "true"]
+cli_response = call_cli_wallet( jsonrpc_call )
+
+jsonrpc_call["method"] = "vote_for_committee_member"
+jsonrpc_call["params"] = ["ptolemy", "init5", "true", "true"]
+cli_response = call_cli_wallet( jsonrpc_call )
+
+jsonrpc_call["method"] = "vote_for_committee_member"
+jsonrpc_call["params"] = ["ptolemy", "init6", "true", "true"]
+cli_response = call_cli_wallet( jsonrpc_call )
+
+jsonrpc_call["method"] = "vote_for_committee_member"
+jsonrpc_call["params"] = ["ptolemy", "init7", "true", "true"]
+cli_response = call_cli_wallet( jsonrpc_call )
+
+jsonrpc_call["method"] = "vote_for_committee_member"
+jsonrpc_call["params"] = ["ptolemy", "init8", "true", "true"]
+cli_response = call_cli_wallet( jsonrpc_call )
+
+jsonrpc_call["method"] = "vote_for_committee_member"
+jsonrpc_call["params"] = ["ptolemy", "init9", "true", "true"]
+cli_response = call_cli_wallet( jsonrpc_call )
+
+jsonrpc_call["method"] = "vote_for_committee_member"
+jsonrpc_call["params"] = ["ptolemy", "init10", "true", "true"]
+cli_response = call_cli_wallet( jsonrpc_call )
+
 # jsonrpc_call["method"] = "transfer"
 # jsonrpc_call["params"] = ["ptolemy", "bank", 10000000, "UMT", "here is some umt", "true"]
 # cli_response = call_cli_wallet( jsonrpc_call )

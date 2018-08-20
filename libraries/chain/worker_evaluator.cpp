@@ -57,6 +57,8 @@ object_id_type service_create_evaluator::do_apply(const service_create_evaluator
 
    assert( new_service.id == next_service_id );
 
+   return new_service.id;
+
 } FC_CAPTURE_AND_RETHROW( (o) ) }  
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,6 +87,8 @@ object_id_type service_update_evaluator::do_apply(const service_update_evaluator
    d.modify(*service_to_update, [&](service_object& so) {
       so.p_memo = o.p_memo;
    });
+
+   return service_to_update->id;
 
 } FC_CAPTURE_AND_RETHROW( (o) ) }  
 
@@ -125,6 +129,8 @@ object_id_type bid_request_create_evaluator::do_apply(const bid_request_create_e
    });
 
    assert( new_bid_request.id == next_bid_request_id );
+
+   return new_bid_request.id;
 
 } FC_CAPTURE_AND_RETHROW( (o) ) }  
 
@@ -177,6 +183,8 @@ object_id_type bid_create_evaluator::do_apply(const bid_create_evaluator::operat
    });
 
    assert( new_bid.id == next_bid_id );
+
+   return new_bid.id;
 
 } FC_CAPTURE_AND_RETHROW( (o) ) }  
 

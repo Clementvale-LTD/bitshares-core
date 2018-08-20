@@ -44,4 +44,9 @@ void committee_member_update_global_parameters_operation::validate() const
    new_parameters.validate();
 }
 
+void committee_member_lock_account_operation::validate() const
+{
+   FC_ASSERT( fee.amount >= 0 );
+}
+
 } } // graphene::chain

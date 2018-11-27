@@ -1360,7 +1360,7 @@ vector<limit_order_object> database_api_impl::get_account_limit_orders( account_
   const auto& by_account_limit_order_idx = limit_order_idx.indices().get<by_account>();
 
   auto itr = by_account_limit_order_idx.lower_bound( boost::make_tuple( account_id, from_order_id ) );
-  auto itr_stop = by_account_limit_order_idx.upper_bound( boost::make_tuple( account_id + 1, limit_order_id_type() ) );
+  auto itr_stop = by_account_limit_order_idx.upper_bound( boost::make_tuple( account_id, limit_order_id_type( unsigned_int(UINT32_MAX) ) ) );
 
   vector<limit_order_object> result;
   uint32_t count = 0;
@@ -1387,7 +1387,7 @@ vector<limit_order_object> database_api_impl::get_limit_orders_for( account_id_t
   const auto& by_counterparty_limit_order_idx = limit_order_idx.indices().get<by_counterparty>();
 
   auto itr = by_counterparty_limit_order_idx.lower_bound( boost::make_tuple( account_id, from_order_id ) );
-  auto itr_stop = by_counterparty_limit_order_idx.upper_bound( boost::make_tuple( account_id + 1, limit_order_id_type() ) );
+  auto itr_stop = by_counterparty_limit_order_idx.upper_bound( boost::make_tuple( account_id, limit_order_id_type( unsigned_int(UINT32_MAX)) ) );
 
   vector<limit_order_object> result;
   uint32_t count = 0;

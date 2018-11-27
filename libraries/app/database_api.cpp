@@ -124,8 +124,8 @@ class database_api_impl : public std::enable_shared_from_this<database_api_impl>
 
       // Markets / feeds
       vector<limit_order_object>         get_limit_orders(asset_id_type a, asset_id_type b, uint32_t limit)const;
-      vector<limit_order_object>         get_account_limit_orders( account_id_type account_id, uint32_t limit)const;
-      vector<limit_order_object>         get_limit_orders_for( account_id_type account_id, uint32_t limit)const;
+      vector<limit_order_object>         get_account_limit_orders( account_id_type account_id, limit_order_id_type from_order_id, uint32_t limit)const;
+      vector<limit_order_object>         get_limit_orders_for( account_id_type account_id, limit_order_id_type from_order_id, uint32_t limit)const;
       void subscribe_to_market(std::function<void(const variant&)> callback, asset_id_type a, asset_id_type b);
       void unsubscribe_from_market(asset_id_type a, asset_id_type b);
       market_ticker                      get_ticker( const string& base, const string& quote, bool skip_order_book = false )const;
@@ -1340,33 +1340,38 @@ vector<limit_order_object> database_api_impl::get_limit_orders(asset_id_type a, 
    return result;
 }
 
-vector<limit_order_object> database_api::get_account_limit_orders( account_id_type account_id, uint32_t limit)const
+vector<limit_order_object> database_api::get_account_limit_orders( account_id_type account_id, limit_order_id_type from_order_id, uint32_t limit)const
 {
-   return my->get_account_limit_orders( account_id, limit );
+   return my->get_account_limit_orders( account_id, from_order_id, limit );
 }
 
-vector<limit_order_object> database_api::get_limit_orders_for( account_id_type account_id, uint32_t limit)const
+vector<limit_order_object> database_api::get_limit_orders_for( account_id_type account_id, limit_order_id_type from_order_id, uint32_t limit)const
 {
-   return my->get_limit_orders_for( account_id, limit );
+   return my->get_limit_orders_for( account_id, from_order_id, limit );
 }
 
 /**
  *  @return the limit orders created by specified account.
  */
-vector<limit_order_object> database_api_impl::get_account_limit_orders( account_id_type account_id, uint32_t limit)const
+vector<limit_order_object> database_api_impl::get_account_limit_orders( account_id_type account_id, limit_order_id_type from_order_id, uint32_t limit)const
 {
+  FC_ASSERT( limit <= 1000 );
   const auto& limit_order_idx = _db.get_index_type<limit_order_index>();
-  const auto& range = limit_order_idx.indices().get<by_account>().equal_range( account_id );
+  const auto& by_account_limit_order_idx = limit_order_idx.indices().get<by_account>();
+
+  auto itr = by_account_limit_order_idx.lower_bound( boost::make_tuple( account_id, from_order_id ) );
+  auto itr_stop = by_account_limit_order_idx.upper_bound( boost::make_tuple( account_id + 1, limit_order_id_type() ) );
 
   vector<limit_order_object> result;
-
   uint32_t count = 0;
-  for( const limit_order_object& o : boost::make_iterator_range( range.first, range.second ) )
+
+  while( itr != itr_stop )
   {
-    result.push_back( o);
-    ++count;
-    if( count >= limit)
-      break;
+      result.push_back( *itr );
+      ++itr;
+      ++count;
+      if( count >= limit)
+        break;
   }
 
   return result;
@@ -1375,20 +1380,25 @@ vector<limit_order_object> database_api_impl::get_account_limit_orders( account_
 /**
  *  @return the limit orders created for specified counterparty account.
  */
-vector<limit_order_object> database_api_impl::get_limit_orders_for( account_id_type account_id, uint32_t limit)const
+vector<limit_order_object> database_api_impl::get_limit_orders_for( account_id_type account_id, limit_order_id_type from_order_id, uint32_t limit)const
 {
+  FC_ASSERT( limit <= 1000 );
   const auto& limit_order_idx = _db.get_index_type<limit_order_index>();
-  const auto& range = limit_order_idx.indices().get<by_counterparty>().equal_range( account_id );
+  const auto& by_counterparty_limit_order_idx = limit_order_idx.indices().get<by_counterparty>();
+
+  auto itr = by_counterparty_limit_order_idx.lower_bound( boost::make_tuple( account_id, from_order_id ) );
+  auto itr_stop = by_counterparty_limit_order_idx.upper_bound( boost::make_tuple( account_id + 1, limit_order_id_type() ) );
 
   vector<limit_order_object> result;
-
   uint32_t count = 0;
-  for( const limit_order_object& o : boost::make_iterator_range( range.first, range.second ) )
+
+  while( itr != itr_stop )
   {
-    result.push_back( o);
-    ++count;
-    if( count >= limit)
-      break;
+      result.push_back( *itr );
+      ++itr;
+      ++count;
+      if( count >= limit)
+        break;
   }
 
   return result;

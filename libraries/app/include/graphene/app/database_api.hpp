@@ -452,12 +452,20 @@ class database_api
       /**
        * @brief Get limit orders created by a given account
        * @param account_id ID of account
+       * @param from_order_id ID of limit order to start output; to start from the begining specify "1.6.0"
        * @param limit Maximum number of orders to retrieve
        * @return The limit orders
        */
-      vector<limit_order_object> get_account_limit_orders( account_id_type account_id, uint32_t limit)const;
+      vector<limit_order_object> get_account_limit_orders( account_id_type account_id, limit_order_id_type from_order_id, uint32_t limit)const;
 
-      vector<limit_order_object> get_limit_orders_for( account_id_type account_id, uint32_t limit)const;
+      /**
+       * @brief Get limit orders addressed to specified counterparty account ID 
+       * @param account_id ID of counterparty account
+       * @param from_order_id ID of limit order to start output; to start from the begining specify "1.6.0"
+       * @param limit Maximum number of orders to retrieve
+       * @return The limit orders
+       */
+      vector<limit_order_object> get_limit_orders_for( account_id_type account_id, limit_order_id_type from_order_id, uint32_t limit)const;
 
       /**
        * @brief Request notification when the active orders in the market between two assets changes

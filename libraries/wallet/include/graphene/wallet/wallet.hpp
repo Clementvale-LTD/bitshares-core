@@ -425,21 +425,23 @@ class wallet_api
        * @see sell_asset() 
        *  
        * @param aname the name or id of the account
+       * @param from_order_id ID of limit order to start output from; to start from the begining specify "1.6.0"
        * @param limit the number of entries to return
        * @returns a list of \c limit_order_object
        */
-      vector<limit_order_object>        get_account_limit_orders(string aname, uint32_t limit)const;
+      vector<limit_order_object>        get_account_limit_orders(string aname, limit_order_id_type from_order_id, uint32_t limit)const;
 
        /**
-       * Returns a list of limit_order_object created for specified counterparty account
+       * Returns a list of limit_order_object addressed to specified counterparty account
        * 
        * @see sell_asset()
        * 
        * @param aname the name or id of the counterparty account, see \c offer_request_detail
+       * @param from_order_id ID of limit order to start output from; to start from the begining specify "1.6.0"
        * @param limit the number of entries to return
        * @returns a list of \c limit_order_object
        */
-      vector<limit_order_object>        get_limit_orders_for( string aname, uint32_t limit)const;
+      vector<limit_order_object>        get_limit_orders_for( string aname, limit_order_id_type from_order_id, uint32_t limit)const;
       
       /** Returns the block chain's slowly-changing settings.
        * This object contains all of the properties of the blockchain that are fixed

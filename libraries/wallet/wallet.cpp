@@ -3041,14 +3041,14 @@ vector<limit_order_object> wallet_api::get_limit_orders(string a, string b, uint
   return my->_remote_db->get_limit_orders(get_asset(a).id, get_asset(b).id, limit);
 }
 
-vector<limit_order_object> wallet_api::get_account_limit_orders(string aname, uint32_t limit)const
+vector<limit_order_object> wallet_api::get_account_limit_orders(string aname, limit_order_id_type from_order_id, uint32_t limit)const
 {
-  return my->_remote_db->get_account_limit_orders( get_account(aname).get_id(), limit);
+  return my->_remote_db->get_account_limit_orders( get_account(aname).get_id(), from_order_id, limit);
 }
 
-vector<limit_order_object> wallet_api::get_limit_orders_for(string aname, uint32_t limit)const
+vector<limit_order_object> wallet_api::get_limit_orders_for(string aname, limit_order_id_type from_order_id, uint32_t limit)const
 {
-  return my->_remote_db->get_limit_orders_for( get_account(aname).get_id(), limit);
+  return my->_remote_db->get_limit_orders_for( get_account(aname).get_id(), from_order_id, limit);
 }
 
 brain_key_info wallet_api::suggest_brain_key()const

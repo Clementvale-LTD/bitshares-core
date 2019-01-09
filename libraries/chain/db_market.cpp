@@ -237,10 +237,14 @@ int database::match( const limit_order_object& usd, const OrderType& core, const
    counterparty_info  usd_info;
    counterparty_info  core_info;
 
+   usd_info.account = usd.seller;
+   usd_info.order = usd.id;
    usd_info.request_id = usd.request_id;
    usd_info.user_id = usd.user_id;
    usd_info.p_memo = usd.p_memo;
 
+   core_info.account = core.seller;
+   core_info.order = core.id;
    core_info.request_id = core.request_id;
    core_info.user_id = core.user_id;
    core_info.p_memo = core.p_memo;

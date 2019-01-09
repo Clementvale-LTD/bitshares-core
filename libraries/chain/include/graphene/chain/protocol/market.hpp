@@ -157,6 +157,8 @@ namespace graphene { namespace chain {
 
    struct counterparty_info
    {
+     account_id_type     account;
+     limit_order_id_type order;
      optional< uint64_t > request_id;
      optional< uint64_t > user_id;
      optional< memo_data > p_memo;
@@ -180,6 +182,8 @@ namespace graphene { namespace chain {
              request_id = cparty_info->request_id;
              user_id = cparty_info->user_id;
              p_memo = cparty_info->p_memo;
+             match_account_id = cparty_info->account;
+             match_order_id = cparty_info->order;
            }
          }
 
@@ -194,7 +198,8 @@ namespace graphene { namespace chain {
       optional< uint64_t > request_id;
       optional< uint64_t > user_id;
       optional< memo_data > p_memo;
-      optional< bid_id_type > bid_id;    
+      optional< account_id_type > match_account_id;    
+      optional< object_id_type > match_order_id;    
 
       pair<asset_id_type,asset_id_type> get_market()const
       {
@@ -245,7 +250,7 @@ FC_REFLECT( graphene::chain::limit_order_accepted_operation::fee_parameters_type
 
 FC_REFLECT( graphene::chain::limit_order_create_operation,(fee)(seller)(amount_to_sell)(min_to_receive)(expiration)(fill_or_kill)(request_id)(user_id)(counterparty_id)(p_memo)(bid_id)(extensions))
 FC_REFLECT( graphene::chain::limit_order_cancel_operation,(fee)(fee_paying_account)(order)(extensions) )
-FC_REFLECT( graphene::chain::fill_order_operation, (fee)(order_id)(account_id)(pays)(receives)(fill_price)(is_maker)(request_id)(user_id)(p_memo)(bid_id) )
+FC_REFLECT( graphene::chain::fill_order_operation, (fee)(order_id)(account_id)(pays)(receives)(fill_price)(is_maker)(request_id)(user_id)(p_memo)(match_account_id)(match_order_id) )
 FC_REFLECT( graphene::chain::execute_bid_operation, (fee)(bidder)(debt)(collateral) )
 FC_REFLECT( graphene::chain::limit_order_accept_operation,(fee)(seller)(asset_id_to_sell)(asset_id_to_receive)(request_id)(user_id)(counterparty_id)(p_memo)(extensions))
 FC_REFLECT( graphene::chain::limit_order_accepted_operation,(fee)(order_id)(order_creator_account_id)(asset_id_to_sell)(asset_id_to_receive)(request_id)(user_id)(accepted_by_account_id)(p_accepted_memo))

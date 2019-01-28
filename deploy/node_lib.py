@@ -68,4 +68,7 @@ def is_cli_wallet_succeeded( jcall):
     return False
   return True
 
+def set_cli_wallet_url( url):
+  global CLI_WALLET_URL
+  CLI_WALLET_URL = url
 

@@ -3,6 +3,7 @@ from node_lib import *
 import json
 import getpass
 
+set_cli_wallet_url( "http://10.200.0.185:1227/rpc")
 cli_password="smSecret"
 
 # template for JSON call

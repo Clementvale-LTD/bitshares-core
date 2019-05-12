@@ -32,6 +32,8 @@ struct service_create_operation : public base_operation
    struct fee_parameters_type { uint64_t fee = 5000*GRAPHENE_BLOCKCHAIN_PRECISION; };
 
    asset                fee;
+   asset                ufee;  //fee in sdr
+
    account_id_type      owner;
    string               name;
    memo_group           p_memo;
@@ -45,6 +47,8 @@ struct service_update_operation : public base_operation
    struct fee_parameters_type { uint64_t fee = 5000*GRAPHENE_BLOCKCHAIN_PRECISION; };
 
    asset                fee;
+   asset                ufee;  //fee in sdr
+
    account_id_type      owner;
    service_id_type      service_to_update;
 
@@ -59,6 +63,8 @@ struct bid_request_create_operation : public base_operation
    struct fee_parameters_type { uint64_t fee = 5000*GRAPHENE_BLOCKCHAIN_PRECISION; };
 
    asset                fee;
+   asset                ufee;  //fee in sdr
+
    account_id_type      owner;
    string               name;
 
@@ -77,6 +83,8 @@ struct bid_request_expired_operation : public base_operation
   struct fee_parameters_type { uint64_t fee = 0; };
 
   asset               fee;
+  asset               ufee;  //fee in sdr
+
   bid_request_id_type bid_request_id;
   /** must be order->seller */
   account_id_type     fee_paying_account;
@@ -92,6 +100,8 @@ struct bid_request_cancel_operation : public base_operation
   struct fee_parameters_type { uint64_t fee = 0; };
 
   asset               fee;
+  asset               ufee;  //fee in sdr
+
   bid_request_id_type bid_request_id;
   /** must be order->seller */
   account_id_type     fee_paying_account;
@@ -105,6 +115,8 @@ struct bid_create_operation : public base_operation
    struct fee_parameters_type { uint64_t fee = 5000*GRAPHENE_BLOCKCHAIN_PRECISION; };
 
    asset                fee;
+   asset                ufee;  //fee in sdr
+
    account_id_type      owner;
    string               name;
 
@@ -122,6 +134,8 @@ struct bid_expired_operation : public base_operation
   struct fee_parameters_type { uint64_t fee = 0; };
 
   asset               fee;
+  asset               ufee;  //fee in sdr
+
   bid_id_type         bid_id;
   /** must be bid->owner */
   account_id_type     fee_paying_account;
@@ -137,6 +151,8 @@ struct bid_cancel_operation : public base_operation
   struct fee_parameters_type { uint64_t fee = 0; };
 
   asset               fee;
+  asset               ufee;  //fee in sdr
+
   bid_id_type         bid_id;
   /** must be bid->owner */
   account_id_type     fee_paying_account;
@@ -145,32 +161,51 @@ struct bid_cancel_operation : public base_operation
   void            validate()const;
 };
 
+struct accumulated_sdr_fee_operation : public base_operation
+{
+  struct fee_parameters_type { uint64_t fee = 0; };
+
+  asset               fee;
+  asset               sdr_fee;
+  /** must be bid->owner */
+  account_id_type     fee_from_account;
+  account_id_type     fee_to_account;
+
+  account_id_type fee_payer()const { return fee_from_account; }
+  void            validate()const { FC_ASSERT( !"virtual operation" ); }
+  /// This is a virtual operation; there is no fee
+  share_type      calculate_fee(const fee_parameters_type& k)const { return 0; }
+};
+
 } }
 
 FC_REFLECT( graphene::chain::service_create_operation::fee_parameters_type, (fee) )
 FC_REFLECT( graphene::chain::service_create_operation,
-            (fee)(owner)(name)(p_memo) )
+            (fee)(ufee)(owner)(name)(p_memo) )
 
 FC_REFLECT( graphene::chain::service_update_operation::fee_parameters_type, (fee) )
 FC_REFLECT( graphene::chain::service_update_operation,
-            (fee)(owner)(service_to_update)(p_memo) )
+            (fee)(ufee)(owner)(service_to_update)(p_memo) )
 
 FC_REFLECT( graphene::chain::bid_request_create_operation::fee_parameters_type, (fee) )
 FC_REFLECT( graphene::chain::bid_request_create_operation,
-            (fee)(owner)(name)(assets)(providers)(p_memo)(expiration) )
+            (fee)(ufee)(owner)(name)(assets)(providers)(p_memo)(expiration) )
 
 FC_REFLECT( graphene::chain::bid_request_expired_operation::fee_parameters_type, (fee) )
-FC_REFLECT( graphene::chain::bid_request_expired_operation,(fee)(fee_paying_account)(bid_request_id) )
+FC_REFLECT( graphene::chain::bid_request_expired_operation,(fee)(ufee)(fee_paying_account)(bid_request_id) )
             
 FC_REFLECT( graphene::chain::bid_request_cancel_operation::fee_parameters_type, (fee) )
-FC_REFLECT( graphene::chain::bid_request_cancel_operation,(fee)(fee_paying_account)(bid_request_id) )
+FC_REFLECT( graphene::chain::bid_request_cancel_operation,(fee)(ufee)(fee_paying_account)(bid_request_id) )
 
 FC_REFLECT( graphene::chain::bid_create_operation::fee_parameters_type, (fee) )
 FC_REFLECT( graphene::chain::bid_create_operation,
-            (fee)(owner)(name)(request)(p_memo)(expiration) )
+            (fee)(ufee)(owner)(name)(request)(p_memo)(expiration) )
 
 FC_REFLECT( graphene::chain::bid_expired_operation::fee_parameters_type, (fee) )
-FC_REFLECT( graphene::chain::bid_expired_operation,(fee)(fee_paying_account)(bid_id) )
+FC_REFLECT( graphene::chain::bid_expired_operation,(fee)(ufee)(fee_paying_account)(bid_id) )
 
 FC_REFLECT( graphene::chain::bid_cancel_operation::fee_parameters_type, (fee) )
-FC_REFLECT( graphene::chain::bid_cancel_operation,(fee)(fee_paying_account)(bid_id) )
+FC_REFLECT( graphene::chain::bid_cancel_operation,(fee)(ufee)(fee_paying_account)(bid_id) )
+
+FC_REFLECT( graphene::chain::accumulated_sdr_fee_operation::fee_parameters_type, (fee) )
+FC_REFLECT( graphene::chain::accumulated_sdr_fee_operation,(fee)(sdr_fee)(fee_from_account)(fee_to_account) )

@@ -74,6 +74,8 @@ namespace graphene { namespace chain {
        };
 
        asset              fee;
+       asset              ufee;  //fee in sdr
+ 
        account_id_type    fee_paying_account;
        vector<op_wrapper> proposed_ops;
        time_point_sec     expiration_time;
@@ -123,7 +125,10 @@ namespace graphene { namespace chain {
       };
 
       account_id_type            fee_paying_account;
+
       asset                      fee;
+      asset                      ufee;  //fee in sdr
+
       proposal_id_type           proposal;
       flat_set<account_id_type>  active_approvals_to_add;
       flat_set<account_id_type>  active_approvals_to_remove;
@@ -158,7 +163,10 @@ namespace graphene { namespace chain {
 
       account_id_type   fee_paying_account;
       bool              using_owner_authority = false;
+
       asset             fee;
+      asset             ufee;  //fee in sdr
+
       proposal_id_type  proposal;
       extensions_type   extensions;
 
@@ -173,9 +181,9 @@ FC_REFLECT( graphene::chain::proposal_create_operation::fee_parameters_type, (fe
 FC_REFLECT( graphene::chain::proposal_update_operation::fee_parameters_type, (fee)(price_per_kbyte) )
 FC_REFLECT( graphene::chain::proposal_delete_operation::fee_parameters_type, (fee) )
 
-FC_REFLECT( graphene::chain::proposal_create_operation, (fee)(fee_paying_account)(expiration_time)
+FC_REFLECT( graphene::chain::proposal_create_operation, (fee)(ufee)(fee_paying_account)(expiration_time)
             (proposed_ops)(review_period_seconds)(extensions) )
-FC_REFLECT( graphene::chain::proposal_update_operation, (fee)(fee_paying_account)(proposal)
+FC_REFLECT( graphene::chain::proposal_update_operation, (fee)(ufee)(fee_paying_account)(proposal)
             (active_approvals_to_add)(active_approvals_to_remove)(owner_approvals_to_add)(owner_approvals_to_remove)
             (key_approvals_to_add)(key_approvals_to_remove)(extensions) )
-FC_REFLECT( graphene::chain::proposal_delete_operation, (fee)(fee_paying_account)(using_owner_authority)(proposal)(extensions) )
+FC_REFLECT( graphene::chain::proposal_delete_operation, (fee)(ufee)(fee_paying_account)(using_owner_authority)(proposal)(extensions) )

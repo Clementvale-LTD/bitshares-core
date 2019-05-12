@@ -50,34 +50,33 @@ database& generic_evaluator::db()const { return trx_state->db(); }
       return result;
    } FC_CAPTURE_AND_RETHROW() }
 
-   void generic_evaluator::prepare_fee(account_id_type account_id, asset fee)
+   void generic_evaluator::prepare_fee(account_id_type account_id, asset fee, asset ufee)
    {
       const database& d = db();
+
       fee_from_account = fee;
       FC_ASSERT( fee.amount >= 0 );
+
+      ufee_from_account = ufee;
+      FC_ASSERT( ufee.amount >= 0 );
+
       fee_paying_account = &account_id(d);
       fee_paying_account_statistics = &fee_paying_account->statistics(d);
 
-      fee_asset = &fee.asset_id(d);
-      fee_asset_dyn_data = &fee_asset->dynamic_asset_data_id(d);
-
-      {
-         FC_ASSERT( is_authorized_asset( d, *fee_paying_account, *fee_asset ), "Account ${acct} '${name}' attempted to pay fee by using asset ${a} '${sym}', which is unauthorized due to whitelist / blacklist",
-            ("acct", fee_paying_account->id)("name", fee_paying_account->name)("a", fee_asset->id)("sym", fee_asset->symbol) );
-      }
-
       FC_ASSERT( fee_from_account.asset_id == asset_id_type() );
-      core_fee_paid = fee_from_account.amount;
+      FC_ASSERT( ufee_from_account.asset_id == GRAPHENE_SDR_ASSET_ID );
+//      core_fee_paid = fee_from_account.amount;
    }
 
    void generic_evaluator::pay_fee()
    { try {
+     //SM!!! todo: check processing ufee_from_account
       if( !trx_state->skip_fee ) {
          database& d = db();
          /// TODO: db().pay_fee( account_id, core_fee );
          d.modify(*fee_paying_account_statistics, [&](account_statistics_object& s)
          {
-            s.pay_fee( core_fee_paid, d.get_global_properties().parameters.cashback_vesting_threshold );
+            s.pay_fee( fee_from_account.amount, d.get_global_properties().parameters.cashback_vesting_threshold, ufee_from_account.amount );
          });
       }
    } FC_CAPTURE_AND_RETHROW() }

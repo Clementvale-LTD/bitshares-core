@@ -80,6 +80,8 @@ namespace graphene { namespace chain {
       };
 
       asset           fee;
+      asset            ufee;  //fee in sdr
+
       /// This account pays the fee. Must be a lifetime member.
       account_id_type registrar;
 
@@ -123,7 +125,9 @@ namespace graphene { namespace chain {
          uint32_t   price_per_kbyte = GRAPHENE_BLOCKCHAIN_PRECISION;
       };
 
-      asset fee;
+      asset      fee;
+      asset      ufee;  //fee in sdr
+
       /// The account to update
       account_id_type account;
 
@@ -171,6 +175,7 @@ namespace graphene { namespace chain {
       };
 
       asset             fee;
+      asset             ufee;  //fee in sdr
       /// The account to upgrade; must not already be a lifetime member
       account_id_type   account_to_upgrade;
       /// If true, the account will be upgraded to a lifetime member; otherwise, it will add a year to the subscription
@@ -188,17 +193,17 @@ FC_REFLECT(graphene::chain::account_options, (memo_key)(voting_account)(num_witn
 
 FC_REFLECT(graphene::chain::account_create_operation::ext, (null_ext)(owner_special_authority)(active_special_authority) )
 FC_REFLECT( graphene::chain::account_create_operation,
-            (fee)(registrar)
+            (fee)(ufee)(registrar)
             (name)(owner)(active)(options)(extensions)
           )
 
 FC_REFLECT(graphene::chain::account_update_operation::ext, (null_ext)(owner_special_authority)(active_special_authority) )
 FC_REFLECT( graphene::chain::account_update_operation,
-            (fee)(account)(owner)(active)(new_options)(extensions)
+            (fee)(ufee)(account)(owner)(active)(new_options)(extensions)
           )
 
 FC_REFLECT( graphene::chain::account_upgrade_operation,
-            (fee)(account_to_upgrade)(upgrade_to_lifetime_member)(extensions) )
+            (fee)(ufee)(account_to_upgrade)(upgrade_to_lifetime_member)(extensions) )
 
 FC_REFLECT( graphene::chain::account_create_operation::fee_parameters_type, (basic_fee)(premium_fee)(price_per_kbyte) )
 FC_REFLECT( graphene::chain::account_update_operation::fee_parameters_type, (fee)(price_per_kbyte) )

@@ -174,6 +174,9 @@ struct get_impacted_account_visitor
    void operator()( const bid_create_operation& op ){}
    void operator()( const bid_expired_operation& op ){}
    void operator()( const bid_cancel_operation& op ){}
+   void operator()( const accumulated_sdr_fee_operation& op ){
+      _impacted.insert( op.fee_to_account );
+   }
 };
 
 static void operation_get_impacted_accounts( const operation& op, flat_set<account_id_type>& result )

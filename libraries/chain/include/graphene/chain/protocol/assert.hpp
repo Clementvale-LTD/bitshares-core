@@ -92,6 +92,8 @@ namespace graphene { namespace chain {
       struct fee_parameters_type { uint64_t fee = GRAPHENE_BLOCKCHAIN_PRECISION; };
 
       asset                      fee;
+      asset                      ufee;  //fee in sdr
+
       account_id_type            fee_paying_account;
       vector<predicate>          predicates;
       flat_set<account_id_type>  required_auths;
@@ -109,5 +111,5 @@ FC_REFLECT( graphene::chain::account_name_eq_lit_predicate, (account_id)(name) )
 FC_REFLECT( graphene::chain::asset_symbol_eq_lit_predicate, (asset_id)(symbol) )
 FC_REFLECT( graphene::chain::block_id_predicate, (id) )
 FC_REFLECT_TYPENAME( graphene::chain::predicate )
-FC_REFLECT( graphene::chain::assert_operation, (fee)(fee_paying_account)(predicates)(required_auths)(extensions) )
+FC_REFLECT( graphene::chain::assert_operation, (fee)(ufee)(fee_paying_account)(predicates)(required_auths)(extensions) )
  

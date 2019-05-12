@@ -77,13 +77,18 @@ namespace graphene { namespace chain {
           */
          share_type pending_vested_fees;
 
+         /**
+          * Fee in  SDRt payed to "umt-fee-pool" account
+          */
+         share_type pending_ufees;
+
          /// @brief Split up and pay out @ref pending_fees and @ref pending_vested_fees
          void process_fees(const account_object& a, database& d) const;
 
          /**
           * Core fees are paid into the account_statistics_object by this method
           */
-         void pay_fee( share_type core_fee, share_type cashback_vesting_threshold );
+         void pay_fee( share_type core_fee, share_type cashback_vesting_threshold, share_type sdr_fee );
    };
 
    /**
@@ -328,6 +333,6 @@ FC_REFLECT_DERIVED( graphene::chain::account_statistics_object,
                     (most_recent_op)
                     (total_ops)(removed_ops)
                     (total_core_in_orders)
-                    (pending_fees)(pending_vested_fees)
+                    (pending_fees)(pending_vested_fees)(pending_ufees)
                   )
 

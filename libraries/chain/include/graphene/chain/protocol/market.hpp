@@ -50,6 +50,8 @@ namespace graphene { namespace chain {
       struct fee_parameters_type { uint64_t fee = 5 * GRAPHENE_BLOCKCHAIN_PRECISION; };
 
       asset           fee;
+      asset           ufee;  //fee in sdr
+      
       account_id_type seller;
       asset           amount_to_sell;
       asset           min_to_receive;
@@ -86,6 +88,8 @@ namespace graphene { namespace chain {
       struct fee_parameters_type { uint64_t fee = 5 * GRAPHENE_BLOCKCHAIN_PRECISION; };
 
       asset           fee;
+      asset           ufee;  //fee in sdr
+
       account_id_type seller;
       asset_id_type asset_id_to_sell;
       asset_id_type asset_id_to_receive;
@@ -115,6 +119,7 @@ namespace graphene { namespace chain {
       limit_order_accepted_operation() {}
 
       asset          fee;
+      asset          ufee;  //fee in sdr
 
       object_id_type      order_id;
       account_id_type     order_creator_account_id;
@@ -146,6 +151,8 @@ namespace graphene { namespace chain {
       struct fee_parameters_type { uint64_t fee = 0; };
 
       asset               fee;
+      asset               ufee;  //fee in sdr
+
       limit_order_id_type order;
       /** must be order->seller */
       account_id_type     fee_paying_account;
@@ -176,8 +183,8 @@ namespace graphene { namespace chain {
       struct fee_parameters_type {};
 
       fill_order_operation(){}
-      fill_order_operation( object_id_type o, account_id_type a, asset p, asset r, price fp, bool m, const counterparty_info* cparty_info = NULL)
-         :order_id(o),account_id(a),pays(p),receives(r),fill_price(fp),is_maker(m) {
+      fill_order_operation( object_id_type o, account_id_type a, asset p, asset r, price fp, bool m, asset uf, const counterparty_info* cparty_info = NULL)
+         :order_id(o),account_id(a),pays(p),receives(r),fill_price(fp),is_maker(m), umt_fee( uf) {
            if( NULL != cparty_info){
              match_account_id = cparty_info->account;
              match_order_id = cparty_info->order;
@@ -191,10 +198,15 @@ namespace graphene { namespace chain {
       account_id_type     account_id;
       asset               pays;
       asset               receives;
+
       asset               fee; // paid by receiving account
+      asset               ufee;  //fee in sdr
+
       price               fill_price;
       bool                is_maker;
 
+      asset               umt_fee;
+      
       account_id_type      match_account_id;    
       limit_order_id_type  match_order_id;    
 
@@ -233,6 +245,7 @@ namespace graphene { namespace chain {
       asset               debt;
       asset               collateral;
       asset               fee;
+      asset               ufee;  //fee in sdr
 
       account_id_type fee_payer()const { return bidder; }
       void            validate()const { FC_ASSERT( !"virtual operation" ); }
@@ -249,9 +262,9 @@ FC_REFLECT( graphene::chain::execute_bid_operation::fee_parameters_type,  ) // V
 FC_REFLECT( graphene::chain::limit_order_accept_operation::fee_parameters_type, (fee) )
 FC_REFLECT( graphene::chain::limit_order_accepted_operation::fee_parameters_type, ) // VIRTUAL
 
-FC_REFLECT( graphene::chain::limit_order_create_operation,(fee)(seller)(amount_to_sell)(min_to_receive)(expiration)(fill_or_kill)(request_id)(user_id)(counterparty_id)(p_memo)(bid_id)(extensions))
-FC_REFLECT( graphene::chain::limit_order_cancel_operation,(fee)(fee_paying_account)(order)(extensions) )
-FC_REFLECT( graphene::chain::fill_order_operation, (fee)(order_id)(account_id)(pays)(receives)(fill_price)(is_maker)(match_account_id)(match_order_id)(request_id)(user_id)(p_memo))
-FC_REFLECT( graphene::chain::execute_bid_operation, (fee)(bidder)(debt)(collateral) )
-FC_REFLECT( graphene::chain::limit_order_accept_operation,(fee)(seller)(asset_id_to_sell)(asset_id_to_receive)(request_id)(user_id)(counterparty_id)(p_memo)(extensions))
-FC_REFLECT( graphene::chain::limit_order_accepted_operation,(fee)(order_id)(order_creator_account_id)(asset_id_to_sell)(asset_id_to_receive)(request_id)(user_id)(accepted_by_account_id)(p_accepted_memo))
+FC_REFLECT( graphene::chain::limit_order_create_operation,(fee)(ufee)(seller)(amount_to_sell)(min_to_receive)(expiration)(fill_or_kill)(request_id)(user_id)(counterparty_id)(p_memo)(bid_id)(extensions))
+FC_REFLECT( graphene::chain::limit_order_cancel_operation,(fee)(ufee)(fee_paying_account)(order)(extensions) )
+FC_REFLECT( graphene::chain::fill_order_operation, (fee)(ufee)(order_id)(account_id)(pays)(receives)(fill_price)(is_maker)(match_account_id)(match_order_id)(request_id)(user_id)(p_memo))
+FC_REFLECT( graphene::chain::execute_bid_operation, (fee)(ufee)(bidder)(debt)(collateral) )
+FC_REFLECT( graphene::chain::limit_order_accept_operation,(fee)(ufee)(seller)(asset_id_to_sell)(asset_id_to_receive)(request_id)(user_id)(counterparty_id)(p_memo)(extensions))
+FC_REFLECT( graphene::chain::limit_order_accepted_operation,(fee)(ufee)(order_id)(order_creator_account_id)(asset_id_to_sell)(asset_id_to_receive)(request_id)(user_id)(accepted_by_account_id)(p_accepted_memo))

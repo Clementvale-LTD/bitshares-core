@@ -68,6 +68,8 @@ namespace graphene { namespace chain {
       struct fee_parameters_type { uint64_t fee = GRAPHENE_BLOCKCHAIN_PRECISION; };
 
       asset                       fee;
+      asset                       ufee;  //fee in sdr
+
       account_id_type             creator; ///< Who provides funds initially
       account_id_type             owner; ///< Who is able to withdraw the balance
       asset                       amount;
@@ -95,6 +97,8 @@ namespace graphene { namespace chain {
       struct fee_parameters_type { uint64_t fee = 20*GRAPHENE_BLOCKCHAIN_PRECISION; };
 
       asset                   fee;
+      asset                   ufee;  //fee in sdr
+
       vesting_balance_id_type vesting_balance;
       account_id_type         owner; ///< Must be vesting_balance.owner
       asset                   amount;
@@ -112,8 +116,8 @@ namespace graphene { namespace chain {
 FC_REFLECT( graphene::chain::vesting_balance_create_operation::fee_parameters_type, (fee) )
 FC_REFLECT( graphene::chain::vesting_balance_withdraw_operation::fee_parameters_type, (fee) )
 
-FC_REFLECT( graphene::chain::vesting_balance_create_operation, (fee)(creator)(owner)(amount)(policy) )
-FC_REFLECT( graphene::chain::vesting_balance_withdraw_operation, (fee)(vesting_balance)(owner)(amount) )
+FC_REFLECT( graphene::chain::vesting_balance_create_operation, (fee)(ufee)(creator)(owner)(amount)(policy) )
+FC_REFLECT( graphene::chain::vesting_balance_withdraw_operation, (fee)(ufee)(vesting_balance)(owner)(amount) )
 
 FC_REFLECT(graphene::chain::linear_vesting_policy_initializer, (begin_timestamp)(vesting_cliff_seconds)(vesting_duration_seconds) )
 FC_REFLECT(graphene::chain::cdd_vesting_policy_initializer, (start_claim)(vesting_seconds) )

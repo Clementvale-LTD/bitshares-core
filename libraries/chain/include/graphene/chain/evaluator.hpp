@@ -61,7 +61,7 @@ namespace graphene { namespace chain {
        * So pay_fee() need only increment the receiving balance.
        *
        * The default implementation simply calls account_statistics_object->pay_fee() to
-       * increment pending_fees or pending_vested_fees.
+       * increment pending_fees, pending_vested_fees, pending_ufees.
        */
       virtual void pay_fee();
 
@@ -72,14 +72,15 @@ namespace graphene { namespace chain {
       /**
        * @brief Fetch objects relevant to fee payer and set pointer members
        * @param account_id Account which is paying the fee
-       * @param fee The fee being paid. May be in assets other than core.
+       * @param fee The fee being paid. May be in core only.
+       * @param sdrfee The fee being paid. May be in SDRT only.
        *
        * This method verifies that the fee is valid and sets the object pointer members and the fee fields. It should
        * be called during do_evaluate.
        *
        * In particular, core_fee_paid field is set by prepare_fee().
        */
-      void prepare_fee(account_id_type account_id, asset fee);
+      void prepare_fee(account_id_type account_id, asset fee, asset sdrfee);
 
 
       object_id_type get_relative_id( object_id_type rel_id )const;
@@ -90,12 +91,11 @@ namespace graphene { namespace chain {
       share_type calculate_fee_for_operation(const operation& op) const;
       void db_adjust_balance(const account_id_type& fee_payer, asset fee_from_account);
 
-      asset                            fee_from_account;
-      share_type                       core_fee_paid;
+      asset                            fee_from_account;   //core fee
+      asset                            ufee_from_account;  //fee in sdr
+//      share_type                       core_fee_paid;    //sm: fee_from_account keeps nesssary info
       const account_object*            fee_paying_account = nullptr;
       const account_statistics_object* fee_paying_account_statistics = nullptr;
-      const asset_object*              fee_asset          = nullptr;
-      const asset_dynamic_data_object* fee_asset_dyn_data = nullptr;
       transaction_evaluation_state*    trx_state;
    };
 
@@ -128,14 +128,14 @@ namespace graphene { namespace chain {
          auto* eval = static_cast<DerivedEvaluator*>(this);
          const auto& op = o.get<typename DerivedEvaluator::operation_type>();
 
-         prepare_fee(op.fee_payer(), op.fee);
+         prepare_fee(op.fee_payer(), op.fee, op.ufee);
          if( !trx_state->skip_fee_schedule_check )
          {
             share_type required_fee = calculate_fee_for_operation(op);
-            GRAPHENE_ASSERT( core_fee_paid >= required_fee,
+            GRAPHENE_ASSERT( fee_from_account.amount >= required_fee,
                        insufficient_fee,
                        "Insufficient Fee Paid",
-                       ("core_fee_paid",core_fee_paid)("required", required_fee) );
+                       ("fee_from_account.amount",fee_from_account.amount)("required", required_fee) );
          }
 
          return eval->do_evaluate(op);

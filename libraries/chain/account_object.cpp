@@ -65,14 +65,31 @@ void account_statistics_object::process_fees(const account_object& a, database& 
          s.pending_vested_fees = 0;
       });
    }
+
+   if( pending_ufees > 0 )
+   {
+      auto pay_out_fees = [&](const account_object& account, share_type sdr_fee)
+      {
+        d.adjust_balance(GRAPHENE_UMT_FEE_POOL_ACCOUNT, sdr_fee);
+      };
+
+//SM!!! check ufee payments
+      pay_out_fees(a, pending_ufees);
+
+      d.modify(*this, [&](account_statistics_object& s) {
+         s.pending_ufees = 0;
+      });
+   }
 }
 
-void account_statistics_object::pay_fee( share_type core_fee, share_type cashback_vesting_threshold )
+void account_statistics_object::pay_fee( share_type core_fee, share_type cashback_vesting_threshold, share_type sdr_fee )
 {
    if( core_fee > cashback_vesting_threshold )
       pending_fees += core_fee;
    else
       pending_vested_fees += core_fee;
+   
+   pending_ufees += sdr_fee;
 }
 
 set<account_id_type> account_member_index::get_account_members(const account_object& a)const

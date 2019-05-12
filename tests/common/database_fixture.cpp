@@ -161,6 +161,7 @@ void database_fixture::verify_asset_supplies( const database& db )
    {
       reported_core_in_orders += a.total_core_in_orders;
       total_balances[asset_id_type()] += a.pending_fees + a.pending_vested_fees;
+      total_balances[GRAPHENE_SDR_ASSET_ID] += a.pending_ufees;
    }
    for( const limit_order_object& o : db.get_index_type<limit_order_index>().indices() )
    {

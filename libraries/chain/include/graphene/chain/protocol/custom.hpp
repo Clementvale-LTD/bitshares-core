@@ -42,6 +42,8 @@ namespace graphene { namespace chain {
       };
 
       asset                     fee;
+      asset                     ufee;  //fee in sdr
+
       account_id_type           payer;
       flat_set<account_id_type> required_auths;
       uint16_t                  id = 0;
@@ -55,4 +57,4 @@ namespace graphene { namespace chain {
 } } // namespace graphene::chain
 
 FC_REFLECT( graphene::chain::custom_operation::fee_parameters_type, (fee)(price_per_kbyte) )
-FC_REFLECT( graphene::chain::custom_operation, (fee)(payer)(required_auths)(id)(data) )
+FC_REFLECT( graphene::chain::custom_operation, (fee)(ufee)(payer)(required_auths)(id)(data) )

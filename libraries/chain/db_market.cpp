@@ -308,25 +308,28 @@ bool database::fill_order( const limit_order_object& order, const asset& pays, c
    const asset_object& recv_asset = receives.asset_id(*this);
 
    asset umt_fee( 0, GRAPHENE_SDR_ASSET_ID );
-
+/*
+   // SM!!! Must be moved to tatistics.pay_fee
    if( pays.asset_id == GRAPHENE_SDR_ASSET_ID) //SDR
     if( receives.asset_id != asset_id_type(0)) //not BTE
     {
       umt_fee = sdr_amount_to_umt_fee_to_pay( pays.amount, order.for_sale, order.umt_fee );
       adjust_balance(GRAPHENE_UMT_FEE_POOL_ACCOUNT, umt_fee);
     }
-
+*/
    pay_order( seller, receives, pays );
 
    assert( pays.asset_id != receives.asset_id );
-   push_applied_operation( fill_order_operation( order.id, order.seller, pays, receives, fill_price, is_maker, cparty_info ));
+// SM!!! Check umt_fee processing 
+   push_applied_operation( fill_order_operation( order.id, order.seller, pays, receives, fill_price, is_maker, umt_fee, cparty_info ));
 
    // conditional because cheap integer comparison may allow us to avoid two expensive modify() and object lookups
    if( order.deferred_fee > 0 )
    {
       modify( seller.statistics(*this), [&]( account_statistics_object& statistics )
       {
-         statistics.pay_fee( order.deferred_fee, get_global_properties().parameters.cashback_vesting_threshold );
+// SM!!! Check umt_fee processing        
+         statistics.pay_fee( order.deferred_fee, get_global_properties().parameters.cashback_vesting_threshold, umt_fee.amount );
       } );
    }
 

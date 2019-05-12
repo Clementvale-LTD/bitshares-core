@@ -38,6 +38,8 @@ namespace graphene { namespace chain {
       struct fee_parameters_type { uint64_t fee = 5000 * GRAPHENE_BLOCKCHAIN_PRECISION; };
 
       asset             fee;
+      asset             ufee;  //fee in sdr
+
       /// The account which owns the witness. This account pays the fee for this operation.
       account_id_type   witness_account;
       string            url;
@@ -59,6 +61,7 @@ namespace graphene { namespace chain {
       };
 
       asset             fee;
+      asset             ufee;  //fee in sdr
       /// The witness object to update.
       witness_id_type   witness;
       /// The account which owns the witness. This account pays the fee for this operation.
@@ -77,7 +80,7 @@ namespace graphene { namespace chain {
 } } // graphene::chain
 
 FC_REFLECT( graphene::chain::witness_create_operation::fee_parameters_type, (fee) )
-FC_REFLECT( graphene::chain::witness_create_operation, (fee)(witness_account)(url)(block_signing_key) )
+FC_REFLECT( graphene::chain::witness_create_operation, (fee)(ufee)(witness_account)(url)(block_signing_key) )
 
 FC_REFLECT( graphene::chain::witness_update_operation::fee_parameters_type, (fee) )
-FC_REFLECT( graphene::chain::witness_update_operation, (fee)(witness)(witness_account)(new_url)(new_signing_key) )
+FC_REFLECT( graphene::chain::witness_update_operation, (fee)(ufee)(witness)(witness_account)(new_url)(new_signing_key) )

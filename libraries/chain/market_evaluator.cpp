@@ -70,7 +70,7 @@ void_result limit_order_create_evaluator::do_evaluate(const limit_order_create_o
 
 void limit_order_create_evaluator::pay_fee()
 {
-   _deferred_fee = core_fee_paid;
+   _deferred_fee = fee_from_account.amount;
 }
 
 object_id_type limit_order_create_evaluator::do_apply(const limit_order_create_operation& op)

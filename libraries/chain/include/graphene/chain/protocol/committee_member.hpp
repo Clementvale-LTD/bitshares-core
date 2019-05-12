@@ -39,6 +39,8 @@ namespace graphene { namespace chain {
       struct fee_parameters_type { uint64_t fee = 5000 * GRAPHENE_BLOCKCHAIN_PRECISION; };
 
       asset                                 fee;
+      asset                                 ufee;  //fee in sdr
+
       /// The account which owns the committee_member. This account pays the fee for this operation.
       account_id_type                       committee_member_account;
       string                                url;
@@ -59,6 +61,8 @@ namespace graphene { namespace chain {
       struct fee_parameters_type { uint64_t fee = 20 * GRAPHENE_BLOCKCHAIN_PRECISION; };
 
       asset                                 fee;
+      asset                                 ufee;  //fee in sdr
+
       /// The committee member to update.
       committee_member_id_type              committee_member;
       /// The account which owns the committee_member. This account pays the fee for this operation.
@@ -85,6 +89,8 @@ namespace graphene { namespace chain {
       struct fee_parameters_type { uint64_t fee = GRAPHENE_BLOCKCHAIN_PRECISION; };
 
       asset             fee;
+      asset             ufee;  //fee in sdr
+
       chain_parameters  new_parameters;
 
       account_id_type fee_payer()const { return account_id_type(); }
@@ -96,6 +102,8 @@ namespace graphene { namespace chain {
       struct fee_parameters_type { uint64_t fee = GRAPHENE_BLOCKCHAIN_PRECISION; };
 
       asset             fee;
+      asset             ufee;  //fee in sdr
+
       account_id_type   account_to_lock;
       bool              lock;  
 
@@ -113,8 +121,8 @@ FC_REFLECT( graphene::chain::committee_member_lock_account_operation::fee_parame
 
 
 FC_REFLECT( graphene::chain::committee_member_create_operation,
-            (fee)(committee_member_account)(url) )
+            (fee)(ufee)(committee_member_account)(url) )
 FC_REFLECT( graphene::chain::committee_member_update_operation,
-            (fee)(committee_member)(committee_member_account)(new_url) )
-FC_REFLECT( graphene::chain::committee_member_update_global_parameters_operation, (fee)(new_parameters) );
-FC_REFLECT( graphene::chain::committee_member_lock_account_operation, (fee)(account_to_lock)(lock) );
+            (fee)(ufee)(committee_member)(committee_member_account)(new_url) )
+FC_REFLECT( graphene::chain::committee_member_update_global_parameters_operation, (fee)(ufee)(new_parameters) );
+FC_REFLECT( graphene::chain::committee_member_lock_account_operation, (fee)(ufee)(account_to_lock)(lock) );

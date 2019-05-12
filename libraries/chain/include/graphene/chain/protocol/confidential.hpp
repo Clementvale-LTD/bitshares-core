@@ -152,8 +152,9 @@ struct transfer_to_blind_operation : public base_operation
       uint32_t price_per_output = 5*GRAPHENE_BLOCKCHAIN_PRECISION;
    };
 
-
    asset                 fee;
+   asset                 ufee;  //fee in sdr
+
    asset                 amount;
    account_id_type       from;
    blind_factor_type     blinding_factor;
@@ -175,6 +176,8 @@ struct transfer_from_blind_operation : public base_operation
    };
 
    asset                 fee;
+   asset                 ufee;  //fee in sdr
+   
    asset                 amount;
    account_id_type       to;
    blind_factor_type     blinding_factor;
@@ -241,6 +244,8 @@ struct blind_transfer_operation : public base_operation
    };
 
    asset                 fee;
+   asset                 ufee;  //fee in sdr
+
    vector<blind_input>   inputs;
    vector<blind_output>  outputs;
     
@@ -273,11 +278,11 @@ FC_REFLECT( graphene::chain::blind_input,
 FC_REFLECT( graphene::chain::blind_output,
             (commitment)(range_proof)(owner)(stealth_memo) )
 FC_REFLECT( graphene::chain::transfer_to_blind_operation,
-            (fee)(amount)(from)(blinding_factor)(outputs) )
+            (fee)(ufee)(amount)(from)(blinding_factor)(outputs) )
 FC_REFLECT( graphene::chain::transfer_from_blind_operation,
-            (fee)(amount)(to)(blinding_factor)(inputs) )
+            (fee)(ufee)(amount)(to)(blinding_factor)(inputs) )
 FC_REFLECT( graphene::chain::blind_transfer_operation,
-            (fee)(inputs)(outputs) )
+            (fee)(ufee)(inputs)(outputs) )
 FC_REFLECT( graphene::chain::transfer_to_blind_operation::fee_parameters_type, (fee)(price_per_output) )
 FC_REFLECT( graphene::chain::transfer_from_blind_operation::fee_parameters_type, (fee) )
 FC_REFLECT( graphene::chain::blind_transfer_operation::fee_parameters_type, (fee)(price_per_output) )

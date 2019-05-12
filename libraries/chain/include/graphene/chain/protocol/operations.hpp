@@ -88,8 +88,9 @@ namespace graphene { namespace chain {
             bid_request_expired_operation,  // VIRTUAL
             bid_request_cancel_operation,
             bid_create_operation,
-            bid_expired_operation,          // VIRTUAL     
-            bid_cancel_operation
+            bid_expired_operation,          // VIRTUAL
+            bid_cancel_operation,
+            accumulated_sdr_fee_operation   // VIRTUAL
          > operation;
 
    /// @} // operations groupvesting_balimit_order_accepted_operationlance_create_operation

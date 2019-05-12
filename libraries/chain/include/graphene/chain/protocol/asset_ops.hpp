@@ -84,6 +84,8 @@ namespace graphene { namespace chain {
       };
 
       asset                   fee;
+      asset                   ufee;  //fee in sdr
+    
       /// This account must sign and pay the fee for this operation. Later, this account may update the asset
       account_id_type         issuer;
       /// The ticker symbol of this asset
@@ -129,6 +131,8 @@ namespace graphene { namespace chain {
       asset_update_operation(){}
 
       asset           fee;
+      asset           ufee;  //fee in sdr
+
       account_id_type issuer;
       asset_id_type   asset_to_update;
 
@@ -153,6 +157,8 @@ namespace graphene { namespace chain {
       };
 
       asset            fee;
+      asset            ufee;  //fee in sdr
+
       account_id_type  issuer; ///< Must be asset_to_issue->asset_id->issuer
       asset            asset_to_issue;
       account_id_type  issue_to_account;
@@ -178,6 +184,8 @@ namespace graphene { namespace chain {
       struct fee_parameters_type { uint64_t fee = 20 * GRAPHENE_BLOCKCHAIN_PRECISION; };
 
       asset             fee;
+      asset             ufee;  //fee in sdr
+
       account_id_type   payer;
       asset             amount_to_reserve;
       extensions_type   extensions;
@@ -208,6 +216,7 @@ FC_REFLECT( graphene::chain::asset_reserve_operation::fee_parameters_type, (fee)
 
 FC_REFLECT( graphene::chain::asset_create_operation,
             (fee)
+            (ufee)
             (issuer)
             (symbol)
             (precision)
@@ -217,6 +226,7 @@ FC_REFLECT( graphene::chain::asset_create_operation,
           )
 FC_REFLECT( graphene::chain::asset_update_operation,
             (fee)
+            (ufee)
             (issuer)
             (asset_to_update)
             (new_issuer)
@@ -224,6 +234,6 @@ FC_REFLECT( graphene::chain::asset_update_operation,
             (extensions)
           )
 FC_REFLECT( graphene::chain::asset_issue_operation,
-            (fee)(issuer)(asset_to_issue)(issue_to_account)(memo)(extensions) )
+            (fee)(ufee)(issuer)(asset_to_issue)(issue_to_account)(memo)(extensions) )
 FC_REFLECT( graphene::chain::asset_reserve_operation,
-            (fee)(payer)(amount_to_reserve)(extensions) )
+            (fee)(ufee)(payer)(amount_to_reserve)(extensions) )

@@ -169,7 +169,7 @@ void account_options::validate() const
               "May not specify fewer witnesses or committee members than the number voted for.");
 }
 
-share_type account_create_operation::calculate_fee( const fee_parameters_type& k )const
+dualfee account_create_operation::calculate_fee( const fee_parameters_type& k )const
 {
    auto core_fee_required = k.basic_fee;
 
@@ -180,7 +180,7 @@ share_type account_create_operation::calculate_fee( const fee_parameters_type& k
    auto data_fee =  calculate_data_fee( fc::raw::pack_size(*this), k.price_per_kbyte ); 
    core_fee_required += data_fee;
 
-   return core_fee_required;
+   return dualfee{core_fee_required,0};
 }
 
 
@@ -201,12 +201,12 @@ void account_create_operation::validate()const
       validate_special_authority( *extensions.value.active_special_authority );
 }
 
-share_type account_update_operation::calculate_fee( const fee_parameters_type& k )const
+dualfee account_update_operation::calculate_fee( const fee_parameters_type& k )const
 {
    auto core_fee_required = k.fee;  
    if( new_options )
       core_fee_required += calculate_data_fee( fc::raw::pack_size(*this), k.price_per_kbyte );
-   return core_fee_required;
+   return dualfee{core_fee_required,0};
 }
 
 void account_update_operation::validate()const
@@ -246,11 +246,11 @@ void account_update_operation::validate()const
       validate_special_authority( *extensions.value.active_special_authority );
 }
 
-share_type account_upgrade_operation::calculate_fee(const fee_parameters_type& k) const
+dualfee account_upgrade_operation::calculate_fee(const fee_parameters_type& k) const
 {
    if( upgrade_to_lifetime_member )
-      return k.membership_lifetime_fee;
-   return k.membership_annual_fee;
+      return dualfee{k.membership_lifetime_fee,0};
+   return dualfee{k.membership_annual_fee,0};
 }
 
 

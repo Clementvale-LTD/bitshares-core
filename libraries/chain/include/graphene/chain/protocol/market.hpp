@@ -136,7 +136,7 @@ namespace graphene { namespace chain {
       void            validate()const { FC_ASSERT( !"virtual operation" ); }
 
       /// This is a virtual operation; there is no fee
-      share_type      calculate_fee(const fee_parameters_type& k)const { return 0; }
+      dualfee      calculate_fee(const fee_parameters_type& k)const { return dualfee{0,0}; }
    };
    
    /**
@@ -224,7 +224,7 @@ namespace graphene { namespace chain {
       void            validate()const { FC_ASSERT( !"virtual operation" ); }
 
       /// This is a virtual operation; there is no fee
-      share_type      calculate_fee(const fee_parameters_type& k)const { return 0; }
+      dualfee      calculate_fee(const fee_parameters_type& k)const { return dualfee{0,0}; }
    };
 
    /**
@@ -251,7 +251,7 @@ namespace graphene { namespace chain {
       void            validate()const { FC_ASSERT( !"virtual operation" ); }
 
       /// This is a virtual operation; there is no fee
-      share_type      calculate_fee(const fee_parameters_type& k)const { return 0; }
+      dualfee      calculate_fee(const fee_parameters_type& k)const { return dualfee{0,0}; }
    };
 } } // graphene::chain
 

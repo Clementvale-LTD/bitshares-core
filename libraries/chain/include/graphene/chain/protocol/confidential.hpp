@@ -162,7 +162,7 @@ struct transfer_to_blind_operation : public base_operation
 
    account_id_type fee_payer()const { return from; }
    void            validate()const;
-   share_type      calculate_fee(const fee_parameters_type& )const;
+   dualfee      calculate_fee(const fee_parameters_type& )const;
 };
 
 /**
@@ -252,7 +252,7 @@ struct blind_transfer_operation : public base_operation
    /** graphene TEMP account */
    account_id_type fee_payer()const;
    void            validate()const;
-   share_type      calculate_fee( const fee_parameters_type& k )const;
+   dualfee      calculate_fee( const fee_parameters_type& k )const;
 
    void            get_required_authorities( vector<authority>& a )const
    {

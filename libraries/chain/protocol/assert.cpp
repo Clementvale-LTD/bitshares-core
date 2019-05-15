@@ -57,9 +57,9 @@ void assert_operation::validate()const
  * The fee for assert operations is proportional to their size,
  * but cheaper than a data fee because they require no storage
  */
-share_type  assert_operation::calculate_fee(const fee_parameters_type& k)const
+dualfee  assert_operation::calculate_fee(const fee_parameters_type& k)const
 {
-   return k.fee * predicates.size();
+   return dualfee{k.fee * predicates.size(),0};
 }
 
 

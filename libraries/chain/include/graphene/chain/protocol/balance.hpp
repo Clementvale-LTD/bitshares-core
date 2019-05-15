@@ -46,7 +46,7 @@ namespace graphene { namespace chain {
       asset             total_claimed;
 
       account_id_type fee_payer()const { return deposit_to_account; }
-      share_type      calculate_fee(const fee_parameters_type& )const { return 0; }
+      dualfee      calculate_fee(const fee_parameters_type& )const { return dualfee{0,0}; }
       void            validate()const;
       void            get_required_authorities( vector<authority>& a )const
       {

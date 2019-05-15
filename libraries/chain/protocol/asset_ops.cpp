@@ -69,12 +69,12 @@ bool is_valid_symbol( const string& symbol )
     return true;
 }
 
-share_type asset_issue_operation::calculate_fee(const fee_parameters_type& k)const
+dualfee asset_issue_operation::calculate_fee(const fee_parameters_type& k)const
 {
-   return k.fee + calculate_data_fee( fc::raw::pack_size(memo), k.price_per_kbyte );
+   return dualfee{ k.fee + calculate_data_fee( fc::raw::pack_size(memo), k.price_per_kbyte ), 0};
 }
 
-share_type asset_create_operation::calculate_fee(const asset_create_operation::fee_parameters_type& param)const
+dualfee asset_create_operation::calculate_fee(const asset_create_operation::fee_parameters_type& param)const
 {
    auto core_fee_required = param.long_symbol; 
 
@@ -90,7 +90,7 @@ share_type asset_create_operation::calculate_fee(const asset_create_operation::f
    // common_options contains several lists and a string. Charge fees for its size
    core_fee_required += calculate_data_fee( fc::raw::pack_size(*this), param.price_per_kbyte );
 
-   return core_fee_required;
+   return dualfee{ core_fee_required, 0};
 }
 
 void  asset_create_operation::validate()const
@@ -110,9 +110,9 @@ void asset_update_operation::validate()const
    new_options.validate();
 }
 
-share_type asset_update_operation::calculate_fee(const asset_update_operation::fee_parameters_type& k)const
+dualfee asset_update_operation::calculate_fee(const asset_update_operation::fee_parameters_type& k)const
 {
-   return k.fee + calculate_data_fee( fc::raw::pack_size(*this), k.price_per_kbyte );
+   return dualfee{ k.fee + calculate_data_fee( fc::raw::pack_size(*this), k.price_per_kbyte ), 0};
 }
 
 void asset_reserve_operation::validate()const

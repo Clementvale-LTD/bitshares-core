@@ -42,9 +42,9 @@ void proposal_create_operation::validate() const
    for( const auto& op : proposed_ops ) operation_validate( op.op );
 }
 
-share_type proposal_create_operation::calculate_fee(const fee_parameters_type& k) const
+dualfee proposal_create_operation::calculate_fee(const fee_parameters_type& k) const
 {
-   return k.fee + calculate_data_fee( fc::raw::pack_size(*this), k.price_per_kbyte );
+   return dualfee{k.fee + calculate_data_fee( fc::raw::pack_size(*this), k.price_per_kbyte ), 0};
 }
 
 void proposal_update_operation::validate() const
@@ -75,9 +75,9 @@ void proposal_delete_operation::validate() const
    FC_ASSERT( fee.amount >= 0 );
 }
 
-share_type proposal_update_operation::calculate_fee(const fee_parameters_type& k) const
+dualfee proposal_update_operation::calculate_fee(const fee_parameters_type& k) const
 {
-   return k.fee + calculate_data_fee( fc::raw::pack_size(*this), k.price_per_kbyte );
+   return dualfee{ k.fee + calculate_data_fee( fc::raw::pack_size(*this), k.price_per_kbyte ), 0};
 }
 
 void proposal_update_operation::get_required_authorities( vector<authority>& o )const

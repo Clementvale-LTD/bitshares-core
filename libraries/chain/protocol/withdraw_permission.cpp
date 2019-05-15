@@ -41,12 +41,12 @@ void withdraw_permission_claim_operation::validate()const
    FC_ASSERT( fee.amount >= 0 );
 }
 
-share_type withdraw_permission_claim_operation::calculate_fee(const fee_parameters_type& k)const
+dualfee withdraw_permission_claim_operation::calculate_fee(const fee_parameters_type& k)const
 {
    share_type core_fee_required = k.fee;
    if( memo )
       core_fee_required += calculate_data_fee( fc::raw::pack_size(memo), k.price_per_kbyte );
-   return core_fee_required;
+   return dualfee{core_fee_required, 0};
 }
 
 void withdraw_permission_create_operation::validate() const

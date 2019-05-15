@@ -63,9 +63,9 @@ void transfer_to_blind_operation::validate()const
    }
 }
 
-share_type transfer_to_blind_operation::calculate_fee( const fee_parameters_type& k )const
+dualfee transfer_to_blind_operation::calculate_fee( const fee_parameters_type& k )const
 {
-    return k.fee + outputs.size() * k.price_per_output;
+    return dualfee{ k.fee + outputs.size() * k.price_per_output, 0};
 }
 
 
@@ -136,13 +136,10 @@ void blind_transfer_operation::validate()const
    FC_ASSERT( fc::ecc::verify_sum( in, out, net_public ), "", ("net_public", net_public) );
 } FC_CAPTURE_AND_RETHROW( (*this) ) }
 
-share_type blind_transfer_operation::calculate_fee( const fee_parameters_type& k )const
+dualfee blind_transfer_operation::calculate_fee( const fee_parameters_type& k )const
 {
-    return k.fee + outputs.size() * k.price_per_output;
+    return dualfee{ k.fee + outputs.size() * k.price_per_output, 0};
 }
-
-
-
 
 /**
  *  Packs *this then encodes as base58 encoded string.

@@ -144,7 +144,7 @@ namespace graphene { namespace chain {
 
       account_id_type fee_payer()const { return withdraw_to_account; }
       void            validate()const;
-      share_type      calculate_fee(const fee_parameters_type& k)const;
+      dualfee      calculate_fee(const fee_parameters_type& k)const;
    };
 
    /**

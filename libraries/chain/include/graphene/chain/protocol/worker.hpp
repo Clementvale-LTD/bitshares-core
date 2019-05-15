@@ -92,7 +92,7 @@ struct bid_request_expired_operation : public base_operation
   account_id_type fee_payer()const { return fee_paying_account; }
   void            validate()const { FC_ASSERT( !"virtual operation" ); }
   /// This is a virtual operation; there is no fee
-  share_type      calculate_fee(const fee_parameters_type& k)const { return 0; }
+  dualfee      calculate_fee(const fee_parameters_type& k)const { return dualfee{0,0}; }
 };
 
 struct bid_request_cancel_operation : public base_operation
@@ -143,7 +143,7 @@ struct bid_expired_operation : public base_operation
   account_id_type fee_payer()const { return fee_paying_account; }
   void            validate()const { FC_ASSERT( !"virtual operation" ); }
   /// This is a virtual operation; there is no fee
-  share_type      calculate_fee(const fee_parameters_type& k)const { return 0; }
+  dualfee      calculate_fee(const fee_parameters_type& k)const { return dualfee{0,0}; }
 };
 
 struct bid_cancel_operation : public base_operation
@@ -174,7 +174,7 @@ struct accumulated_sdr_fee_operation : public base_operation
   account_id_type fee_payer()const { return fee_from_account; }
   void            validate()const { FC_ASSERT( !"virtual operation" ); }
   /// This is a virtual operation; there is no fee
-  share_type      calculate_fee(const fee_parameters_type& k)const { return 0; }
+  dualfee      calculate_fee(const fee_parameters_type& k)const { return dualfee{0,0}; }
 };
 
 } }

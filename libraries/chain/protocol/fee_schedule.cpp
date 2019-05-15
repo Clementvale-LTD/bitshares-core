@@ -77,7 +77,13 @@ namespace graphene { namespace chain {
 
    struct calc_fee_visitor
    {
-      typedef uint64_t result_type;
+      struct calc_dualfee
+      {
+        int64_t fee;
+        int64_t ufee;
+      };
+
+      typedef calc_dualfee result_type;
 
       const fee_schedule& param;
       const int current_op;
@@ -87,12 +93,14 @@ namespace graphene { namespace chain {
       result_type operator()( const OpType& op )const
       {
          try {
-            return op.calculate_fee( param.get<OpType>() ).value;
+            auto dfee = op.calculate_fee( param.get<OpType>() );
+            return calc_dualfee{ std::max(dfee.fee.value,int64_t(0)), std::max(dfee.ufee.value,int64_t(0))};
          } catch (fc::assert_exception e) {
              fee_parameters params; params.set_which(current_op);
              auto itr = param.parameters.find(params);
              if( itr != param.parameters.end() ) params = *itr;
-             return op.calculate_fee( params.get<typename OpType::fee_parameters_type>() ).value;
+             auto dfee = op.calculate_fee( params.get<typename OpType::fee_parameters_type>() );
+             return calc_dualfee{ std::max(dfee.fee.value,int64_t(0)), std::max(dfee.ufee.value,int64_t(0))};
          }
       }
    };
@@ -133,7 +141,7 @@ namespace graphene { namespace chain {
    asset fee_schedule::calculate_fee( const operation& op )const
    {
       auto base_value = op.visit( calc_fee_visitor( *this, op ) );
-      auto scaled = fc::uint128(base_value) * scale;
+      auto scaled = fc::uint128(base_value.fee) * scale;
       scaled /= GRAPHENE_100_PERCENT;
       FC_ASSERT( scaled <= GRAPHENE_MAX_SHARE_SUPPLY );
 

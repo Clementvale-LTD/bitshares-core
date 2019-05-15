@@ -25,12 +25,12 @@
 
 namespace graphene { namespace chain {
 
-share_type transfer_operation::calculate_fee( const fee_parameters_type& schedule )const
+dualfee transfer_operation::calculate_fee( const fee_parameters_type& schedule )const
 {
    share_type core_fee_required = schedule.fee;
    if( memo )
       core_fee_required += calculate_data_fee( fc::raw::pack_size(memo), schedule.price_per_kbyte );
-   return core_fee_required;
+   return dualfee{core_fee_required,0};
 }
 
 
@@ -41,12 +41,12 @@ void transfer_operation::validate()const
    FC_ASSERT( amount.amount > 0 );
 }
 
-share_type override_transfer_operation::calculate_fee( const fee_parameters_type& schedule )const
+dualfee override_transfer_operation::calculate_fee( const fee_parameters_type& schedule )const
 {
    share_type core_fee_required = schedule.fee;
    if( memo )
       core_fee_required += calculate_data_fee( fc::raw::pack_size(memo), schedule.price_per_kbyte );
-   return core_fee_required;
+   return dualfee{core_fee_required,0};
 }
 
 void override_transfer_operation::validate()const

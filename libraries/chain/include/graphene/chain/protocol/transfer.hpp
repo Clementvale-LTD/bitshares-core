@@ -63,7 +63,7 @@ namespace graphene { namespace chain {
 
       account_id_type fee_payer()const { return from; }
       void            validate()const;
-      share_type      calculate_fee(const fee_parameters_type& k)const;
+      dualfee      calculate_fee(const fee_parameters_type& k)const;
    };
 
    /**
@@ -98,7 +98,7 @@ namespace graphene { namespace chain {
 
       account_id_type fee_payer()const { return issuer; }
       void            validate()const;
-      share_type      calculate_fee(const fee_parameters_type& k)const;
+      dualfee      calculate_fee(const fee_parameters_type& k)const;
    };
 
 }} // graphene::chain

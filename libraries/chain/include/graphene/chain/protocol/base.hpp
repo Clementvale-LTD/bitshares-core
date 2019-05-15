@@ -83,12 +83,18 @@ namespace graphene { namespace chain {
    struct void_result{};
    typedef fc::static_variant<void_result,object_id_type,asset> operation_result;
 
+   struct dualfee
+   {
+     share_type fee;
+     share_type ufee;
+   };
+
    struct base_operation
    {
       template<typename T>
-      share_type calculate_fee(const T& params)const
+      dualfee calculate_fee(const T& params)const
       {
-         return params.fee;
+         return dualfee{params.fee,0};
       }
       void get_required_authorities( vector<authority>& )const{}
       void get_required_active_authorities( flat_set<account_id_type>& )const{}

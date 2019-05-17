@@ -912,18 +912,22 @@ public:
       FC_ASSERT( operation_index < trx.operations.size());
       trx.operations[operation_index] = new_op;
    }
-   asset set_fees_on_builder_transaction(transaction_handle_type handle )
+   sdualfee set_fees_on_builder_transaction(transaction_handle_type handle )
    {
       FC_ASSERT(_builder_transactions.count(handle));
+//      auto fee_asset_obj1 = get_asset( GRAPHENE_SYMBOL);
+//      auto fee_asset_obj2 = get_asset( GRAPHENE_SDR_SYMBOL);
 
-      auto fee_asset_obj = get_asset( GRAPHENE_SYMBOL);
-      asset total_fee = fee_asset_obj.amount(0);
+      sdualfee total_fee = { asset( 0, asset_id_type()), asset( 0, GRAPHENE_SDR_ASSET_ID) };
 
       auto gprops = _remote_db->get_global_properties().parameters;
-      FC_ASSERT( fee_asset_obj.get_id() != asset_id_type() );
+//      FC_ASSERT( fee_asset_obj.get_id() != asset_id_type() );
 
-      for( auto& op : _builder_transactions[handle].operations )
-        total_fee += gprops.current_fees->set_fee( op );
+      for( auto& op : _builder_transactions[handle].operations ){
+        auto addfee = gprops.current_fees->set_fee( op );
+        total_fee.fee += addfee.fee;
+        total_fee.ufee += addfee.ufee;
+      }
 
       return total_fee;
    }
@@ -3123,7 +3127,7 @@ void wallet_api::replace_operation_in_builder_transaction(transaction_handle_typ
    my->replace_operation_in_builder_transaction(handle, operation_index, new_op);
 }
 
-asset wallet_api::set_fees_on_builder_transaction(transaction_handle_type handle)
+sdualfee wallet_api::set_fees_on_builder_transaction(transaction_handle_type handle)
 {
    return my->set_fees_on_builder_transaction(handle);
 }
@@ -4128,7 +4132,11 @@ blind_confirmation wallet_api::transfer_from_blind( string from_blind_account_ke
    FC_ASSERT(asset_obj.valid(), "Could not find asset matching ${asset}", ("asset", symbol));
    auto amount = asset_obj->amount_from_string(amount_in);
 
-   from_blind.fee  = fees->calculate_fee( from_blind );
+   {
+   auto dfee  = fees->calculate_fee( from_blind );
+   from_blind.fee  = dfee.fee;
+   from_blind.ufee = dfee.ufee;
+   }
 
    auto blind_in = asset_obj->amount_to_string( from_blind.fee + amount );
 
@@ -4143,7 +4151,12 @@ blind_confirmation wallet_api::transfer_from_blind( string from_blind_account_ke
    from_blind.amount = amount;
    from_blind.blinding_factor = conf.outputs.back().decrypted_memo.blinding_factor;
    from_blind.inputs.push_back( {conf.outputs.back().decrypted_memo.commitment, authority() } );
-   from_blind.fee  = fees->calculate_fee( from_blind );
+   
+   {
+   auto dfee = fees->calculate_fee( from_blind );
+   from_blind.fee  = dfee.fee;
+   from_blind.ufee = dfee.ufee;
+   }
 
    idump( (from_blind) );
    conf.trx.operations.push_back(from_blind);
@@ -4210,9 +4223,11 @@ blind_confirmation wallet_api::blind_transfer_help( string from_key_or_label,
    vector<fc::sha256> blinding_factors;
 
    //auto from_priv_key = my->get_private_key( from_key );
-
-   blind_tr.fee  = fees->calculate_fee( blind_tr);
-
+   {
+   auto dfee = fees->calculate_fee( blind_tr);
+   blind_tr.fee  = dfee.fee;
+   blind_tr.ufee = dfee.ufee;
+   }
    vector<commitment_type> used;
 
    auto& to_asset_used_idx = my->_wallet.blind_receipts.get<by_to_asset_used>();

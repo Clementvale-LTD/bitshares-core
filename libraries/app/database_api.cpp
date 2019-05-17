@@ -2180,7 +2180,7 @@ struct get_required_fees_helper
       }
       else
       {
-         asset fee = current_fee_schedule.set_fee( op );
+         sdualfee fee = current_fee_schedule.set_fee( op );
          fc::variant result;
          fc::to_variant( fee, result );
          return result;
@@ -2190,7 +2190,7 @@ struct get_required_fees_helper
    fc::variant set_proposal_create_op_fees( operation& proposal_create_op )
    {
       proposal_create_operation& op = proposal_create_op.get<proposal_create_operation>();
-      std::pair< asset, fc::variants > result;
+      std::pair< sdualfee, fc::variants > result;
       for( op_wrapper& prop_op : op.proposed_ops )
       {
          FC_ASSERT( current_recursion < max_recursion );

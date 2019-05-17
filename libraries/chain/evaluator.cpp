@@ -81,9 +81,9 @@ database& generic_evaluator::db()const { return trx_state->db(); }
       }
    } FC_CAPTURE_AND_RETHROW() }
 
-   share_type generic_evaluator::calculate_fee_for_operation(const operation& op) const
+   sdualfee generic_evaluator::calculate_fee_for_operation(const operation& op) const
    {
-     return db().current_fee_schedule().calculate_fee( op ).amount;
+     return db().current_fee_schedule().calculate_fee( op );
    }
    void generic_evaluator::db_adjust_balance(const account_id_type& fee_payer, asset fee_from_account)
    {

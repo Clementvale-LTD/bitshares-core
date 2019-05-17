@@ -108,14 +108,15 @@ namespace graphene { namespace chain {
    struct set_fee_visitor
    {
       typedef void result_type;
-      asset _fee;
+      sdualfee _dfee;
 
-      set_fee_visitor( asset f ):_fee(f){}
+      set_fee_visitor( sdualfee df ):_dfee(df){}
 
       template<typename OpType>
       void operator()( OpType& op )const
       {
-         op.fee = _fee;
+         op.fee = _dfee.fee;
+         op.ufee = _dfee.ufee;
       }
    };
 
@@ -138,23 +139,28 @@ namespace graphene { namespace chain {
       this->scale = 0;
    }
 
-   asset fee_schedule::calculate_fee( const operation& op )const
+   sdualfee fee_schedule::calculate_fee( const operation& op )const
    {
       auto base_value = op.visit( calc_fee_visitor( *this, op ) );
       auto scaled = fc::uint128(base_value.fee) * scale;
       scaled /= GRAPHENE_100_PERCENT;
       FC_ASSERT( scaled <= GRAPHENE_MAX_SHARE_SUPPLY );
 
-      auto result = asset( scaled.to_uint64(), asset_id_type(0) );
+      auto result1 = asset( scaled.to_uint64(), asset_id_type(0) );
 
-      while( result < asset( scaled.to_uint64()) )
-        result.amount++;
+      while( result1 < asset( scaled.to_uint64()) )
+        result1.amount++;
 
-      FC_ASSERT( result.amount <= GRAPHENE_MAX_SHARE_SUPPLY );
-      return result;
+      FC_ASSERT( result1.amount <= GRAPHENE_MAX_SHARE_SUPPLY );
+
+      auto result2 = asset( base_value.ufee, GRAPHENE_SDR_ASSET_ID );
+      FC_ASSERT( result2.amount <= GRAPHENE_MAX_SHARE_SUPPLY );
+      FC_ASSERT( result2.amount >=0 );
+
+      return sdualfee{result1,result2};
    }
 
-   asset fee_schedule::set_fee( operation& op )const
+   sdualfee fee_schedule::set_fee( operation& op )const
    {
       auto f = calculate_fee( op );
       auto f_max = f;
@@ -162,9 +168,9 @@ namespace graphene { namespace chain {
       {
          op.visit( set_fee_visitor( f_max ) );
          auto f2 = calculate_fee( op );
-         if( f == f2 )
+         if( f.fee == f2.fee && f.ufee == f2.ufee )
             break;
-         f_max = std::max( f_max, f2 );
+         f_max = sdualfee{std::max( f_max.fee, f2.fee ), std::max( f_max.ufee, f2.ufee )};
          f = f2;
          if( i == 0 )
          {

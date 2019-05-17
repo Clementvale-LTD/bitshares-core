@@ -199,7 +199,9 @@ BOOST_AUTO_TEST_CASE( cashback_test )
       op.options.memo_key = actor_name ## _private_key.get_public_key(); \
       op.active = authority(1, public_key_type(actor_name ## _private_key.get_public_key()), 1); \
       op.owner = op.active; \
-      op.fee = fees->calculate_fee(op); \
+      auto dfee = fees->calculate_fee(op); \
+      op.fee = dfee.fee; \
+      op.ufee = dfee.ufee; \
       trx.operations = {op}; \
       sign( trx,  registrar_name ## _private_key ); \
       actor_name ## _id = PUSH_TX( db, trx ).operation_results.front().get<object_id_type>(); \
@@ -788,14 +790,14 @@ BOOST_AUTO_TEST_CASE( defaults_test )
     const limit_order_create_operation::fee_parameters_type default_order_fee;
 
     // no fees set yet -> default
-    asset fee = schedule.calculate_fee( limit_order_create_operation() );
-    BOOST_CHECK_EQUAL( default_order_fee.fee, fee.amount.value );
+    auto dfee = schedule.calculate_fee( limit_order_create_operation() );
+    BOOST_CHECK_EQUAL( default_order_fee.fee, dfee.fee.amount.value );
 
     limit_order_create_operation::fee_parameters_type new_order_fee; new_order_fee.fee = 123;
     // set fee + check
     schedule.parameters.insert( new_order_fee );
-    fee = schedule.calculate_fee( limit_order_create_operation() );
-    BOOST_CHECK_EQUAL( new_order_fee.fee, fee.amount.value );
+    dfee = schedule.calculate_fee( limit_order_create_operation() );
+    BOOST_CHECK_EQUAL( new_order_fee.fee, dfee.fee.amount.value );
   }
   catch( const fc::exception& e )
   {

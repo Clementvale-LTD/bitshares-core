@@ -163,7 +163,9 @@ BOOST_AUTO_TEST_CASE( update_account )
          account_upgrade_operation op;
          op.account_to_upgrade = nathan.id;
          op.upgrade_to_lifetime_member = true;
-         op.fee = db.get_global_properties().parameters.current_fees->calculate_fee(op);
+         auto dfee = db.get_global_properties().parameters.current_fees->calculate_fee(op);
+         op.fee = dfee.fee;
+         op.ufee = dfee.ufee;
          trx.operations = {op};
          PUSH_TX( db, trx, ~0 );
       }
@@ -594,7 +596,9 @@ BOOST_AUTO_TEST_CASE( uia_fees )
       const share_type prec = asset::scaled_precision( asset_id_type()(db).precision );
 
       transfer_operation op;
-      op.fee = db.current_fee_schedule().calculate_fee( op );
+      auto dfee = db.current_fee_schedule().calculate_fee( op );
+      op.fee = dfee.fee;
+      op.ufee = dfee.ufee;
       op.from = nathan_account.id;
       op.to   = committee_account.id;
       op.amount = test_asset.amount(100);

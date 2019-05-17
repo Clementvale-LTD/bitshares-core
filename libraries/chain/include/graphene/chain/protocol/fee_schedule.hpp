@@ -62,6 +62,12 @@ namespace graphene { namespace chain {
       }
    };
 
+   struct sdualfee
+   {
+     asset fee;
+     asset ufee;
+   };
+
    /**
     *  @brief contains all of the parameters necessary to calculate the fee for any operation
     */
@@ -75,8 +81,8 @@ namespace graphene { namespace chain {
        *  Finds the appropriate fee parameter struct for the operation
        *  and then calculates the appropriate fee.
        */
-      asset calculate_fee( const operation& op )const;
-      asset set_fee( operation& op )const;
+      sdualfee calculate_fee( const operation& op )const;
+      sdualfee set_fee( operation& op )const;
 
       void zero_all_fees();
 
@@ -108,4 +114,5 @@ namespace graphene { namespace chain {
 } } // graphene::chain
 
 FC_REFLECT_TYPENAME( graphene::chain::fee_parameters )
+FC_REFLECT( graphene::chain::sdualfee, (fee)(ufee) )
 FC_REFLECT( graphene::chain::fee_schedule, (parameters)(scale) )

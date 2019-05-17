@@ -531,7 +531,7 @@ class wallet_api
       /**
        * @ingroup Transaction Builder API
        */
-      asset set_fees_on_builder_transaction(transaction_handle_type handle);
+      sdualfee set_fees_on_builder_transaction(transaction_handle_type handle);
       /**
        * @ingroup Transaction Builder API
        */

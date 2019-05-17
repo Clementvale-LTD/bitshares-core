@@ -346,7 +346,10 @@ account_create_operation database_fixture::make_account(
    }
    create_account.options.num_committee = create_account.options.votes.size();
 
-   create_account.fee = db.current_fee_schedule().calculate_fee( create_account );
+   auto dfee = db.current_fee_schedule().calculate_fee( create_account );
+   create_account.fee = dfee.fee;
+   create_account.ufee = dfee.ufee;
+
    return create_account;
 } FC_CAPTURE_AND_RETHROW() }
 
@@ -381,7 +384,10 @@ account_create_operation database_fixture::make_account(
       }
       create_account.options.num_committee = create_account.options.votes.size();
 
-      create_account.fee = db.current_fee_schedule().calculate_fee( create_account );
+      auto dfee = db.current_fee_schedule().calculate_fee( create_account );
+      create_account.fee = dfee.fee;
+      create_account.ufee = dfee.ufee;
+
       return create_account;
    }
    FC_CAPTURE_AND_RETHROW((name))
@@ -692,7 +698,11 @@ void database_fixture::upgrade_to_lifetime_member( const account_object& account
       account_upgrade_operation op;
       op.account_to_upgrade = account.get_id();
       op.upgrade_to_lifetime_member = true;
-      op.fee = db.get_global_properties().parameters.current_fees->calculate_fee(op);
+      
+      auto dfee = db.get_global_properties().parameters.current_fees->calculate_fee(op);
+      op.fee = dfee.fee;
+      op.ufee = dfee.ufee;
+
       trx.operations = {op};
       db.push_transaction(trx, ~0);
       FC_ASSERT( op.account_to_upgrade(db).is_lifetime_member() );
@@ -712,7 +722,11 @@ void database_fixture::upgrade_to_annual_member(const account_object& account)
    try {
       account_upgrade_operation op;
       op.account_to_upgrade = account.get_id();
-      op.fee = db.get_global_properties().parameters.current_fees->calculate_fee(op);
+
+      auto dfee = db.get_global_properties().parameters.current_fees->calculate_fee(op);
+      op.fee = dfee.fee;
+      op.ufee = dfee.ufee;
+
       trx.operations = {op};
       db.push_transaction(trx, ~0);
       FC_ASSERT( op.account_to_upgrade(db).is_member(db.head_block_time()) );

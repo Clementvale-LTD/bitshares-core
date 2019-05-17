@@ -1007,7 +1007,9 @@ BOOST_FIXTURE_TEST_CASE( bogus_signature, database_fixture )
       xfer_op.from = alice_account_object.id;
       xfer_op.to = bob_account_object.id;
       xfer_op.amount = core.amount(5000);
-      xfer_op.fee = db.current_fee_schedule().calculate_fee( xfer_op );
+      auto dfee = db.current_fee_schedule().calculate_fee( xfer_op );
+      xfer_op.fee = dfee.fee;
+      xfer_op.ufee = dfee.ufee;
 
       trx.clear();
       trx.operations.push_back( xfer_op );

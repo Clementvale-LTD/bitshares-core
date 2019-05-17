@@ -54,6 +54,7 @@ class limit_order_object : public abstract_object<limit_order_object>
       share_type       for_sale; ///< asset id is sell_price.base.asset_id
       price            sell_price;
       share_type       deferred_fee;
+      share_type       deferred_ufee;
 
       asset umt_fee;
 
@@ -126,5 +127,5 @@ typedef generic_index<limit_order_object, limit_order_multi_index_type> limit_or
 
 FC_REFLECT_DERIVED( graphene::chain::limit_order_object,
                     (graphene::db::object),
-                    (expiration)(seller)(for_sale)(sell_price)(deferred_fee)(umt_fee)(request_id)(user_id)(counterparty_id)(bid_id)(p_memo)(p_accepted_memo)
+                    (expiration)(seller)(for_sale)(sell_price)(deferred_fee)(deferred_ufee)(umt_fee)(request_id)(user_id)(counterparty_id)(bid_id)(p_memo)(p_accepted_memo)
                   )

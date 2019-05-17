@@ -202,13 +202,20 @@ void database::clear_expired_orders()
             const limit_order_object& order = *limit_index.begin();
             canceler.fee_paying_account = order.seller;
             canceler.order = order.id;
-            canceler.fee = current_fee_schedule().calculate_fee( canceler );
+/*            
+            auto dfee = current_fee_schedule().calculate_fee( canceler );
+            canceler.fee = dfee.fee;
             if( canceler.fee.amount > order.deferred_fee )
             {
                // Cap auto-cancel fees at deferred_fee; see #549
                //wlog( "At block ${b}, fee for clearing expired order ${oid} was capped at deferred_fee ${fee}", ("b", head_block_num())("oid", order.id)("fee", order.deferred_fee) );
                canceler.fee = asset( order.deferred_fee, asset_id_type() );
             }
+*/
+            //Set auto canceler all fees to zero 
+            canceler.fee =  asset( 0, asset_id_type() );
+            canceler.ufee = asset( 0, GRAPHENE_SDR_ASSET_ID);
+
             // we know the fee for this op is set correctly since it is set by the chain.
             // this allows us to avoid a hung chain:
             // - if #549 case above triggers
@@ -249,7 +256,11 @@ void database::clear_expired_bids()
         bid_expired_operation canceler;
         canceler.fee_paying_account = bid.owner;
         canceler.bid_id = bid.id;
-        canceler.fee = current_fee_schedule().calculate_fee( canceler );
+//        canceler.fee = current_fee_schedule().calculate_fee( canceler );
+
+        //Set auto canceler all fees to zero 
+        canceler.fee =  asset( 0, asset_id_type() );
+        canceler.ufee = asset( 0, GRAPHENE_SDR_ASSET_ID);
 
         push_applied_operation( canceler );
         remove( bid);
@@ -285,7 +296,11 @@ void database::clear_expired_bid_requests()
         bid_request_expired_operation canceler;
         canceler.fee_paying_account = bid_request.owner;
         canceler.bid_request_id = bid_request.id;
-        canceler.fee = current_fee_schedule().calculate_fee( canceler );
+//        canceler.fee = current_fee_schedule().calculate_fee( canceler );
+
+        //Set auto canceler all fees to zero 
+        canceler.fee =  asset( 0, asset_id_type() );
+        canceler.ufee = asset( 0, GRAPHENE_SDR_ASSET_ID);
 
         push_applied_operation( canceler );
         remove( bid_request);

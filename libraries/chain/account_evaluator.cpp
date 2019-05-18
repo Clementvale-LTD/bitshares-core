@@ -71,7 +71,7 @@ void verify_account_votes( const database& db, const account_options& options )
    FC_ASSERT( options.num_committee <= chain_params.maximum_committee_count,
               "Voted for more committee members than currently allowed (${c})", ("c", chain_params.maximum_committee_count) );
 
-   uint32_t max_vote_id = gpo.next_available_vote_id;
+   // uint32_t max_vote_id = gpo.next_available_vote_id;
 
    {
       const auto& committee_idx = db.get_index_type<committee_member_index>().indices().get<by_vote_id>();
@@ -128,12 +128,12 @@ void_result account_create_evaluator::do_evaluate( const account_create_operatio
 object_id_type account_create_evaluator::do_apply( const account_create_operation& o )
 { try {
 
-   database& d = db();
+   //database& d = db();
 
    const auto& new_acnt_object = db().create<account_object>( [&]( account_object& obj ){
          obj.registrar = o.registrar;
 
-         auto& params = db().get_global_properties().parameters;
+         //auto& params = db().get_global_properties().parameters;
 
          obj.name             = o.name;
          obj.owner            = o.owner;

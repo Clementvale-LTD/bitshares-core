@@ -36,7 +36,10 @@ namespace graphene { namespace chain {
     */
    struct committee_member_create_operation : public base_operation
    {
-      struct fee_parameters_type { uint64_t fee = 5000 * GRAPHENE_BLOCKCHAIN_PRECISION; };
+      struct fee_parameters_type { 
+        uint64_t fee = 5000 * GRAPHENE_BLOCKCHAIN_PRECISION; 
+        uint64_t ufee = 0;      //SDR fee per operation
+      };
 
       asset                                 fee;
       asset                                 ufee;  //fee in sdr
@@ -58,7 +61,10 @@ namespace graphene { namespace chain {
     */
    struct committee_member_update_operation : public base_operation
    {
-      struct fee_parameters_type { uint64_t fee = 20 * GRAPHENE_BLOCKCHAIN_PRECISION; };
+      struct fee_parameters_type { 
+        uint64_t fee = 20 * GRAPHENE_BLOCKCHAIN_PRECISION; 
+        uint64_t ufee = 0;      //SDR fee per operation
+      };
 
       asset                                 fee;
       asset                                 ufee;  //fee in sdr
@@ -86,7 +92,10 @@ namespace graphene { namespace chain {
     */
    struct committee_member_update_global_parameters_operation : public base_operation
    {
-      struct fee_parameters_type { uint64_t fee = GRAPHENE_BLOCKCHAIN_PRECISION; };
+      struct fee_parameters_type { 
+        uint64_t fee = GRAPHENE_BLOCKCHAIN_PRECISION; 
+        uint64_t ufee = 0;      //SDR fee per operation
+      };
 
       asset             fee;
       asset             ufee;  //fee in sdr
@@ -99,7 +108,10 @@ namespace graphene { namespace chain {
 
    struct committee_member_lock_account_operation : public base_operation
    {
-      struct fee_parameters_type { uint64_t fee = GRAPHENE_BLOCKCHAIN_PRECISION; };
+      struct fee_parameters_type { 
+        uint64_t fee = GRAPHENE_BLOCKCHAIN_PRECISION; 
+        uint64_t ufee = 0;      //SDR fee per operation
+      };
 
       asset             fee;
       asset             ufee;  //fee in sdr
@@ -114,10 +126,10 @@ namespace graphene { namespace chain {
    /// TODO: committee_member_resign_operation : public base_operation
 
 } } // graphene::chain
-FC_REFLECT( graphene::chain::committee_member_create_operation::fee_parameters_type, (fee) )
-FC_REFLECT( graphene::chain::committee_member_update_operation::fee_parameters_type, (fee) )
-FC_REFLECT( graphene::chain::committee_member_update_global_parameters_operation::fee_parameters_type, (fee) )
-FC_REFLECT( graphene::chain::committee_member_lock_account_operation::fee_parameters_type, (fee) )
+FC_REFLECT( graphene::chain::committee_member_create_operation::fee_parameters_type, (fee)(ufee) )
+FC_REFLECT( graphene::chain::committee_member_update_operation::fee_parameters_type, (fee)(ufee) )
+FC_REFLECT( graphene::chain::committee_member_update_global_parameters_operation::fee_parameters_type, (fee)(ufee) )
+FC_REFLECT( graphene::chain::committee_member_lock_account_operation::fee_parameters_type, (fee)(ufee) )
 
 
 FC_REFLECT( graphene::chain::committee_member_create_operation,

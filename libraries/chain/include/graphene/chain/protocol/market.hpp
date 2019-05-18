@@ -47,7 +47,11 @@ namespace graphene { namespace chain {
     */
    struct limit_order_create_operation : public base_operation
    {
-      struct fee_parameters_type { uint64_t fee = 5 * GRAPHENE_BLOCKCHAIN_PRECISION; };
+      struct fee_parameters_type { 
+        uint64_t fee = 5 * GRAPHENE_BLOCKCHAIN_PRECISION; 
+        uint64_t ufee = 0;      //SDR fee per operation
+        uint64_t ufee_pkb = 0;  //SDR fee per kilobyte in memo
+      };
 
       asset           fee;
       asset           ufee;  //fee in sdr
@@ -85,7 +89,11 @@ namespace graphene { namespace chain {
 
    struct limit_order_accept_operation : public base_operation
    {
-      struct fee_parameters_type { uint64_t fee = 5 * GRAPHENE_BLOCKCHAIN_PRECISION; };
+      struct fee_parameters_type { 
+        uint64_t fee = 5 * GRAPHENE_BLOCKCHAIN_PRECISION; 
+        uint64_t ufee = 0;      //SDR fee per operation
+        uint64_t ufee_pkb = 0;  //SDR fee per kilobyte in memo
+      };
 
       asset           fee;
       asset           ufee;  //fee in sdr
@@ -148,7 +156,10 @@ namespace graphene { namespace chain {
     */
    struct limit_order_cancel_operation : public base_operation
    {
-      struct fee_parameters_type { uint64_t fee = 0; };
+      struct fee_parameters_type { 
+        uint64_t fee = 0;
+        uint64_t ufee = 0;      //SDR fee per operation
+      };
 
       asset               fee;
       asset               ufee;  //fee in sdr
@@ -255,11 +266,11 @@ namespace graphene { namespace chain {
    };
 } } // graphene::chain
 
-FC_REFLECT( graphene::chain::limit_order_create_operation::fee_parameters_type, (fee) )
-FC_REFLECT( graphene::chain::limit_order_cancel_operation::fee_parameters_type, (fee) )
+FC_REFLECT( graphene::chain::limit_order_create_operation::fee_parameters_type, (fee)(ufee)(ufee_pkb) )
+FC_REFLECT( graphene::chain::limit_order_cancel_operation::fee_parameters_type, (fee)(ufee) )
 FC_REFLECT( graphene::chain::fill_order_operation::fee_parameters_type,  ) // VIRTUAL
 FC_REFLECT( graphene::chain::execute_bid_operation::fee_parameters_type,  ) // VIRTUAL
-FC_REFLECT( graphene::chain::limit_order_accept_operation::fee_parameters_type, (fee) )
+FC_REFLECT( graphene::chain::limit_order_accept_operation::fee_parameters_type, (fee)(ufee)(ufee_pkb) )
 FC_REFLECT( graphene::chain::limit_order_accepted_operation::fee_parameters_type, ) // VIRTUAL
 
 FC_REFLECT( graphene::chain::limit_order_create_operation,(fee)(ufee)(seller)(amount_to_sell)(min_to_receive)(expiration)(fill_or_kill)(request_id)(user_id)(counterparty_id)(p_memo)(bid_id)(extensions))

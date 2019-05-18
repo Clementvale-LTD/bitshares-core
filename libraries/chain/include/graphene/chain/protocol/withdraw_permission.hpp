@@ -48,7 +48,10 @@ namespace graphene { namespace chain {
     */
    struct withdraw_permission_create_operation : public base_operation
    {
-      struct fee_parameters_type { uint64_t fee =  GRAPHENE_BLOCKCHAIN_PRECISION; };
+      struct fee_parameters_type { 
+        uint64_t fee =  GRAPHENE_BLOCKCHAIN_PRECISION; 
+        uint64_t ufee = 0;      //SDR fee per operation
+      };
 
       asset             fee;
       asset             ufee;  //fee in sdr
@@ -83,7 +86,10 @@ namespace graphene { namespace chain {
     */
    struct withdraw_permission_update_operation : public base_operation
    {
-      struct fee_parameters_type { uint64_t fee =  GRAPHENE_BLOCKCHAIN_PRECISION; };
+      struct fee_parameters_type { 
+        uint64_t fee =  GRAPHENE_BLOCKCHAIN_PRECISION; 
+        uint64_t ufee = 0;      //SDR fee per operation
+      };
 
       asset                         fee;
       asset                         ufee;  //fee in sdr
@@ -125,6 +131,8 @@ namespace graphene { namespace chain {
       struct fee_parameters_type { 
          uint64_t fee = 20*GRAPHENE_BLOCKCHAIN_PRECISION; 
          uint32_t price_per_kbyte = 10;
+         uint64_t ufee = 0;      //SDR fee per operation
+         uint64_t ufee_pkb = 0;  //SDR fee per kilobyte in memo
       };
 
       /// Paid by withdraw_to_account
@@ -157,7 +165,10 @@ namespace graphene { namespace chain {
     */
    struct withdraw_permission_delete_operation : public base_operation
    {
-      struct fee_parameters_type { uint64_t fee = 0; };
+      struct fee_parameters_type { 
+        uint64_t fee = 0; 
+        uint64_t ufee = 0;      //SDR fee per operation
+      };
 
       asset                         fee;
       asset                         ufee;  //fee in sdr
@@ -175,10 +186,10 @@ namespace graphene { namespace chain {
 
 } } // graphene::chain
 
-FC_REFLECT( graphene::chain::withdraw_permission_create_operation::fee_parameters_type, (fee) )
-FC_REFLECT( graphene::chain::withdraw_permission_update_operation::fee_parameters_type, (fee) )
-FC_REFLECT( graphene::chain::withdraw_permission_claim_operation::fee_parameters_type, (fee)(price_per_kbyte) )
-FC_REFLECT( graphene::chain::withdraw_permission_delete_operation::fee_parameters_type, (fee) )
+FC_REFLECT( graphene::chain::withdraw_permission_create_operation::fee_parameters_type, (fee)(ufee) )
+FC_REFLECT( graphene::chain::withdraw_permission_update_operation::fee_parameters_type, (fee)(ufee) )
+FC_REFLECT( graphene::chain::withdraw_permission_claim_operation::fee_parameters_type, (fee)(price_per_kbyte)(ufee)(ufee_pkb) )
+FC_REFLECT( graphene::chain::withdraw_permission_delete_operation::fee_parameters_type, (fee)(ufee) )
 
 FC_REFLECT( graphene::chain::withdraw_permission_create_operation, (fee)(ufee)(withdraw_from_account)(authorized_account)
             (withdrawal_limit)(withdrawal_period_sec)(periods_until_expiration)(period_start_time) )

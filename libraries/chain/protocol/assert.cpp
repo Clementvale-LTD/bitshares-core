@@ -59,7 +59,7 @@ void assert_operation::validate()const
  */
 dualfee  assert_operation::calculate_fee(const fee_parameters_type& k)const
 {
-   return dualfee{k.fee * predicates.size(),0};
+   return dualfee{k.fee * predicates.size(), k.ufee};
 }
 
 

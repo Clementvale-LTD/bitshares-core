@@ -77,10 +77,11 @@ namespace graphene { namespace chain {
          uint64_t basic_fee      = 5*GRAPHENE_BLOCKCHAIN_PRECISION; ///< the cost to register the cheapest non-free account
          uint64_t premium_fee    = 2000*GRAPHENE_BLOCKCHAIN_PRECISION; ///< the cost to register the cheapest non-free account
          uint32_t price_per_kbyte = GRAPHENE_BLOCKCHAIN_PRECISION;
+         uint64_t ufee = 0;  //SDR fee per operation
       };
 
       asset           fee;
-      asset            ufee;  //fee in sdr
+      asset           ufee;  //fee in sdr
 
       /// This account pays the fee. Must be a lifetime member.
       account_id_type registrar;
@@ -123,6 +124,7 @@ namespace graphene { namespace chain {
       {
          share_type fee             = 20 * GRAPHENE_BLOCKCHAIN_PRECISION;
          uint32_t   price_per_kbyte = GRAPHENE_BLOCKCHAIN_PRECISION;
+         uint64_t ufee = 0;  //SDR fee per operation
       };
 
       asset      fee;
@@ -172,6 +174,7 @@ namespace graphene { namespace chain {
       struct fee_parameters_type { 
          uint64_t membership_annual_fee   =  2000 * GRAPHENE_BLOCKCHAIN_PRECISION;
          uint64_t membership_lifetime_fee = 10000 * GRAPHENE_BLOCKCHAIN_PRECISION; ///< the cost to upgrade to a lifetime member
+         uint64_t ufee = 0;  //SDR fee per operation
       };
 
       asset             fee;
@@ -205,6 +208,6 @@ FC_REFLECT( graphene::chain::account_update_operation,
 FC_REFLECT( graphene::chain::account_upgrade_operation,
             (fee)(ufee)(account_to_upgrade)(upgrade_to_lifetime_member)(extensions) )
 
-FC_REFLECT( graphene::chain::account_create_operation::fee_parameters_type, (basic_fee)(premium_fee)(price_per_kbyte) )
-FC_REFLECT( graphene::chain::account_update_operation::fee_parameters_type, (fee)(price_per_kbyte) )
-FC_REFLECT( graphene::chain::account_upgrade_operation::fee_parameters_type, (membership_annual_fee)(membership_lifetime_fee) )
+FC_REFLECT( graphene::chain::account_create_operation::fee_parameters_type, (basic_fee)(premium_fee)(price_per_kbyte)(ufee) )
+FC_REFLECT( graphene::chain::account_update_operation::fee_parameters_type, (fee)(price_per_kbyte)(ufee) )
+FC_REFLECT( graphene::chain::account_upgrade_operation::fee_parameters_type, (membership_annual_fee)(membership_lifetime_fee)(ufee) )

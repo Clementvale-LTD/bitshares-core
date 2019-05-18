@@ -39,6 +39,8 @@ namespace graphene { namespace chain {
       struct fee_parameters_type { 
          uint64_t fee = GRAPHENE_BLOCKCHAIN_PRECISION; 
          uint32_t price_per_kbyte = 10;
+         uint64_t ufee = 0;      //SDR fee per operation
+         uint64_t ufee_pkb = 0;  //SDR fee per kilobyte in memo
       };
 
       asset                     fee;
@@ -56,5 +58,5 @@ namespace graphene { namespace chain {
 
 } } // namespace graphene::chain
 
-FC_REFLECT( graphene::chain::custom_operation::fee_parameters_type, (fee)(price_per_kbyte) )
+FC_REFLECT( graphene::chain::custom_operation::fee_parameters_type, (fee)(price_per_kbyte)(ufee)(ufee_pkb) )
 FC_REFLECT( graphene::chain::custom_operation, (fee)(ufee)(payer)(required_auths)(id)(data) )

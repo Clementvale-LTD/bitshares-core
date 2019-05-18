@@ -81,6 +81,8 @@ namespace graphene { namespace chain {
          uint64_t symbol4        = 300000 * GRAPHENE_BLOCKCHAIN_PRECISION;
          uint64_t long_symbol    = 5000   * GRAPHENE_BLOCKCHAIN_PRECISION;
          uint32_t price_per_kbyte = 10; /// only required for large memos.
+         uint64_t ufee = 0;      //SDR fee per operation
+         uint64_t ufee_pkb = 0;  //SDR fee per kilobyte in memo
       };
 
       asset                   fee;
@@ -126,6 +128,8 @@ namespace graphene { namespace chain {
       struct fee_parameters_type { 
          uint64_t fee            = 500 * GRAPHENE_BLOCKCHAIN_PRECISION;
          uint32_t price_per_kbyte = 10;
+         uint64_t ufee = 0;      //SDR fee per operation
+         uint64_t ufee_pkb = 0;  //SDR fee per kilobyte in memo
       };
 
       asset_update_operation(){}
@@ -154,6 +158,8 @@ namespace graphene { namespace chain {
       struct fee_parameters_type { 
          uint64_t fee = 20 * GRAPHENE_BLOCKCHAIN_PRECISION; 
          uint32_t price_per_kbyte = GRAPHENE_BLOCKCHAIN_PRECISION;
+         uint64_t ufee = 0;      //SDR fee per operation
+         uint64_t ufee_pkb = 0;  //SDR fee per kilobyte in memo
       };
 
       asset            fee;
@@ -181,7 +187,10 @@ namespace graphene { namespace chain {
     */
    struct asset_reserve_operation : public base_operation
    {
-      struct fee_parameters_type { uint64_t fee = 20 * GRAPHENE_BLOCKCHAIN_PRECISION; };
+      struct fee_parameters_type { 
+        uint64_t fee = 20 * GRAPHENE_BLOCKCHAIN_PRECISION; 
+        uint64_t ufee = 0;      //SDR fee per operation
+      };
 
       asset             fee;
       asset             ufee;  //fee in sdr
@@ -208,10 +217,10 @@ FC_REFLECT( graphene::chain::asset_options,
             (extensions)
           )
 
-FC_REFLECT( graphene::chain::asset_create_operation::fee_parameters_type, (symbol3)(symbol4)(long_symbol)(price_per_kbyte) )
-FC_REFLECT( graphene::chain::asset_update_operation::fee_parameters_type, (fee)(price_per_kbyte) )
-FC_REFLECT( graphene::chain::asset_issue_operation::fee_parameters_type, (fee)(price_per_kbyte) )
-FC_REFLECT( graphene::chain::asset_reserve_operation::fee_parameters_type, (fee) )
+FC_REFLECT( graphene::chain::asset_create_operation::fee_parameters_type, (symbol3)(symbol4)(long_symbol)(price_per_kbyte)(ufee)(ufee_pkb) )
+FC_REFLECT( graphene::chain::asset_update_operation::fee_parameters_type, (fee)(price_per_kbyte)(ufee)(ufee_pkb) )
+FC_REFLECT( graphene::chain::asset_issue_operation::fee_parameters_type, (fee)(price_per_kbyte)(ufee)(ufee_pkb) )
+FC_REFLECT( graphene::chain::asset_reserve_operation::fee_parameters_type, (fee)(ufee) )
 
 
 FC_REFLECT( graphene::chain::asset_create_operation,

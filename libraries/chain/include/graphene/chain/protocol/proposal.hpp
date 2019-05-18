@@ -71,6 +71,7 @@ namespace graphene { namespace chain {
        struct fee_parameters_type { 
           uint64_t fee            = 20 * GRAPHENE_BLOCKCHAIN_PRECISION; 
           uint32_t price_per_kbyte = 10;
+          uint64_t ufee = 0;      //SDR fee per operation
        };
 
        asset              fee;
@@ -122,6 +123,7 @@ namespace graphene { namespace chain {
       struct fee_parameters_type { 
          uint64_t fee            = 20 * GRAPHENE_BLOCKCHAIN_PRECISION; 
          uint32_t price_per_kbyte = 10;
+         uint64_t ufee = 0;      //SDR fee per operation
       };
 
       account_id_type            fee_paying_account;
@@ -159,7 +161,10 @@ namespace graphene { namespace chain {
     */
    struct proposal_delete_operation : public base_operation
    {
-      struct fee_parameters_type { uint64_t fee =  GRAPHENE_BLOCKCHAIN_PRECISION; };
+      struct fee_parameters_type { 
+        uint64_t fee =  GRAPHENE_BLOCKCHAIN_PRECISION; 
+        uint64_t ufee = 0;      //SDR fee per operation
+      };
 
       account_id_type   fee_paying_account;
       bool              using_owner_authority = false;
@@ -177,9 +182,9 @@ namespace graphene { namespace chain {
    
 }} // graphene::chain
 
-FC_REFLECT( graphene::chain::proposal_create_operation::fee_parameters_type, (fee)(price_per_kbyte) )
-FC_REFLECT( graphene::chain::proposal_update_operation::fee_parameters_type, (fee)(price_per_kbyte) )
-FC_REFLECT( graphene::chain::proposal_delete_operation::fee_parameters_type, (fee) )
+FC_REFLECT( graphene::chain::proposal_create_operation::fee_parameters_type, (fee)(price_per_kbyte)(ufee) )
+FC_REFLECT( graphene::chain::proposal_update_operation::fee_parameters_type, (fee)(price_per_kbyte)(ufee) )
+FC_REFLECT( graphene::chain::proposal_delete_operation::fee_parameters_type, (fee)(ufee) )
 
 FC_REFLECT( graphene::chain::proposal_create_operation, (fee)(ufee)(fee_paying_account)(expiration_time)
             (proposed_ops)(review_period_seconds)(extensions) )

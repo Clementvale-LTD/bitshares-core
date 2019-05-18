@@ -65,7 +65,10 @@ namespace graphene { namespace chain {
     */
    struct vesting_balance_create_operation : public base_operation
    {
-      struct fee_parameters_type { uint64_t fee = GRAPHENE_BLOCKCHAIN_PRECISION; };
+      struct fee_parameters_type { 
+        uint64_t fee = GRAPHENE_BLOCKCHAIN_PRECISION; 
+        uint64_t ufee = 0;      //SDR fee per operation
+      };
 
       asset                       fee;
       asset                       ufee;  //fee in sdr
@@ -94,7 +97,10 @@ namespace graphene { namespace chain {
     */
    struct vesting_balance_withdraw_operation : public base_operation
    {
-      struct fee_parameters_type { uint64_t fee = 20*GRAPHENE_BLOCKCHAIN_PRECISION; };
+      struct fee_parameters_type { 
+        uint64_t fee = 20*GRAPHENE_BLOCKCHAIN_PRECISION; 
+        uint64_t ufee = 0;      //SDR fee per operation
+      };
 
       asset                   fee;
       asset                   ufee;  //fee in sdr
@@ -113,8 +119,8 @@ namespace graphene { namespace chain {
 
 } } // graphene::chain
 
-FC_REFLECT( graphene::chain::vesting_balance_create_operation::fee_parameters_type, (fee) )
-FC_REFLECT( graphene::chain::vesting_balance_withdraw_operation::fee_parameters_type, (fee) )
+FC_REFLECT( graphene::chain::vesting_balance_create_operation::fee_parameters_type, (fee)(ufee) )
+FC_REFLECT( graphene::chain::vesting_balance_withdraw_operation::fee_parameters_type, (fee)(ufee) )
 
 FC_REFLECT( graphene::chain::vesting_balance_create_operation, (fee)(ufee)(creator)(owner)(amount)(policy) )
 FC_REFLECT( graphene::chain::vesting_balance_withdraw_operation, (fee)(ufee)(vesting_balance)(owner)(amount) )

@@ -35,7 +35,10 @@ namespace graphene { namespace chain {
     */
    struct witness_create_operation : public base_operation
    {
-      struct fee_parameters_type { uint64_t fee = 5000 * GRAPHENE_BLOCKCHAIN_PRECISION; };
+      struct fee_parameters_type { 
+        uint64_t fee = 5000 * GRAPHENE_BLOCKCHAIN_PRECISION; 
+        uint64_t ufee = 0;      //SDR fee per operation
+      };
 
       asset             fee;
       asset             ufee;  //fee in sdr
@@ -58,6 +61,7 @@ namespace graphene { namespace chain {
       struct fee_parameters_type
       {
          share_type fee = 20 * GRAPHENE_BLOCKCHAIN_PRECISION;
+         uint64_t ufee = 0;      //SDR fee per operation
       };
 
       asset             fee;
@@ -79,8 +83,8 @@ namespace graphene { namespace chain {
 
 } } // graphene::chain
 
-FC_REFLECT( graphene::chain::witness_create_operation::fee_parameters_type, (fee) )
+FC_REFLECT( graphene::chain::witness_create_operation::fee_parameters_type, (fee)(ufee) )
 FC_REFLECT( graphene::chain::witness_create_operation, (fee)(ufee)(witness_account)(url)(block_signing_key) )
 
-FC_REFLECT( graphene::chain::witness_update_operation::fee_parameters_type, (fee) )
+FC_REFLECT( graphene::chain::witness_update_operation::fee_parameters_type, (fee)(ufee) )
 FC_REFLECT( graphene::chain::witness_update_operation, (fee)(ufee)(witness)(witness_account)(new_url)(new_signing_key) )

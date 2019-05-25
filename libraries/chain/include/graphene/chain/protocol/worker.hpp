@@ -44,6 +44,7 @@ struct service_create_operation : public base_operation
 
    account_id_type   fee_payer()const { return owner; }
    void              validate()const;
+   dualfee           calculate_fee(const fee_parameters_type& k)const;
 };  
 
 struct service_update_operation : public base_operation
@@ -64,6 +65,7 @@ struct service_update_operation : public base_operation
 
    account_id_type   fee_payer()const { return owner; }
    void              validate()const;
+   dualfee           calculate_fee(const fee_parameters_type& k)const;
 };  
 
 struct bid_request_create_operation : public base_operation
@@ -88,6 +90,7 @@ struct bid_request_create_operation : public base_operation
 
    account_id_type   fee_payer()const { return owner; }
    void              validate()const;
+   dualfee           calculate_fee(const fee_parameters_type& k)const;
 };
 
 struct bid_request_expired_operation : public base_operation
@@ -104,7 +107,7 @@ struct bid_request_expired_operation : public base_operation
   account_id_type fee_payer()const { return fee_paying_account; }
   void            validate()const { FC_ASSERT( !"virtual operation" ); }
   /// This is a virtual operation; there is no fee
-  dualfee      calculate_fee(const fee_parameters_type& k)const { return dualfee{0,0}; }
+  dualfee         calculate_fee(const fee_parameters_type& k)const { return dualfee{0,0}; }
 };
 
 struct bid_request_cancel_operation : public base_operation
@@ -123,6 +126,7 @@ struct bid_request_cancel_operation : public base_operation
 
   account_id_type fee_payer()const { return fee_paying_account; }
   void            validate()const;
+  dualfee         calculate_fee(const fee_parameters_type& k)const;
 };
 
 struct bid_create_operation : public base_operation
@@ -146,6 +150,7 @@ struct bid_create_operation : public base_operation
    
    account_id_type   fee_payer()const { return owner; }
    void              validate()const;
+   dualfee           calculate_fee(const fee_parameters_type& k)const;
 };
 
 struct bid_expired_operation : public base_operation
@@ -181,6 +186,7 @@ struct bid_cancel_operation : public base_operation
 
   account_id_type fee_payer()const { return fee_paying_account; }
   void            validate()const;
+  dualfee         calculate_fee(const fee_parameters_type& k)const;
 };
 
 struct accumulated_sdr_fee_operation : public base_operation

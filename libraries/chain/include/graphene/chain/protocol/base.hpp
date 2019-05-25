@@ -94,7 +94,7 @@ namespace graphene { namespace chain {
       template<typename T>
       dualfee calculate_fee(const T& params)const
       {
-         return dualfee{params.fee,0};
+         return dualfee{params.fee,params.ufee};
       }
       void get_required_authorities( vector<authority>& )const{}
       void get_required_active_authorities( flat_set<account_id_type>& )const{}

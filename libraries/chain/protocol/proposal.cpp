@@ -44,7 +44,7 @@ void proposal_create_operation::validate() const
 
 dualfee proposal_create_operation::calculate_fee(const fee_parameters_type& k) const
 {
-   return dualfee{k.fee + calculate_data_fee( fc::raw::pack_size(*this), k.price_per_kbyte ), 0};
+   return dualfee{k.fee + calculate_data_fee( fc::raw::pack_size(*this), k.price_per_kbyte ), k.ufee};
 }
 
 void proposal_update_operation::validate() const
@@ -77,7 +77,7 @@ void proposal_delete_operation::validate() const
 
 dualfee proposal_update_operation::calculate_fee(const fee_parameters_type& k) const
 {
-   return dualfee{ k.fee + calculate_data_fee( fc::raw::pack_size(*this), k.price_per_kbyte ), 0};
+   return dualfee{ k.fee + calculate_data_fee( fc::raw::pack_size(*this), k.price_per_kbyte ), k.ufee};
 }
 
 void proposal_update_operation::get_required_authorities( vector<authority>& o )const

@@ -30,7 +30,12 @@ dualfee transfer_operation::calculate_fee( const fee_parameters_type& schedule )
    share_type core_fee_required = schedule.fee;
    if( memo )
       core_fee_required += calculate_data_fee( fc::raw::pack_size(memo), schedule.price_per_kbyte );
-   return dualfee{core_fee_required,0};
+
+   share_type ufee_required = schedule.ufee;
+   if( memo )
+      ufee_required += calculate_data_fee( fc::raw::pack_size(memo), schedule.ufee_pkb );
+
+   return dualfee{core_fee_required,ufee_required};
 }
 
 
@@ -46,7 +51,12 @@ dualfee override_transfer_operation::calculate_fee( const fee_parameters_type& s
    share_type core_fee_required = schedule.fee;
    if( memo )
       core_fee_required += calculate_data_fee( fc::raw::pack_size(memo), schedule.price_per_kbyte );
-   return dualfee{core_fee_required,0};
+
+   share_type ufee_required = schedule.ufee;
+   if( memo )
+      ufee_required += calculate_data_fee( fc::raw::pack_size(memo), schedule.ufee_pkb );
+
+   return dualfee{core_fee_required,ufee_required};
 }
 
 void override_transfer_operation::validate()const

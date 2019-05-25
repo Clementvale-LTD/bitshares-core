@@ -84,4 +84,42 @@ void  bid_cancel_operation::validate()const
    FC_ASSERT( fee.amount >= 0 );
 }
 
+dualfee service_create_operation::calculate_fee(const fee_parameters_type& k)const
+{
+   share_type ufee_required = k.ufee + calculate_data_fee( fc::raw::pack_size(p_memo), k.ufee_pkb );
+   return dualfee{k.fee, ufee_required};
+}
+
+dualfee service_update_operation::calculate_fee(const fee_parameters_type& k)const
+{
+   share_type ufee_required = k.ufee + calculate_data_fee( fc::raw::pack_size(p_memo), k.ufee_pkb );
+   return dualfee{k.fee, ufee_required};
+}
+
+dualfee bid_request_create_operation::calculate_fee(const fee_parameters_type& k)const
+{
+   share_type ufee_required = k.ufee + calculate_data_fee( 
+     fc::raw::pack_size(p_memo) +
+     fc::raw::pack_size(assets) + 
+     fc::raw::pack_size(providers), 
+     k.ufee_pkb );
+   return dualfee{k.fee, ufee_required};
+}
+
+dualfee bid_request_cancel_operation::calculate_fee(const fee_parameters_type& k)const
+{
+   return dualfee{k.fee, k.ufee};
+}
+
+dualfee bid_create_operation::calculate_fee(const fee_parameters_type& k)const
+{
+   share_type ufee_required = k.ufee + calculate_data_fee( fc::raw::pack_size(p_memo), k.ufee_pkb );
+   return dualfee{k.fee, ufee_required};
+}
+
+dualfee bid_cancel_operation::calculate_fee(const fee_parameters_type& k)const
+{
+   return dualfee{k.fee, k.ufee};
+}
+
 } }

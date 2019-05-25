@@ -71,7 +71,11 @@ bool is_valid_symbol( const string& symbol )
 
 dualfee asset_issue_operation::calculate_fee(const fee_parameters_type& k)const
 {
-   return dualfee{ k.fee + calculate_data_fee( fc::raw::pack_size(memo), k.price_per_kbyte ), 0};
+   share_type ufee_required = k.ufee;
+   if( memo )
+      ufee_required += calculate_data_fee( fc::raw::pack_size(memo), k.ufee_pkb );
+
+   return dualfee{ k.fee + calculate_data_fee( fc::raw::pack_size(memo), k.price_per_kbyte ), ufee_required};
 }
 
 dualfee asset_create_operation::calculate_fee(const asset_create_operation::fee_parameters_type& param)const
@@ -90,7 +94,9 @@ dualfee asset_create_operation::calculate_fee(const asset_create_operation::fee_
    // common_options contains several lists and a string. Charge fees for its size
    core_fee_required += calculate_data_fee( fc::raw::pack_size(*this), param.price_per_kbyte );
 
-   return dualfee{ core_fee_required, 0};
+   share_type ufee_required = param.ufee + calculate_data_fee( fc::raw::pack_size(common_options), param.ufee_pkb );
+
+   return dualfee{ core_fee_required, ufee_required};
 }
 
 void  asset_create_operation::validate()const
@@ -112,7 +118,8 @@ void asset_update_operation::validate()const
 
 dualfee asset_update_operation::calculate_fee(const asset_update_operation::fee_parameters_type& k)const
 {
-   return dualfee{ k.fee + calculate_data_fee( fc::raw::pack_size(*this), k.price_per_kbyte ), 0};
+  share_type ufee_required = k.ufee + calculate_data_fee( fc::raw::pack_size(new_options), k.ufee_pkb );
+  return dualfee{ k.fee + calculate_data_fee( fc::raw::pack_size(*this), k.price_per_kbyte ), ufee_required};
 }
 
 void asset_reserve_operation::validate()const

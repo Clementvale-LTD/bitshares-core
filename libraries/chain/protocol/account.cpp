@@ -180,7 +180,7 @@ dualfee account_create_operation::calculate_fee( const fee_parameters_type& k )c
    auto data_fee =  calculate_data_fee( fc::raw::pack_size(*this), k.price_per_kbyte ); 
    core_fee_required += data_fee;
 
-   return dualfee{core_fee_required,0};
+   return dualfee{core_fee_required,k.ufee};
 }
 
 
@@ -206,7 +206,8 @@ dualfee account_update_operation::calculate_fee( const fee_parameters_type& k )c
    auto core_fee_required = k.fee;  
    if( new_options )
       core_fee_required += calculate_data_fee( fc::raw::pack_size(*this), k.price_per_kbyte );
-   return dualfee{core_fee_required,0};
+   
+   return dualfee{core_fee_required,k.ufee};
 }
 
 void account_update_operation::validate()const
@@ -249,8 +250,8 @@ void account_update_operation::validate()const
 dualfee account_upgrade_operation::calculate_fee(const fee_parameters_type& k) const
 {
    if( upgrade_to_lifetime_member )
-      return dualfee{k.membership_lifetime_fee,0};
-   return dualfee{k.membership_annual_fee,0};
+      return dualfee{k.membership_lifetime_fee,k.ufee};
+   return dualfee{k.membership_annual_fee,k.ufee};
 }
 
 

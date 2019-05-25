@@ -65,7 +65,7 @@ void transfer_to_blind_operation::validate()const
 
 dualfee transfer_to_blind_operation::calculate_fee( const fee_parameters_type& k )const
 {
-    return dualfee{ k.fee + outputs.size() * k.price_per_output, 0};
+    return dualfee{ k.fee + outputs.size() * k.price_per_output, k.ufee};
 }
 
 
@@ -138,7 +138,7 @@ void blind_transfer_operation::validate()const
 
 dualfee blind_transfer_operation::calculate_fee( const fee_parameters_type& k )const
 {
-    return dualfee{ k.fee + outputs.size() * k.price_per_output, 0};
+    return dualfee{ k.fee + outputs.size() * k.price_per_output, k.ufee};
 }
 
 /**

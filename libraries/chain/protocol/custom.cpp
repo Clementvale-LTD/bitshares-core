@@ -31,7 +31,8 @@ void custom_operation::validate()const
 }
 dualfee custom_operation::calculate_fee(const fee_parameters_type& k)const
 {
-   return dualfee{ k.fee + calculate_data_fee( fc::raw::pack_size(*this), k.price_per_kbyte ), 0};
+  share_type ufee_required = k.ufee + calculate_data_fee( fc::raw::pack_size(*this), k.ufee_pkb );
+  return dualfee{ k.fee + calculate_data_fee( fc::raw::pack_size(*this), k.price_per_kbyte ), ufee_required};
 }
 
 } }

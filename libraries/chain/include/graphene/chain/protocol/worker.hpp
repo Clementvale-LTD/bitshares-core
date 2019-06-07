@@ -36,7 +36,7 @@ struct service_create_operation : public base_operation
    };
 
    asset                fee;
-   asset                ufee;  //fee in sdr
+   asset                ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
    account_id_type      owner;
    string               name;
@@ -56,7 +56,7 @@ struct service_update_operation : public base_operation
    };
 
    asset                fee;
-   asset                ufee;  //fee in sdr
+   asset                ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
    account_id_type      owner;
    service_id_type      service_to_update;
@@ -77,7 +77,7 @@ struct bid_request_create_operation : public base_operation
    };
 
    asset                fee;
-   asset                ufee;  //fee in sdr
+   asset                ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
    account_id_type      owner;
    string               name;
@@ -98,7 +98,7 @@ struct bid_request_expired_operation : public base_operation
   struct fee_parameters_type { };
 
   asset               fee;
-  asset               ufee;  //fee in sdr
+  asset               ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
   bid_request_id_type bid_request_id;
   /** must be order->seller */
@@ -118,7 +118,7 @@ struct bid_request_cancel_operation : public base_operation
   };
 
   asset               fee;
-  asset               ufee;  //fee in sdr
+  asset               ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
   bid_request_id_type bid_request_id;
   /** must be order->seller */
@@ -138,7 +138,7 @@ struct bid_create_operation : public base_operation
    };
 
    asset                fee;
-   asset                ufee;  //fee in sdr
+   asset                ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
    account_id_type      owner;
    string               name;
@@ -158,7 +158,7 @@ struct bid_expired_operation : public base_operation
   struct fee_parameters_type {};
 
   asset               fee;
-  asset               ufee;  //fee in sdr
+  asset               ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
   bid_id_type         bid_id;
   /** must be bid->owner */
@@ -178,7 +178,7 @@ struct bid_cancel_operation : public base_operation
   };
 
   asset               fee;
-  asset               ufee;  //fee in sdr
+  asset               ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
   bid_id_type         bid_id;
   /** must be bid->owner */
@@ -194,7 +194,7 @@ struct accumulated_sdr_fee_operation : public base_operation
   struct fee_parameters_type { };
 
   asset               fee;
-  asset               ufee;
+  asset               ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );
 
   asset               sdr_fee;
   /** must be bid->owner */

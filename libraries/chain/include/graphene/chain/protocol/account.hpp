@@ -81,7 +81,7 @@ namespace graphene { namespace chain {
       };
 
       asset           fee;
-      asset           ufee;  //fee in sdr
+      asset           ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       /// This account pays the fee. Must be a lifetime member.
       account_id_type registrar;
@@ -128,7 +128,7 @@ namespace graphene { namespace chain {
       };
 
       asset      fee;
-      asset      ufee;  //fee in sdr
+      asset      ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       /// The account to update
       account_id_type account;
@@ -178,7 +178,7 @@ namespace graphene { namespace chain {
       };
 
       asset             fee;
-      asset             ufee;  //fee in sdr
+      asset             ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
       /// The account to upgrade; must not already be a lifetime member
       account_id_type   account_to_upgrade;
       /// If true, the account will be upgraded to a lifetime member; otherwise, it will add a year to the subscription

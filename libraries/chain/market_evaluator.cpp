@@ -71,6 +71,7 @@ void_result limit_order_create_evaluator::do_evaluate(const limit_order_create_o
 void limit_order_create_evaluator::pay_fee()
 {
    _deferred_fee = fee_from_account.amount;
+   _deferred_ufee = ufee_from_account.amount;
 }
 
 object_id_type limit_order_create_evaluator::do_apply(const limit_order_create_operation& op)
@@ -109,6 +110,7 @@ object_id_type limit_order_create_evaluator::do_apply(const limit_order_create_o
        obj.bid_id = op.bid_id; 
 
        obj.deferred_fee = _deferred_fee;
+       obj.deferred_ufee = _deferred_ufee;
    });
    limit_order_id_type order_id = new_order_object.id; // save this because we may remove the object by filling it
    bool filled = db().apply_order(new_order_object);

@@ -155,6 +155,7 @@ namespace graphene { namespace chain {
          auto result = eval->do_apply(op);
 
          db_adjust_balance(op.fee_payer(), -fee_from_account);
+         db_adjust_balance(op.fee_payer(), -ufee_from_account);
 
          return result;
       }

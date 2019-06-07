@@ -71,7 +71,7 @@ namespace graphene { namespace chain {
       };
 
       asset                       fee;
-      asset                       ufee;  //fee in sdr
+      asset                       ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       account_id_type             creator; ///< Who provides funds initially
       account_id_type             owner; ///< Who is able to withdraw the balance
@@ -103,7 +103,7 @@ namespace graphene { namespace chain {
       };
 
       asset                   fee;
-      asset                   ufee;  //fee in sdr
+      asset                   ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       vesting_balance_id_type vesting_balance;
       account_id_type         owner; ///< Must be vesting_balance.owner

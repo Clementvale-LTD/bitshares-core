@@ -388,6 +388,9 @@ void database::init_genesis(const genesis_state_type& genesis_state)
          cop.active = authority(1, account.active_key, 1);
          cop.options.memo_key = account.active_key;
       }
+//      cop.fee = asset();
+//      cop.ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );
+
       account_id_type account_id(apply_operation(genesis_eval_state, cop).get<object_id_type>());
 
       if( account.is_lifetime_member )
@@ -395,6 +398,8 @@ void database::init_genesis(const genesis_state_type& genesis_state)
           account_upgrade_operation op;
           op.account_to_upgrade = account_id;
           op.upgrade_to_lifetime_member = true;
+//          op.fee = asset();
+//          op.ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );
           apply_operation(genesis_eval_state, op);
       }
    }
@@ -528,6 +533,8 @@ void database::init_genesis(const genesis_state_type& genesis_state)
       witness_create_operation op;
       op.witness_account = get_account_id(witness.owner_name);
       op.block_signing_key = witness.block_signing_key;
+//      op.fee = asset();
+//      op.ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );
       apply_operation(genesis_eval_state, op);
    });
 
@@ -536,6 +543,8 @@ void database::init_genesis(const genesis_state_type& genesis_state)
                  [&](const genesis_state_type::initial_committee_member_type& member) {
       committee_member_create_operation op;
       op.committee_member_account = get_account_id(member.owner_name);
+//      op.fee = asset();
+//      op.ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );
       apply_operation(genesis_eval_state, op);
    });
 

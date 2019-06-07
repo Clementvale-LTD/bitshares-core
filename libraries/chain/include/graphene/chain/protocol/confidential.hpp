@@ -154,7 +154,7 @@ struct transfer_to_blind_operation : public base_operation
    };
 
    asset                 fee;
-   asset                 ufee;  //fee in sdr
+   asset                 ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
    asset                 amount;
    account_id_type       from;
@@ -178,7 +178,7 @@ struct transfer_from_blind_operation : public base_operation
    };
 
    asset                 fee;
-   asset                 ufee;  //fee in sdr
+   asset                 ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
    
    asset                 amount;
    account_id_type       to;
@@ -247,7 +247,7 @@ struct blind_transfer_operation : public base_operation
    };
 
    asset                 fee;
-   asset                 ufee;  //fee in sdr
+   asset                 ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
    vector<blind_input>   inputs;
    vector<blind_output>  outputs;

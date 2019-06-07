@@ -95,7 +95,7 @@ namespace graphene { namespace chain {
       };
 
       asset                      fee;
-      asset                      ufee;  //fee in sdr
+      asset                      ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       account_id_type            fee_paying_account;
       vector<predicate>          predicates;

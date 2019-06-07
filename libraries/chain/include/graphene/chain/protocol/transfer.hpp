@@ -51,7 +51,7 @@ namespace graphene { namespace chain {
       };
 
       asset             fee;
-      asset            ufee;  //fee in sdr
+      asset            ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
       /// Account to transfer asset from
       account_id_type  from;
       /// Account to transfer asset to
@@ -86,7 +86,7 @@ namespace graphene { namespace chain {
       };
 
       asset           fee;
-      asset            ufee;  //fee in sdr
+      asset            ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       account_id_type issuer;
       /// Account to transfer asset from

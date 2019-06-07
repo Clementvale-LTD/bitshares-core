@@ -75,7 +75,7 @@ namespace graphene { namespace chain {
        };
 
        asset              fee;
-       asset              ufee;  //fee in sdr
+       asset              ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
  
        account_id_type    fee_paying_account;
        vector<op_wrapper> proposed_ops;
@@ -129,7 +129,7 @@ namespace graphene { namespace chain {
       account_id_type            fee_paying_account;
 
       asset                      fee;
-      asset                      ufee;  //fee in sdr
+      asset                      ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       proposal_id_type           proposal;
       flat_set<account_id_type>  active_approvals_to_add;
@@ -170,7 +170,7 @@ namespace graphene { namespace chain {
       bool              using_owner_authority = false;
 
       asset             fee;
-      asset             ufee;  //fee in sdr
+      asset             ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       proposal_id_type  proposal;
       extensions_type   extensions;

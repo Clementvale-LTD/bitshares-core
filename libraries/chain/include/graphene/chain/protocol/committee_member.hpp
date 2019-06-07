@@ -42,7 +42,7 @@ namespace graphene { namespace chain {
       };
 
       asset                                 fee;
-      asset                                 ufee;  //fee in sdr
+      asset                                 ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       /// The account which owns the committee_member. This account pays the fee for this operation.
       account_id_type                       committee_member_account;
@@ -67,7 +67,7 @@ namespace graphene { namespace chain {
       };
 
       asset                                 fee;
-      asset                                 ufee;  //fee in sdr
+      asset                                 ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       /// The committee member to update.
       committee_member_id_type              committee_member;
@@ -98,7 +98,7 @@ namespace graphene { namespace chain {
       };
 
       asset             fee;
-      asset             ufee;  //fee in sdr
+      asset             ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       chain_parameters  new_parameters;
 
@@ -114,7 +114,7 @@ namespace graphene { namespace chain {
       };
 
       asset             fee;
-      asset             ufee;  //fee in sdr
+      asset             ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       account_id_type   account_to_lock;
       bool              lock;  

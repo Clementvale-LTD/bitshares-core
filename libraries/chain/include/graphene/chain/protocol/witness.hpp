@@ -41,7 +41,7 @@ namespace graphene { namespace chain {
       };
 
       asset             fee;
-      asset             ufee;  //fee in sdr
+      asset             ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       /// The account which owns the witness. This account pays the fee for this operation.
       account_id_type   witness_account;
@@ -65,7 +65,7 @@ namespace graphene { namespace chain {
       };
 
       asset             fee;
-      asset             ufee;  //fee in sdr
+      asset             ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
       /// The witness object to update.
       witness_id_type   witness;
       /// The account which owns the witness. This account pays the fee for this operation.

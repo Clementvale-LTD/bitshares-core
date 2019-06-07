@@ -54,7 +54,7 @@ namespace graphene { namespace chain {
       };
 
       asset             fee;
-      asset             ufee;  //fee in sdr
+      asset             ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       /// The account authorizing withdrawals from its balances
       account_id_type   withdraw_from_account;
@@ -92,7 +92,7 @@ namespace graphene { namespace chain {
       };
 
       asset                         fee;
-      asset                         ufee;  //fee in sdr
+      asset                         ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       /// This account pays the fee. Must match permission_to_update->withdraw_from_account
       account_id_type               withdraw_from_account;
@@ -137,7 +137,7 @@ namespace graphene { namespace chain {
 
       /// Paid by withdraw_to_account
       asset                       fee;
-      asset                       ufee;  //fee in sdr
+      asset                       ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       /// ID of the permission authorizing this withdrawal
       withdraw_permission_id_type withdraw_permission;
@@ -171,7 +171,7 @@ namespace graphene { namespace chain {
       };
 
       asset                         fee;
-      asset                         ufee;  //fee in sdr
+      asset                         ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       /// Must match withdrawal_permission->withdraw_from_account. This account pays the fee.
       account_id_type               withdraw_from_account;

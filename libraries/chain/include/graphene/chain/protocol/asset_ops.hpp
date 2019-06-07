@@ -86,7 +86,7 @@ namespace graphene { namespace chain {
       };
 
       asset                   fee;
-      asset                   ufee;  //fee in sdr
+      asset                   ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
     
       /// This account must sign and pay the fee for this operation. Later, this account may update the asset
       account_id_type         issuer;
@@ -135,7 +135,7 @@ namespace graphene { namespace chain {
       asset_update_operation(){}
 
       asset           fee;
-      asset           ufee;  //fee in sdr
+      asset           ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       account_id_type issuer;
       asset_id_type   asset_to_update;
@@ -163,7 +163,7 @@ namespace graphene { namespace chain {
       };
 
       asset            fee;
-      asset            ufee;  //fee in sdr
+      asset            ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       account_id_type  issuer; ///< Must be asset_to_issue->asset_id->issuer
       asset            asset_to_issue;
@@ -193,7 +193,7 @@ namespace graphene { namespace chain {
       };
 
       asset             fee;
-      asset             ufee;  //fee in sdr
+      asset             ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       account_id_type   payer;
       asset             amount_to_reserve;

@@ -129,6 +129,13 @@ namespace graphene { namespace chain {
       {
          memset( (char*)&op, 0, sizeof(op) );
       }
+      result_type operator()(  limit_order_create_operation::fee_parameters_type & op )const
+      {
+        op.fee = 0; 
+        op.ufee = 0;
+        op.ufee_pkb = 0;
+        op.accufee.clear();
+      }
    };
 
    void fee_schedule::zero_all_fees()

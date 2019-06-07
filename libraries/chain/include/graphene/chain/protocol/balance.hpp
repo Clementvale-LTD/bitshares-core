@@ -38,7 +38,7 @@ namespace graphene { namespace chain {
       struct fee_parameters_type {};
 
       asset             fee;
-      asset             ufee;  //fee in sdr
+      asset             ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       account_id_type   deposit_to_account;
       balance_id_type   balance_to_claim;

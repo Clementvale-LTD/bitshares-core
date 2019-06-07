@@ -47,14 +47,21 @@ namespace graphene { namespace chain {
     */
    struct limit_order_create_operation : public base_operation
    {
+      struct sales_ufee
+      {
+        uint64_t  usell;
+        uint64_t  ubuy;
+      };
+
       struct fee_parameters_type { 
         uint64_t fee = 5 * GRAPHENE_BLOCKCHAIN_PRECISION; 
         uint64_t ufee = 0;      //SDR fee per operation
         uint64_t ufee_pkb = 0;  //SDR fee per kilobyte in memo
+        std::map< int, sales_ufee > accufee;
       };
 
       asset           fee;
-      asset           ufee;  //fee in sdr
+      asset           ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
       
       account_id_type seller;
       asset           amount_to_sell;
@@ -96,7 +103,7 @@ namespace graphene { namespace chain {
       };
 
       asset           fee;
-      asset           ufee;  //fee in sdr
+      asset           ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       account_id_type seller;
       asset_id_type asset_id_to_sell;
@@ -127,7 +134,7 @@ namespace graphene { namespace chain {
       limit_order_accepted_operation() {}
 
       asset          fee;
-      asset          ufee;  //fee in sdr
+      asset          ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       object_id_type      order_id;
       account_id_type     order_creator_account_id;
@@ -162,7 +169,7 @@ namespace graphene { namespace chain {
       };
 
       asset               fee;
-      asset               ufee;  //fee in sdr
+      asset               ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       limit_order_id_type order;
       /** must be order->seller */
@@ -211,7 +218,7 @@ namespace graphene { namespace chain {
       asset               receives;
 
       asset               fee; // paid by receiving account
-      asset               ufee;  //fee in sdr
+      asset               ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       price               fill_price;
       bool                is_maker;
@@ -256,7 +263,7 @@ namespace graphene { namespace chain {
       asset               debt;
       asset               collateral;
       asset               fee;
-      asset               ufee;  //fee in sdr
+      asset               ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
 
       account_id_type fee_payer()const { return bidder; }
       void            validate()const { FC_ASSERT( !"virtual operation" ); }
@@ -266,7 +273,8 @@ namespace graphene { namespace chain {
    };
 } } // graphene::chain
 
-FC_REFLECT( graphene::chain::limit_order_create_operation::fee_parameters_type, (fee)(ufee)(ufee_pkb) )
+FC_REFLECT( graphene::chain::limit_order_create_operation::sales_ufee, (usell)(ubuy) )
+FC_REFLECT( graphene::chain::limit_order_create_operation::fee_parameters_type, (fee)(ufee)(ufee_pkb)(accufee) )
 FC_REFLECT( graphene::chain::limit_order_cancel_operation::fee_parameters_type, (fee)(ufee) )
 FC_REFLECT( graphene::chain::fill_order_operation::fee_parameters_type,  ) // VIRTUAL
 FC_REFLECT( graphene::chain::execute_bid_operation::fee_parameters_type,  ) // VIRTUAL

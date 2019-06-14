@@ -757,6 +757,7 @@ class wallet_api
       signed_transaction register_account(string name,
                                           public_key_type owner,
                                           public_key_type active,
+                                          uint16_t level, 
                                           string  registrar_account,
                                           bool broadcast = false);
 
@@ -797,6 +798,13 @@ class wallet_api
        * @returns the signed transaction upgrading the account
        */
       signed_transaction upgrade_account(string name, bool broadcast);
+
+      /*
+        Changes level of the account
+        * @param name the name or id of the account to upgrade
+        * @param level new level
+      */
+      signed_transaction set_account_level(string name, uint16_t level, bool broadcast);
 
       /** Creates a new account and registers it on the blockchain.
        *
@@ -1686,6 +1694,7 @@ FC_API( graphene::wallet::wallet_api,
         (remove_account_key)
         (upgrade_account)
         (create_account_with_brain_key)
+        (set_account_level)
         (sell_asset)
         (accept_limit_order)
         (sell)

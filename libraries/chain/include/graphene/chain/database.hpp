@@ -333,7 +333,7 @@ namespace graphene { namespace chain {
 
          //////////////////// db_market.cpp ////////////////////
 
-         void cancel_order(const limit_order_object& order, bool create_virtual_op = true);
+         void cancel_order(const limit_order_object& order);
 
          /**
           * @brief Process a new limit order through the markets
@@ -366,9 +366,6 @@ namespace graphene { namespace chain {
          int match( const limit_order_object& bid, const OrderType& ask, const price& match_price );
          int match( const limit_order_object& bid, const limit_order_object& ask, const price& trade_price );
          ///@}
-
-         asset sdr_amount_to_umt_fee_to_reserve( share_type sdr_amount);
-         asset sdr_amount_to_umt_fee_to_pay( share_type sdr_amount_to_pay, share_type sdr_amount_in_order, asset sdr_amount_fee_reserved );
 
          /**
           * @return true if the order was completely filled and thus freed.

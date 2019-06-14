@@ -29,19 +29,6 @@
 
 namespace graphene { namespace chain {
 
-share_type cut_fee(share_type a, uint16_t p)
-{
-   if( a == 0 || p == 0 )
-      return 0;
-   if( p == GRAPHENE_100_PERCENT )
-      return a;
-
-   fc::uint128 r(a.value);
-   r *= p;
-   r /= GRAPHENE_100_PERCENT;
-   return r.to_uint64();
-}
-
 void account_balance_object::adjust_balance(const asset& delta)
 {
    assert(delta.asset_id == asset_type);
@@ -50,6 +37,8 @@ void account_balance_object::adjust_balance(const asset& delta)
 
 void account_statistics_object::process_fees(const account_object& a, database& d) const
 {
+// SM: do nothing here; We route fees without account_statistics_object now
+#if 0  
    if( pending_fees > 0 || pending_vested_fees > 0 )
    {
       auto pay_out_fees = [&](const account_object& account, share_type core_fee_total, bool require_vesting)
@@ -80,16 +69,33 @@ void account_statistics_object::process_fees(const account_object& a, database& 
          s.pending_ufees = 0;
       });
    }
+#endif   
 }
 
-void account_statistics_object::pay_fee( share_type core_fee, share_type cashback_vesting_threshold, share_type sdr_fee )
+void account_statistics_object::pay_fee( account_id_type from, asset fee, asset ufee, database& d )
 {
-   if( core_fee > cashback_vesting_threshold )
-      pending_fees += core_fee;
-   else
-      pending_vested_fees += core_fee;
-   
-   pending_ufees += sdr_fee;
+  if( fee.amount > 0 ){
+    d.adjust_balance( GRAPHENE_UMT_FEE_POOL_ACCOUNT, fee);
+    if( fee.asset_id == asset_id_type()){
+      total_fees += fee.amount;
+    }
+  }
+  if( ufee.amount > 0){
+    d.adjust_balance( GRAPHENE_UMT_FEE_POOL_ACCOUNT, ufee);
+    if( ufee.asset_id == GRAPHENE_SDR_ASSET_ID){
+      total_ufees += ufee.amount;
+    }
+  }
+
+  if( fee.amount > 0 || ufee.amount > 0){
+    fee_pay_operation op_fee_pay;
+    op_fee_pay.paid_fee = fee;
+    op_fee_pay.paid_ufee = ufee;
+    op_fee_pay.fee_from_account = from;
+    op_fee_pay.fee_to_account = GRAPHENE_UMT_FEE_POOL_ACCOUNT;
+
+    d.push_applied_operation( op_fee_pay);
+  }
 }
 
 set<account_id_type> account_member_index::get_account_members(const account_object& a)const

@@ -991,6 +991,7 @@ public:
    signed_transaction register_account(string name,
                                        public_key_type owner,
                                        public_key_type active,
+                                       uint16_t level,
                                        string  registrar_account,
                                        bool broadcast = false)
    { try {
@@ -1009,6 +1010,7 @@ public:
       account_create_op.owner = authority(1, owner, 1);
       account_create_op.active = authority(1, active, 1);
       account_create_op.options.memo_key = active;
+      account_create_op.options.feelevel = level;
 
       signed_transaction tx;
 
@@ -1082,6 +1084,31 @@ public:
 
       return sign_transaction( tx, broadcast );
    } FC_CAPTURE_AND_RETHROW( (name)(owner)(active)(broadcast) ) }
+
+
+   signed_transaction set_account_level(string name, uint16_t level, bool broadcast)
+   { try {
+
+      account_object account_object_to_modify = get_account(name);
+
+      if (account_object_to_modify.options.feelevel == level){
+         FC_THROW("Account ${account} already has feelevel ${level}",
+                  ("account", name)("level", level));
+      }
+      account_object_to_modify.options.feelevel = level;
+
+      account_update_operation account_update_op;
+      account_update_op.account = account_object_to_modify.id;
+      account_update_op.new_options = account_object_to_modify.options;
+
+      signed_transaction tx;
+      tx.operations.push_back( account_update_op );
+      set_operation_fees( tx, _remote_db->get_global_properties().parameters.current_fees);
+      tx.validate();
+
+      return sign_transaction( tx, broadcast );
+   } FC_CAPTURE_AND_RETHROW( (name)(level)(broadcast) ) }
+
    
    signed_transaction remove_account_key( string name,
                                           fc::optional<public_key_type> owner,
@@ -3347,10 +3374,11 @@ fc::ecc::private_key wallet_api::derive_private_key(const std::string& prefix_st
 signed_transaction wallet_api::register_account(string name,
                                                 public_key_type owner_pubkey,
                                                 public_key_type active_pubkey,
+                                                uint16_t level,
                                                 string  registrar_account,
                                                 bool broadcast)
 {
-   return my->register_account( name, owner_pubkey, active_pubkey, registrar_account, broadcast );
+   return my->register_account( name, owner_pubkey, active_pubkey, level, registrar_account, broadcast );
 }
 
 signed_transaction wallet_api::add_account_key( string name,
@@ -3359,6 +3387,11 @@ signed_transaction wallet_api::add_account_key( string name,
                                                 bool broadcast)
 {
    return my->add_account_key( name, owner_pubkey, active_pubkey, broadcast );
+}
+
+signed_transaction wallet_api::set_account_level(string name, uint16_t level, bool broadcast)
+{
+   return my->set_account_level( name, level, broadcast);
 }
 
 signed_transaction wallet_api::remove_account_key( string name,
@@ -3718,8 +3751,8 @@ string wallet_api::gethelp(const string& method)const
    }
    else if( method == "register_account" )
    {
-      ss << "usage: register_account ACCOUNT_NAME OWNER_PUBLIC_KEY ACTIVE_PUBLIC_KEY REGISTRAR REFERRER REFERRER_PERCENT BROADCAST\n\n";
-      ss << "example: register_account \"newaccount\" \"CORE6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV\" \"CORE6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV\" \"1.3.11\" \"1.3.11\" 50 true\n";
+      ss << "usage: register_account ACCOUNT_NAME OWNER_PUBLIC_KEY ACTIVE_PUBLIC_KEY LEVEL REGISTRAR BROADCAST\n\n";
+      ss << "example: register_account \"newaccount\" \"CORE6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV\" \"CORE6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV\" 0 \"1.3.11\" true\n";
       ss << "\n";
       ss << "Use this method to register an account for which you do not know the private keys.";
    }

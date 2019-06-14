@@ -41,17 +41,9 @@ namespace graphene { namespace chain {
          void_result do_evaluate( const limit_order_create_operation& o );
          object_id_type do_apply( const limit_order_create_operation& o );
 
-         /** override the default behavior defined by generic_evalautor which is to
-          * post the fee to fee_paying_account_stats.pending_fees
-          */
-         virtual void pay_fee() override;
-
-         share_type                          _deferred_fee   = 0;
-         share_type                          _deferred_ufee  = 0;
-         const limit_order_create_operation* _op            = nullptr;
-         const account_object*               _seller        = nullptr;
-         const asset_object*                 _sell_asset    = nullptr;
-         const asset_object*                 _receive_asset = nullptr;
+         share_type              _reserve_ufee = 0; 
+         uint64_t                _percent_ufee = 0; 
+         const account_object*   _seller        = nullptr;
    };
 
    class limit_order_accept_evaluator : public evaluator<limit_order_accept_evaluator>

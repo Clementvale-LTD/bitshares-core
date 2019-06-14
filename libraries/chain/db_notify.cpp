@@ -27,22 +27,10 @@ struct get_impacted_account_visitor
 
    void operator()( const limit_order_create_operation& op ) {}
    void operator()( const limit_order_accept_operation& op ) {}
-   void operator()( const limit_order_accepted_operation& op ) 
-   {
-      _impacted.insert( op.order_creator_account_id );
-   }
-   void operator()( const limit_order_cancel_operation& op )
-   {
-      _impacted.insert( op.fee_paying_account );
-   }
-   void operator()( const fill_order_operation& op )
-   {
-      _impacted.insert( op.account_id );
-   }
-   void operator()( const execute_bid_operation& op )
-   {
-      _impacted.insert( op.bidder );
-   }
+   void operator()( const limit_order_accepted_operation& op ){}
+   void operator()( const limit_order_cancel_operation& op ){}
+   void operator()( const limit_order_closed_operation& op ){}
+   void operator()( const fill_order_operation& op ){}
 
    void operator()( const account_create_operation& op )
    {
@@ -75,14 +63,8 @@ struct get_impacted_account_visitor
    }
 
    void operator()( const asset_reserve_operation& op ) {}
-   void operator()( const witness_create_operation& op )
-   {
-      _impacted.insert( op.witness_account );
-   }
-   void operator()( const witness_update_operation& op )
-   {
-      _impacted.insert( op.witness_account );
-   }
+   void operator()( const witness_create_operation& op ){}
+   void operator()( const witness_update_operation& op ){}
 
    void operator()( const proposal_create_operation& op )
    {
@@ -174,7 +156,7 @@ struct get_impacted_account_visitor
    void operator()( const bid_create_operation& op ){}
    void operator()( const bid_expired_operation& op ){}
    void operator()( const bid_cancel_operation& op ){}
-   void operator()( const accumulated_sdr_fee_operation& op ){
+   void operator()( const fee_pay_operation& op ){
       _impacted.insert( op.fee_to_account );
    }
 };

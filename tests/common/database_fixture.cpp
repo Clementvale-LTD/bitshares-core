@@ -160,15 +160,14 @@ void database_fixture::verify_asset_supplies( const database& db )
    for( const account_statistics_object& a : statistics_index )
    {
       reported_core_in_orders += a.total_core_in_orders;
-      total_balances[asset_id_type()] += a.pending_fees + a.pending_vested_fees;
-      total_balances[GRAPHENE_SDR_ASSET_ID] += a.pending_ufees;
+//      total_balances[asset_id_type()] += a.pending_fees + a.pending_vested_fees;
+//      total_balances[GRAPHENE_SDR_ASSET_ID] += a.pending_ufees;
    }
    for( const limit_order_object& o : db.get_index_type<limit_order_index>().indices() )
    {
       asset for_sale = o.amount_for_sale();
       if( for_sale.asset_id == asset_id_type() ) core_in_orders += for_sale.amount;
       total_balances[for_sale.asset_id] += for_sale.amount;
-      total_balances[asset_id_type()] += o.deferred_fee;
    }
    for( const asset_object& asset_obj : db.get_index_type<asset_index>().indices() )
    {

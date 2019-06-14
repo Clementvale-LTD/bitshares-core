@@ -3,7 +3,8 @@ from node_lib import *
 import json
 import getpass
 
-set_cli_wallet_url( "http://10.200.0.185:1227/rpc")
+# set_cli_wallet_url( "http://10.200.0.185:1227/rpc")
+set_cli_wallet_url( "http://127.0.0.1:1227/rpc")
 cli_password="smSecret"
 
 # template for JSON call
@@ -15,7 +16,6 @@ jsonrpc_call = json.loads(jsonrpc_call_s)
 jsonrpc_call["method"] = "about"
 jsonrpc_call["params"] = []
 call_cli_wallet( jsonrpc_call )
-
 
 jsonrpc_call["method"] = "info"
 jsonrpc_call["params"] = []
@@ -52,10 +52,6 @@ jsonrpc_call["method"] = "import_balance"
 jsonrpc_call["params"] = ["ptolemy", ["5JcA4UqWn8s3ktBaXxeLNcD8CgmWdHHvd9CRkDWtopcCPQVwG8f"], True]
 cli_response = call_cli_wallet( jsonrpc_call )
 
-jsonrpc_call["method"] = "upgrade_account"
-jsonrpc_call["params"] = ["ptolemy", True]
-cli_response = call_cli_wallet( jsonrpc_call )
- 
 jsonrpc_call["method"] = "import_key"
 jsonrpc_call["params"] = ["bank", "5KA96LxtCRmkcNwvWrB4QohaXKL3ysEUsddsEsVt5WEapn5Ckf5"]
 cli_response = call_cli_wallet( jsonrpc_call )
@@ -64,6 +60,14 @@ jsonrpc_call["method"] = "import_balance"
 jsonrpc_call["params"] = ["bank", ["5KA96LxtCRmkcNwvWrB4QohaXKL3ysEUsddsEsVt5WEapn5Ckf5"], True]
 cli_response = call_cli_wallet( jsonrpc_call )
 
+jsonrpc_call["method"] = "transfer"
+jsonrpc_call["params"] = ["bank", "ptolemy", 100000, "SDRT", "here is some SDRs", "true"]
+cli_response = call_cli_wallet( jsonrpc_call )
+
+jsonrpc_call["method"] = "upgrade_account"
+jsonrpc_call["params"] = ["ptolemy", True]
+cli_response = call_cli_wallet( jsonrpc_call )
+ 
 jsonrpc_call["method"] = "register_account"
 jsonrpc_call["params"] = ["bubbletone", "BTE7vEhUJxJE8WKC4GVEdee114WeHcfBfRA5B7NbheMNMqnAuHUwm", "BTE7vEhUJxJE8WKC4GVEdee114WeHcfBfRA5B7NbheMNMqnAuHUwm", "ptolemy", True]
 cli_response = call_cli_wallet( jsonrpc_call )
@@ -72,8 +76,13 @@ jsonrpc_call["method"] = "import_key"
 jsonrpc_call["params"] = ["bubbletone", "5KG2Uao68bRN8QmPaei1bYRdNc9r8wQP1TR3xfx2Y1hiE38ukxV"]
 cli_response = call_cli_wallet( jsonrpc_call )
 
+
 jsonrpc_call["method"] = "transfer"
 jsonrpc_call["params"] = ["ptolemy", "bubbletone", 1000000000, "BTE", "here is some umt", "true"]
+cli_response = call_cli_wallet( jsonrpc_call )
+
+jsonrpc_call["method"] = "transfer"
+jsonrpc_call["params"] = ["bank", "bubbletone", 100000, "SDRT", "here is some SDRs", "true"]
 cli_response = call_cli_wallet( jsonrpc_call )
 
 jsonrpc_call["method"] = "upgrade_account"

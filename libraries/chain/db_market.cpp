@@ -33,10 +33,10 @@
 
 namespace graphene { namespace chain {
 
-void database::cancel_order( const limit_order_object& order, bool create_virtual_op  )
+void database::cancel_order( const limit_order_object& order )
 {
    auto refunded = order.amount_for_sale();
-   auto refunded_umt = order.umt_fee;
+   asset refunded_ufee = asset( order.reserved_ufee, GRAPHENE_SDR_ASSET_ID);
 
    modify( order.seller(*this).statistics(*this),[&]( account_statistics_object& obj ){
       if( refunded.asset_id == asset_id_type() )
@@ -45,14 +45,15 @@ void database::cancel_order( const limit_order_object& order, bool create_virtua
       }
    });
    adjust_balance(order.seller, refunded);
-   adjust_balance(order.seller, refunded_umt);
-   adjust_balance(order.seller, order.deferred_fee);
+   adjust_balance(order.seller, refunded_ufee);
 
-   if( create_virtual_op )
    {
-      limit_order_cancel_operation vop;
+      limit_order_closed_operation vop;
       vop.order = order.id;
-      vop.fee_paying_account = order.seller;
+      vop.account_id = order.seller;
+      vop.refunded = refunded;
+      vop.refunded_ufee = refunded_ufee;
+
       push_applied_operation( vop );
    }
 
@@ -263,7 +264,7 @@ int database::match( const limit_order_object& bid, const limit_order_object& as
 {
    return match<limit_order_object>( bid, ask, match_price );
 }
-
+/*
 asset database::sdr_amount_to_umt_fee_to_reserve( share_type sdr_amount )
 {
   const auto& gpo = get_global_properties();
@@ -296,45 +297,71 @@ asset database::sdr_amount_to_umt_fee_to_pay( share_type sdr_amount_to_pay, shar
 
   return umt_fee;
 }
+*/
 
-bool database::fill_order( const limit_order_object& order, const asset& pays, const asset& receives, bool cull_if_small,
-                           const price& fill_price, const bool is_maker, const counterparty_info* cparty_info )
+bool database::fill_order( const limit_order_object& order
+                         , const asset& pays
+                         , const asset& receives_before_fee
+                         , bool cull_if_small
+                         , const price& fill_price
+                         , const bool is_maker
+                         , const counterparty_info* cparty_info )
 { try {
 
    FC_ASSERT( order.amount_for_sale().asset_id == pays.asset_id );
-   FC_ASSERT( pays.asset_id != receives.asset_id );
+   FC_ASSERT( pays.asset_id != receives_before_fee.asset_id );
 
    const account_object& seller = order.seller(*this);
-   const asset_object& recv_asset = receives.asset_id(*this);
+//   const asset_object& recv_asset = receives.asset_id(*this);
 
-   asset umt_fee( 0, GRAPHENE_SDR_ASSET_ID );
-/*
-   // SM!!! Must be moved to tatistics.pay_fee
-   if( pays.asset_id == GRAPHENE_SDR_ASSET_ID) //SDR
-    if( receives.asset_id != asset_id_type(0)) //not BTE
-    {
-      umt_fee = sdr_amount_to_umt_fee_to_pay( pays.amount, order.for_sale, order.umt_fee );
-      adjust_balance(GRAPHENE_UMT_FEE_POOL_ACCOUNT, umt_fee);
-    }
-*/
+   share_type _buy_ufee = 0;
+   share_type _sell_ufee = 0;
+
+   asset receives = receives_before_fee;
+
+   //fee calculation for sell or buy operation
+   if( pays.asset_id == GRAPHENE_SDR_ASSET_ID){ //SDR
+     _buy_ufee = cut_fee( pays.amount, order.percent_ufee );
+     if( _buy_ufee > order.reserved_ufee){
+       _buy_ufee = order.reserved_ufee;
+     }
+   }else if( receives.asset_id == GRAPHENE_SDR_ASSET_ID){
+     _sell_ufee = cut_fee( receives.amount, order.percent_ufee );
+     if( _sell_ufee > receives.amount){
+       _sell_ufee = receives.amount;
+     }
+     receives -= asset(_sell_ufee, receives.asset_id);
+   }
+
+   asset pay_ufee(_buy_ufee > 0 ? _buy_ufee : _sell_ufee, GRAPHENE_SDR_ASSET_ID );
+
    pay_order( seller, receives, pays );
 
    assert( pays.asset_id != receives.asset_id );
 // SM!!! Check umt_fee processing 
-   push_applied_operation( fill_order_operation( order.id, order.seller, pays, receives, fill_price, is_maker, umt_fee, cparty_info ));
+   push_applied_operation( fill_order_operation( order.id, order.seller, pays, receives, fill_price, is_maker, pay_ufee, cparty_info ));
 
-   // conditional because cheap integer comparison may allow us to avoid two expensive modify() and object lookups
-   if( order.deferred_fee > 0 )
+   if( pay_ufee.amount > 0 )
    {
       modify( seller.statistics(*this), [&]( account_statistics_object& statistics )
       {
-// SM!!! Check umt_fee processing        
-         statistics.pay_fee( order.deferred_fee, get_global_properties().parameters.cashback_vesting_threshold, umt_fee.amount );
+         statistics.pay_fee( order.seller, asset(), pay_ufee, *this);
       } );
    }
 
    if( pays == order.amount_for_sale() )
    {
+      {
+        limit_order_closed_operation vop;
+        asset refunded_ufee = asset( order.reserved_ufee - _buy_ufee, GRAPHENE_SDR_ASSET_ID);
+        vop.order = order.id;
+        vop.account_id = order.seller;
+        vop.refunded = asset(0,pays.asset_id);
+        vop.refunded_ufee = refunded_ufee;
+
+        push_applied_operation( vop );
+      }
+      
       remove( order );
       return true;
    }
@@ -342,8 +369,7 @@ bool database::fill_order( const limit_order_object& order, const asset& pays, c
    {
       modify( order, [&]( limit_order_object& b ) {
                              b.for_sale -= pays.amount;
-                             b.umt_fee -= umt_fee;
-                             b.deferred_fee = 0;
+                             b.reserved_ufee -= _buy_ufee;
                              if( NULL != cparty_info){
                                if( !b.p_accepted_memo.valid()){
                                  b.p_accepted_memo = cparty_info->p_memo;
@@ -354,7 +380,7 @@ bool database::fill_order( const limit_order_object& order, const asset& pays, c
          return maybe_cull_small_order( *this, order );
       return false;
    }
-} FC_CAPTURE_AND_RETHROW( (order)(pays)(receives) ) }
+} FC_CAPTURE_AND_RETHROW( (order)(pays)(receives_before_fee) ) }
 
 void database::pay_order( const account_object& receiver, const asset& receives, const asset& pays )
 {

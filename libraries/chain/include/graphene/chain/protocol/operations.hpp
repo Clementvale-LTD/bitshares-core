@@ -50,6 +50,7 @@ namespace graphene { namespace chain {
             transfer_operation,
             limit_order_create_operation,
             limit_order_cancel_operation,
+            limit_order_closed_operation,   // VIRTUAL
             fill_order_operation,           // VIRTUAL
             limit_order_accept_operation,
             limit_order_accepted_operation,   //VIRTUAL 
@@ -90,7 +91,7 @@ namespace graphene { namespace chain {
             bid_create_operation,
             bid_expired_operation,          // VIRTUAL
             bid_cancel_operation,
-            accumulated_sdr_fee_operation   // VIRTUAL
+            fee_pay_operation   // VIRTUAL
          > operation;
 
    /// @} // operations groupvesting_balimit_order_accepted_operationlance_create_operation

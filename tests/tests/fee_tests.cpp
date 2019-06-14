@@ -86,11 +86,11 @@ BOOST_AUTO_TEST_CASE( nonzero_fee_test )
 #define CHECK_BALANCE( actor_name, amount ) \
    BOOST_CHECK_EQUAL( get_balance( actor_name ## _id, asset_id_type() ), amount )
 
-#define CHECK_VESTED_CASHBACK( actor_name, amount ) \
-   BOOST_CHECK_EQUAL( actor_name ## _id(db).statistics(db).pending_vested_fees.value, amount )
+//#define CHECK_VESTED_CASHBACK( actor_name, amount ) \
+//   BOOST_CHECK_EQUAL( actor_name ## _id(db).statistics(db).pending_vested_fees.value, amount )
 
-#define CHECK_UNVESTED_CASHBACK( actor_name, amount ) \
-   BOOST_CHECK_EQUAL( actor_name ## _id(db).statistics(db).pending_fees.value, amount )
+//#define CHECK_UNVESTED_CASHBACK( actor_name, amount ) \
+//   BOOST_CHECK_EQUAL( actor_name ## _id(db).statistics(db).pending_fees.value, amount )
 
 #define P100 GRAPHENE_100_PERCENT
 #define P1 GRAPHENE_1_PERCENT
@@ -211,8 +211,6 @@ BOOST_AUTO_TEST_CASE( cashback_test )
    if( actor_name ## _id != account_id_type() )                     \
    {                                                                \
       CHECK_BALANCE( actor_name, a ## actor_name.bal );             \
-      CHECK_VESTED_CASHBACK( actor_name, a ## actor_name.vcb );     \
-      CHECK_UNVESTED_CASHBACK( actor_name, a ## actor_name.ucb );   \
    }
 
 #define CustomAudit()                                \

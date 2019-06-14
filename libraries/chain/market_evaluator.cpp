@@ -41,38 +41,57 @@
 namespace graphene { namespace chain {
 void_result limit_order_create_evaluator::do_evaluate(const limit_order_create_operation& op)
 { try {
-   const database& d = db();
+    const database& d = db();
 
-   FC_ASSERT( op.expiration >= d.head_block_time() );
+    FC_ASSERT( op.expiration >= d.head_block_time() );
 
-   _seller        = this->fee_paying_account;
-   _sell_asset    = &op.amount_to_sell.asset_id(d);
-   _receive_asset = &op.min_to_receive.asset_id(d);
+    _seller        = this->fee_paying_account;
+    const asset_object* _sell_asset    = &op.amount_to_sell.asset_id(d);
+    const asset_object* _receive_asset = &op.min_to_receive.asset_id(d);
+    const asset_object* _sdrt_asset    = &(GRAPHENE_SDR_ASSET_ID(d));
 
-   if( _sell_asset->options.whitelist_markets.size() )
+    FC_ASSERT( _seller->options.feelevel >= op.feelevel);
+
+    if( _sell_asset->options.whitelist_markets.size() )
       FC_ASSERT( _sell_asset->options.whitelist_markets.find(_receive_asset->id) != _sell_asset->options.whitelist_markets.end() );
-   if( _sell_asset->options.blacklist_markets.size() )
+    if( _sell_asset->options.blacklist_markets.size() )
       FC_ASSERT( _sell_asset->options.blacklist_markets.find(_receive_asset->id) == _sell_asset->options.blacklist_markets.end() );
 
-   if( op.bid_id.valid() ){
-     const bid_object&  bo = (*(op.bid_id))(d);
-     FC_ASSERT( bo.expiration >= d.head_block_time() );
-   }
+    if( op.bid_id.valid() ){
+      const bid_object&  bo = (*(op.bid_id))(d);
+      FC_ASSERT( bo.expiration >= d.head_block_time() );
+    }
 
-   FC_ASSERT( is_authorized_asset( d, *_seller, *_sell_asset ) );
-   FC_ASSERT( is_authorized_asset( d, *_seller, *_receive_asset ) );
+    FC_ASSERT( is_authorized_asset( d, *_seller, *_sell_asset ) );
+    FC_ASSERT( is_authorized_asset( d, *_seller, *_receive_asset ) );
 
-   FC_ASSERT( d.get_balance( *_seller, *_sell_asset ) >= op.amount_to_sell, "insufficient balance",
-              ("balance",d.get_balance(*_seller,*_sell_asset))("amount_to_sell",op.amount_to_sell) );
+    asset  amount_to_reserve = op.amount_to_sell;
+    if(  amount_to_reserve.asset_id == fee_from_account.asset_id){
+      amount_to_reserve += fee_from_account;
+    }
+
+    auto k = d.current_fee_schedule().get<limit_order_create_operation>();
+    _percent_ufee = op.get_sales_ufee_percent( k);
+    _reserve_ufee = op.calculate_reserve_ufee( k); 
+    asset all_ufee = asset( _reserve_ufee, GRAPHENE_SDR_ASSET_ID);
+    all_ufee += ufee_from_account;
+
+    FC_ASSERT(ufee_from_account.asset_id==GRAPHENE_SDR_ASSET_ID);
+
+    if(  amount_to_reserve.asset_id == all_ufee.asset_id){
+      //just increment total amount to reserve
+      amount_to_reserve += all_ufee;
+    }else{
+      //check if account have sufficient SDRt
+      FC_ASSERT( d.get_balance( *_seller, *_sdrt_asset ) >= all_ufee, "insufficient balance",
+                  ("balance",d.get_balance(*_seller,*_sdrt_asset))("all_ufee",all_ufee) );
+    }
+   
+    FC_ASSERT( d.get_balance( *_seller, *_sell_asset ) >= amount_to_reserve, "insufficient balance",
+              ("balance",d.get_balance(*_seller,*_sell_asset))("amount_to_reserve",amount_to_reserve) );
 
    return void_result();
 } FC_CAPTURE_AND_RETHROW( (op) ) }
-
-void limit_order_create_evaluator::pay_fee()
-{
-   _deferred_fee = fee_from_account.amount;
-   _deferred_ufee = ufee_from_account.amount;
-}
 
 object_id_type limit_order_create_evaluator::do_apply(const limit_order_create_operation& op)
 { try {
@@ -86,6 +105,8 @@ object_id_type limit_order_create_evaluator::do_apply(const limit_order_create_o
 
    db().adjust_balance(op.seller, -op.amount_to_sell);
 
+   /*
+
    asset umt_fee( 0, GRAPHENE_SDR_ASSET_ID );
 
    if( op.amount_to_sell.asset_id == GRAPHENE_SDR_ASSET_ID) //SDR
@@ -95,22 +116,22 @@ object_id_type limit_order_create_evaluator::do_apply(const limit_order_create_o
       db().adjust_balance(op.seller, -umt_fee);
     }
 
+   */ 
+
    const auto& new_order_object = db().create<limit_order_object>([&](limit_order_object& obj){
        obj.seller   = _seller->id;
        obj.for_sale = op.amount_to_sell.amount;
        obj.sell_price = op.get_price();
        obj.expiration = op.expiration;
 
-       obj.umt_fee = umt_fee;
+       obj.percent_ufee = _percent_ufee;
+       obj.reserved_ufee = _reserve_ufee;
 
        obj.request_id =  op.request_id;
        obj.user_id = op.user_id;
        obj.counterparty_id = op.counterparty_id;
        obj.p_memo = op.p_memo;
        obj.bid_id = op.bid_id; 
-
-       obj.deferred_fee = _deferred_fee;
-       obj.deferred_ufee = _deferred_ufee;
    });
    limit_order_id_type order_id = new_order_object.id; // save this because we may remove the object by filling it
    bool filled = db().apply_order(new_order_object);
@@ -182,7 +203,7 @@ asset limit_order_cancel_evaluator::do_apply(const limit_order_cancel_operation&
 
    auto refunded = _order->amount_for_sale();
 
-   d.cancel_order(*_order, false /* don't create a virtual op*/);
+   d.cancel_order(*_order );
 
    return refunded;
 } FC_CAPTURE_AND_RETHROW( (o) ) }

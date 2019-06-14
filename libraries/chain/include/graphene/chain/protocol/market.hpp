@@ -45,6 +45,9 @@ namespace graphene { namespace chain {
     *  Market orders are matched in the order they are included
     *  in the block chain.
     */
+
+   share_type cut_fee(share_type a, uint16_t p);
+
    struct limit_order_create_operation : public base_operation
    {
       struct sales_ufee
@@ -64,6 +67,8 @@ namespace graphene { namespace chain {
       asset           ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
       
       account_id_type seller;
+      int             feelevel = 0;   //Fee level of seller account
+
       asset           amount_to_sell;
       asset           min_to_receive;
 
@@ -92,6 +97,9 @@ namespace graphene { namespace chain {
       account_id_type fee_payer()const { return seller; }
       void            validate()const;
       price           get_price()const { return amount_to_sell / min_to_receive; }
+      dualfee         calculate_fee(const fee_parameters_type& )const;
+      share_type      calculate_reserve_ufee(const fee_parameters_type& )const;
+      uint64_t        get_sales_ufee_percent(const fee_parameters_type& )const;
    };
 
    struct limit_order_accept_operation : public base_operation
@@ -174,10 +182,31 @@ namespace graphene { namespace chain {
       limit_order_id_type order;
       /** must be order->seller */
       account_id_type     fee_paying_account;
-      extensions_type   extensions;
+      extensions_type     extensions;
 
       account_id_type fee_payer()const { return fee_paying_account; }
       void            validate()const;
+   };
+
+   struct limit_order_closed_operation : public base_operation
+   {
+      struct fee_parameters_type { 
+      };
+
+      asset               fee;
+      asset               ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
+
+      limit_order_id_type order;
+      /** must be order->seller */
+      account_id_type     account_id;
+      asset               refunded;
+      asset               refunded_ufee;
+
+      account_id_type fee_payer()const { return account_id; }
+      void            validate()const { FC_ASSERT( !"virtual operation" ); }
+
+      /// This is a virtual operation; there is no fee
+      dualfee      calculate_fee(const fee_parameters_type& k)const { return dualfee{0,0}; }
    };
 
    struct counterparty_info
@@ -245,45 +274,20 @@ namespace graphene { namespace chain {
       dualfee      calculate_fee(const fee_parameters_type& k)const { return dualfee{0,0}; }
    };
 
-   /**
-    * @ingroup operations
-    *
-    * @note This is a virtual operation that is created while reviving a
-    * bitasset from collateral bids.
-    */
-   struct execute_bid_operation : public base_operation
-   {
-      struct fee_parameters_type {};
-
-      execute_bid_operation(){}
-      execute_bid_operation( account_id_type a, asset d, asset c )
-         : bidder(a), debt(d), collateral(c) {}
-
-      account_id_type     bidder;
-      asset               debt;
-      asset               collateral;
-      asset               fee;
-      asset               ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );  //fee in sdr
-
-      account_id_type fee_payer()const { return bidder; }
-      void            validate()const { FC_ASSERT( !"virtual operation" ); }
-
-      /// This is a virtual operation; there is no fee
-      dualfee      calculate_fee(const fee_parameters_type& k)const { return dualfee{0,0}; }
-   };
 } } // graphene::chain
 
 FC_REFLECT( graphene::chain::limit_order_create_operation::sales_ufee, (usell)(ubuy) )
 FC_REFLECT( graphene::chain::limit_order_create_operation::fee_parameters_type, (fee)(ufee)(ufee_pkb)(accufee) )
 FC_REFLECT( graphene::chain::limit_order_cancel_operation::fee_parameters_type, (fee)(ufee) )
+FC_REFLECT( graphene::chain::limit_order_closed_operation::fee_parameters_type, ) // VIRTUAL
 FC_REFLECT( graphene::chain::fill_order_operation::fee_parameters_type,  ) // VIRTUAL
-FC_REFLECT( graphene::chain::execute_bid_operation::fee_parameters_type,  ) // VIRTUAL
 FC_REFLECT( graphene::chain::limit_order_accept_operation::fee_parameters_type, (fee)(ufee)(ufee_pkb) )
 FC_REFLECT( graphene::chain::limit_order_accepted_operation::fee_parameters_type, ) // VIRTUAL
 
-FC_REFLECT( graphene::chain::limit_order_create_operation,(fee)(ufee)(seller)(amount_to_sell)(min_to_receive)(expiration)(fill_or_kill)(request_id)(user_id)(counterparty_id)(p_memo)(bid_id)(extensions))
+FC_REFLECT( graphene::chain::limit_order_create_operation,(fee)(ufee)(seller)(feelevel)(amount_to_sell)(min_to_receive)(expiration)(fill_or_kill)(request_id)(user_id)(counterparty_id)(p_memo)(bid_id)(extensions))
 FC_REFLECT( graphene::chain::limit_order_cancel_operation,(fee)(ufee)(fee_paying_account)(order)(extensions) )
+FC_REFLECT( graphene::chain::limit_order_closed_operation,(fee)(ufee)(account_id)(order)(refunded)(refunded_ufee) )
 FC_REFLECT( graphene::chain::fill_order_operation, (fee)(ufee)(order_id)(account_id)(pays)(receives)(fill_price)(is_maker)(match_account_id)(match_order_id)(request_id)(user_id)(p_memo))
-FC_REFLECT( graphene::chain::execute_bid_operation, (fee)(ufee)(bidder)(debt)(collateral) )
 FC_REFLECT( graphene::chain::limit_order_accept_operation,(fee)(ufee)(seller)(asset_id_to_sell)(asset_id_to_receive)(request_id)(user_id)(counterparty_id)(p_memo)(extensions))
 FC_REFLECT( graphene::chain::limit_order_accepted_operation,(fee)(ufee)(order_id)(order_creator_account_id)(asset_id_to_sell)(asset_id_to_receive)(request_id)(user_id)(accepted_by_account_id)(p_accepted_memo))
+

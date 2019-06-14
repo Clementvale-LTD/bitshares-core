@@ -189,14 +189,15 @@ struct bid_cancel_operation : public base_operation
   dualfee         calculate_fee(const fee_parameters_type& k)const;
 };
 
-struct accumulated_sdr_fee_operation : public base_operation
+struct fee_pay_operation : public base_operation
 {
   struct fee_parameters_type { };
 
   asset               fee;
   asset               ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );
 
-  asset               sdr_fee;
+  asset               paid_fee;
+  asset               paid_ufee;
   /** must be bid->owner */
   account_id_type     fee_from_account;
   account_id_type     fee_to_account;
@@ -237,5 +238,5 @@ FC_REFLECT( graphene::chain::bid_expired_operation,(fee)(ufee)(fee_paying_accoun
 FC_REFLECT( graphene::chain::bid_cancel_operation::fee_parameters_type, (fee)(ufee) )
 FC_REFLECT( graphene::chain::bid_cancel_operation,(fee)(ufee)(fee_paying_account)(bid_id) )
 
-FC_REFLECT( graphene::chain::accumulated_sdr_fee_operation::fee_parameters_type, )
-FC_REFLECT( graphene::chain::accumulated_sdr_fee_operation,(fee)(ufee)(sdr_fee)(fee_from_account)(fee_to_account) )
+FC_REFLECT( graphene::chain::fee_pay_operation::fee_parameters_type, )
+FC_REFLECT( graphene::chain::fee_pay_operation,(fee)(ufee)(paid_fee)(paid_ufee)(fee_from_account)(fee_to_account) )

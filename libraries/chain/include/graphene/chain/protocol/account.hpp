@@ -52,6 +52,8 @@ namespace graphene { namespace chain {
       /// The number of active committee members this account votes the blockchain should appoint
       /// Must not exceed the actual number of committee members voted for in @ref votes
       uint16_t num_committee = 0;
+      /// Fee level of the account in limit_order_create_operation; the greater feelevel the smaller fee
+      uint16_t feelevel = 0;
       /// This is the list of vote IDs this account votes for. The weight of these votes is determined by this
       /// account's balance of core asset.
       flat_set<vote_id_type> votes;
@@ -192,7 +194,7 @@ namespace graphene { namespace chain {
 
 } } // graphene::chain
 
-FC_REFLECT(graphene::chain::account_options, (memo_key)(voting_account)(num_witness)(num_committee)(votes)(extensions))
+FC_REFLECT(graphene::chain::account_options, (memo_key)(voting_account)(num_witness)(num_committee)(feelevel)(votes)(extensions))
 
 FC_REFLECT(graphene::chain::account_create_operation::ext, (null_ext)(owner_special_authority)(active_special_authority) )
 FC_REFLECT( graphene::chain::account_create_operation,

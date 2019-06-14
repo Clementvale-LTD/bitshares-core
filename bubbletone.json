@@ -14,7 +14,20 @@
           1,{
             "fee": 0,
             "ufee": 5,
-            "ufee_pkb": 3
+            "ufee_pkb": 3,
+            "accufee":[ 
+              [
+                0,{
+                  "usell": 600,
+                  "ubuy": 800
+                }
+              ],[
+                1,{
+                  "usell": 400,
+                  "ubuy": 600
+                }
+              ]
+            ]
           }
         ],[
           2,{
@@ -24,44 +37,39 @@
         ],[
           3,{}
         ],[
-          4,{
+          4,{}
+        ],[
+          5,{
             "fee": 0,
             "ufee": 5,
             "ufee_pkb": 3
           }
         ],[
-          5,{}
+          6,{}
         ],[
-          6,{
+          7,{
             "basic_fee": 1000000,
             "premium_fee": 1000000,
             "price_per_kbyte": 0,
             "ufee": 2
           }
         ],[
-          7,{
+          8,{
             "fee": 0,
             "price_per_kbyte": 0,
             "ufee": 2
           }
         ],[
-          8,{
+          9,{
             "membership_annual_fee": 0,
             "membership_lifetime_fee": 50000000,
             "ufee": 2
           }
         ],[
-          9,{
+          10,{
             "symbol3": "0",
             "symbol4": "0",
             "long_symbol": 0,
-            "price_per_kbyte": 0,
-            "ufee": 5,
-            "ufee_pkb": 3
-          }
-        ],[
-          10,{
-            "fee": 0,
             "price_per_kbyte": 0,
             "ufee": 5,
             "ufee_pkb": 3
@@ -76,22 +84,23 @@
         ],[
           12,{
             "fee": 0,
-            "ufee": 5
+            "price_per_kbyte": 0,
+            "ufee": 5,
+            "ufee_pkb": 3
           }
         ],[
           13,{
-            "fee": 100000000,
-            "ufee": 2
+            "fee": 0,
+            "ufee": 5
           }
         ],[
           14,{
-            "fee": 0,
+            "fee": 100000000,
             "ufee": 2
           }
         ],[
           15,{
             "fee": 0,
-            "price_per_kbyte": 0,
             "ufee": 2
           }
         ],[
@@ -103,6 +112,7 @@
         ],[
           17,{
             "fee": 0,
+            "price_per_kbyte": 0,
             "ufee": 2
           }
         ],[
@@ -118,23 +128,23 @@
         ],[
           20,{
             "fee": 0,
+            "ufee": 2
+          }
+        ],[
+          21,{
+            "fee": 0,
             "price_per_kbyte": 0,
             "ufee": 5,
             "ufee_pkb": 3
           }
         ],[
-          21,{
-            "fee": 0,
-            "ufee": 2
-          }
-        ],[
           22,{
-            "fee": 100000000,
+            "fee": 0,
             "ufee": 2
           }
         ],[
           23,{
-            "fee": 0,
+            "fee": 100000000,
             "ufee": 2
           }
         ],[
@@ -160,37 +170,37 @@
         ],[
           28,{
             "fee": 0,
+            "ufee": 2
+          }
+        ],[
+          29,{
+            "fee": 0,
             "price_per_kbyte": 0,
             "ufee": 5,
             "ufee_pkb": 3
           }
         ],[
-          29,{
-            "fee": 0,
-            "ufee": 2
-          }
-        ],[
           30,{
             "fee": 0,
-            "price_per_kbyte": 0,
             "ufee": 2
           }
         ],[
           31,{
             "fee": 0,
-            "price_per_output": 0,
-            "ufee": 5,
-            "ufee_pkb": 3
+            "price_per_kbyte": 0,
+            "ufee": 2
           }
         ],[
           32,{
             "fee": 0,
             "price_per_output": 0,
-            "ufee": 2
+            "ufee": 5,
+            "ufee_pkb": 3
           }
         ],[
           33,{
             "fee": 0,
+            "price_per_output": 0,
             "ufee": 2
           }
         ],[
@@ -201,8 +211,7 @@
         ],[
           35,{
             "fee": 0,
-            "ufee": 5,
-            "ufee_pkb": 3
+            "ufee": 2
           }
         ],[
           36,{
@@ -218,27 +227,33 @@
           }
         ],[
           38,{
-          }
-        ],[
-          39,{
-            "fee": 0,
-            "ufee": 2
-          }
-        ],[
-          40,{
             "fee": 0,
             "ufee": 5,
             "ufee_pkb": 3
           }
         ],[
-          41,{}
+          39,{
+          }
         ],[
-          42,{
+          40,{
             "fee": 0,
             "ufee": 2
           }
         ],[
-          43,{}
+          41,{
+            "fee": 0,
+            "ufee": 5,
+            "ufee_pkb": 3
+          }
+        ],[
+          42,{}
+        ],[
+          43,{
+            "fee": 0,
+            "ufee": 2
+          }
+        ],[
+          44,{}
         ]
       ],
       "scale": 10000
@@ -356,12 +371,17 @@
   "initial_balances": [{
       "owner": "BTE3a2bK9APBszTAJLZUsAimzk9pWaVqKZkZ",
       "asset_symbol": "BTE",
-      "amount": "1000000000000000"
+      "amount": "999999990000000"
     },
     {
       "owner": "BTENhhbTvcGKtH8Np2BnJ188TEovqLYPzPP1",
       "asset_symbol": "SDRT",
       "amount": "1000000000000000"
+    },
+    {
+      "owner": "BTENhhbTvcGKtH8Np2BnJ188TEovqLYPzPP1",
+      "asset_symbol": "BTE",
+      "amount": "10000000"
     }
   ],
   "initial_vesting_balances": [],
@@ -426,7 +446,7 @@
     }
   ],
   "initial_worker_candidates": [],
-  "initial_chain_id": "e18c1972e0811975e27c2000e08a2007fc3de0c73de42483ba9af1d153a04971",
+  "initial_chain_id": "e18c1972e0811975e27c2000e08a2007e05320193de42483ba9af1d153a04971",
   "immutable_parameters": {
     "min_committee_member_count": 11,
     "min_witness_count": 11,

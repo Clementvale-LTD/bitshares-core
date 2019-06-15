@@ -104,7 +104,9 @@ object_id_type limit_order_create_evaluator::do_apply(const limit_order_create_o
    });
 
    db().adjust_balance(op.seller, -op.amount_to_sell);
-
+   if( _reserve_ufee > 0){
+     db().adjust_balance(op.seller, -asset(_reserve_ufee, GRAPHENE_SDR_ASSET_ID));
+   }
    /*
 
    asset umt_fee( 0, GRAPHENE_SDR_ASSET_ID );

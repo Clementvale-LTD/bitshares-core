@@ -8,13 +8,13 @@
             "fee": 0,
             "price_per_kbyte": 0,
             "ufee": 5,
-            "ufee_pkb": 3
+            "ufee_pkb": 15
           }
         ],[
           1,{
             "fee": 0,
             "ufee": 5,
-            "ufee_pkb": 3,
+            "ufee_pkb": 15,
             "accufee":[ 
               [
                 0,{
@@ -32,7 +32,7 @@
         ],[
           2,{
             "fee": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           3,{}
@@ -42,7 +42,7 @@
           5,{
             "fee": 0,
             "ufee": 5,
-            "ufee_pkb": 3
+            "ufee_pkb": 15
           }
         ],[
           6,{}
@@ -51,19 +51,19 @@
             "basic_fee": 1000000,
             "premium_fee": 1000000,
             "price_per_kbyte": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           8,{
             "fee": 0,
             "price_per_kbyte": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           9,{
             "membership_annual_fee": 0,
             "membership_lifetime_fee": 50000000,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           10,{
@@ -72,21 +72,21 @@
             "long_symbol": 0,
             "price_per_kbyte": 0,
             "ufee": 5,
-            "ufee_pkb": 3
+            "ufee_pkb": 15
           }
         ],[
           11,{
             "fee": 0,
             "price_per_kbyte": 0,
             "ufee": 5,
-            "ufee_pkb": 3
+            "ufee_pkb": 15
           }
         ],[
           12,{
             "fee": 0,
             "price_per_kbyte": 0,
             "ufee": 5,
-            "ufee_pkb": 3
+            "ufee_pkb": 15
           }
         ],[
           13,{
@@ -96,140 +96,140 @@
         ],[
           14,{
             "fee": 100000000,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           15,{
             "fee": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           16,{
             "fee": 0,
             "price_per_kbyte": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           17,{
             "fee": 0,
             "price_per_kbyte": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           18,{
             "fee": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           19,{
             "fee": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           20,{
             "fee": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           21,{
             "fee": 0,
             "price_per_kbyte": 0,
             "ufee": 5,
-            "ufee_pkb": 3
+            "ufee_pkb": 15
           }
         ],[
           22,{
             "fee": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           23,{
             "fee": 100000000,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           24,{
             "fee": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           25,{
             "fee": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           26,{
             "fee": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           27,{
             "fee": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           28,{
             "fee": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           29,{
             "fee": 0,
             "price_per_kbyte": 0,
             "ufee": 5,
-            "ufee_pkb": 3
+            "ufee_pkb": 15
           }
         ],[
           30,{
             "fee": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           31,{
             "fee": 0,
             "price_per_kbyte": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           32,{
             "fee": 0,
             "price_per_output": 0,
             "ufee": 5,
-            "ufee_pkb": 3
+            "ufee_pkb": 15
           }
         ],[
           33,{
             "fee": 0,
             "price_per_output": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           34,{
             "fee": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           35,{
             "fee": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           36,{
             "fee": 0,
             "ufee": 5,
-            "ufee_pkb": 3
+            "ufee_pkb": 15
           }
         ],[
           37,{
             "fee": 0,
             "ufee": 5,
-            "ufee_pkb": 3
+            "ufee_pkb": 15
           }
         ],[
           38,{
             "fee": 0,
             "ufee": 5,
-            "ufee_pkb": 3
+            "ufee_pkb": 15
           }
         ],[
           39,{
@@ -237,20 +237,20 @@
         ],[
           40,{
             "fee": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           41,{
             "fee": 0,
             "ufee": 5,
-            "ufee_pkb": 3
+            "ufee_pkb": 15
           }
         ],[
           42,{}
         ],[
           43,{
             "fee": 0,
-            "ufee": 2
+            "ufee": 5
           }
         ],[
           44,{}

@@ -138,10 +138,12 @@ bool memo_group::try_get_message( const fc::ecc::private_key& priv, std::string&
           return false;
 
         fc::ecc::public_key mypub = priv.get_public_key();
+        const public_key_type *pfrompub = &from;
 
         to_ekey euse;
         if( from == mypub){
           euse = gto[0];
+          pfrompub = &gto[0].to;
         }else{
           for( const to_ekey& r : gto ){
             if( r.to == mypub){
@@ -151,8 +153,8 @@ bool memo_group::try_get_message( const fc::ecc::private_key& priv, std::string&
           }
         }
 
-        if( euse.to != public_key_type() ){
-          auto secret = priv.get_shared_secret( euse.to);
+        if( (*pfrompub) != public_key_type() ){
+          auto secret = priv.get_shared_secret( *pfrompub);
           auto nonce_plus_secret = fc::sha512::hash(fc::to_string(nonce) + secret.str());
           vector<char> aes_secret_raw = fc::aes_decrypt( nonce_plus_secret, euse.ekey );
           fc::sha512 aes_secret( aes_secret_raw.data(), aes_secret_raw.size() );

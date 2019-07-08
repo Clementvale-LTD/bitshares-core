@@ -2153,6 +2153,7 @@ public:
       if( timeout_sec )
          op.expiration = fc::time_point::now() + fc::seconds(timeout_sec);
       op.fill_or_kill = fill_or_kill;
+      op.feelevel = seller.options.feelevel;
 
       if( offer_request.valid() ){
         op.request_id = offer_request->request_id;

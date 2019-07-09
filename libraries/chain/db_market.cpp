@@ -338,8 +338,8 @@ bool database::fill_order( const limit_order_object& order
    pay_order( seller, receives, pays );
 
    assert( pays.asset_id != receives.asset_id );
-// SM!!! Check umt_fee processing 
-   push_applied_operation( fill_order_operation( order.id, order.seller, pays, receives, fill_price, is_maker, pay_ufee, cparty_info ));
+// SM: "receives" is stored without fee, fee is stored by "pay_ufee"
+   push_applied_operation( fill_order_operation( order.id, order.seller, pays, receives_before_fee, fill_price, is_maker, pay_ufee, cparty_info ));
 
    if( pay_ufee.amount > 0 )
    {

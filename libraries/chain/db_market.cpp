@@ -300,7 +300,7 @@ asset database::sdr_amount_to_umt_fee_to_pay( share_type sdr_amount_to_pay, shar
 */
 
 bool database::fill_order( const limit_order_object& order
-                         , const asset& pays
+                         , const asset& pays_before_fee
                          , const asset& receives_before_fee
                          , bool cull_if_small
                          , const price& fill_price
@@ -308,8 +308,8 @@ bool database::fill_order( const limit_order_object& order
                          , const counterparty_info* cparty_info )
 { try {
 
-   FC_ASSERT( order.amount_for_sale().asset_id == pays.asset_id );
-   FC_ASSERT( pays.asset_id != receives_before_fee.asset_id );
+   FC_ASSERT( order.amount_for_sale().asset_id == pays_before_fee.asset_id );
+   FC_ASSERT( pays_before_fee.asset_id != receives_before_fee.asset_id );
 
    const account_object& seller = order.seller(*this);
 //   const asset_object& recv_asset = receives.asset_id(*this);
@@ -317,29 +317,31 @@ bool database::fill_order( const limit_order_object& order
    share_type _buy_ufee = 0;
    share_type _sell_ufee = 0;
 
-   asset receives = receives_before_fee;
+   asset pays_after_fee = pays_before_fee;
+   asset receives_after_fee = receives_before_fee;
 
    //fee calculation for sell or buy operation
-   if( pays.asset_id == GRAPHENE_SDR_ASSET_ID){ //SDR
-     _buy_ufee = cut_fee( pays.amount, order.percent_ufee );
+   if( pays_before_fee.asset_id == GRAPHENE_SDR_ASSET_ID){ //SDR
+     _buy_ufee = cut_fee( pays_before_fee.amount, order.percent_ufee );
      if( _buy_ufee > order.reserved_ufee){
        _buy_ufee = order.reserved_ufee;
      }
-   }else if( receives.asset_id == GRAPHENE_SDR_ASSET_ID){
-     _sell_ufee = cut_fee( receives.amount, order.percent_ufee );
-     if( _sell_ufee > receives.amount){
-       _sell_ufee = receives.amount;
+     pays_after_fee += asset(_buy_ufee, pays_before_fee.asset_id);
+   }else if( receives_before_fee.asset_id == GRAPHENE_SDR_ASSET_ID){
+     _sell_ufee = cut_fee( receives_before_fee.amount, order.percent_ufee );
+     if( _sell_ufee > receives_before_fee.amount){
+       _sell_ufee = receives_before_fee.amount;
      }
-     receives -= asset(_sell_ufee, receives.asset_id);
+     receives_after_fee -= asset(_sell_ufee, receives_before_fee.asset_id);
    }
 
    asset pay_ufee(_buy_ufee > 0 ? _buy_ufee : _sell_ufee, GRAPHENE_SDR_ASSET_ID );
 
-   pay_order( seller, receives, pays );
+   pay_order( seller, receives_after_fee, pays_before_fee );
 
-   assert( pays.asset_id != receives.asset_id );
-// SM: "receives" is stored without fee, fee is stored by "pay_ufee"
-   push_applied_operation( fill_order_operation( order.id, order.seller, pays, receives_before_fee, fill_price, is_maker, pay_ufee, cparty_info ));
+   assert( pays_before_fee.asset_id != receives_before_fee.asset_id );
+// SM: fill_order_operation keeps actual values payed and received after fee assessment 
+   push_applied_operation( fill_order_operation( order.id, order.seller, pays_after_fee, receives_after_fee, fill_price, is_maker, cparty_info ));
 
    if( pay_ufee.amount > 0 )
    {
@@ -349,14 +351,14 @@ bool database::fill_order( const limit_order_object& order
       } );
    }
 
-   if( pays == order.amount_for_sale() )
+   if( pays_before_fee == order.amount_for_sale() )
    {
       {
         limit_order_closed_operation vop;
         asset refunded_ufee = asset( order.reserved_ufee - _buy_ufee, GRAPHENE_SDR_ASSET_ID);
         vop.order = order.id;
         vop.account_id = order.seller;
-        vop.refunded = asset(0,pays.asset_id);
+        vop.refunded = asset(0,pays_before_fee.asset_id);
         vop.refunded_ufee = refunded_ufee;
 
         push_applied_operation( vop );
@@ -368,7 +370,7 @@ bool database::fill_order( const limit_order_object& order
    else
    {
       modify( order, [&]( limit_order_object& b ) {
-                             b.for_sale -= pays.amount;
+                             b.for_sale -= pays_before_fee.amount;
                              b.reserved_ufee -= _buy_ufee;
                              if( NULL != cparty_info){
                                if( !b.p_accepted_memo.valid()){
@@ -380,7 +382,7 @@ bool database::fill_order( const limit_order_object& order
          return maybe_cull_small_order( *this, order );
       return false;
    }
-} FC_CAPTURE_AND_RETHROW( (order)(pays)(receives_before_fee) ) }
+} FC_CAPTURE_AND_RETHROW( (order)(pays_before_fee)(receives_before_fee) ) }
 
 void database::pay_order( const account_object& receiver, const asset& receives, const asset& pays )
 {

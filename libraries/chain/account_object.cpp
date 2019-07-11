@@ -72,7 +72,7 @@ void account_statistics_object::process_fees(const account_object& a, database& 
 #endif   
 }
 
-void account_statistics_object::pay_fee( account_id_type from, asset fee, asset ufee, database& d )
+void account_statistics_object::pay_fee( account_id_type from, int optype, asset fee, asset ufee, database& d )
 {
   if( fee.amount > 0 ){
     d.adjust_balance( GRAPHENE_UMT_FEE_POOL_ACCOUNT, fee);
@@ -92,6 +92,7 @@ void account_statistics_object::pay_fee( account_id_type from, asset fee, asset 
     op_fee_pay.paid_fee = fee;
     op_fee_pay.paid_ufee = ufee;
     op_fee_pay.fee_from_account = from;
+    op_fee_pay.optype = optype;
     op_fee_pay.fee_to_account = GRAPHENE_UMT_FEE_POOL_ACCOUNT;
 
     d.push_applied_operation( op_fee_pay);

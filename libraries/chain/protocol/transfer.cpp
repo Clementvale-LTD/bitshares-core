@@ -42,6 +42,7 @@ dualfee transfer_operation::calculate_fee( const fee_parameters_type& schedule )
 void transfer_operation::validate()const
 {
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
    FC_ASSERT( from != to );
    FC_ASSERT( amount.amount > 0 );
 }
@@ -62,6 +63,7 @@ dualfee override_transfer_operation::calculate_fee( const fee_parameters_type& s
 void override_transfer_operation::validate()const
 {
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
    FC_ASSERT( from != to );
    FC_ASSERT( amount.amount > 0 );
    FC_ASSERT( issuer != from );

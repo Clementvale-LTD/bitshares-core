@@ -49,6 +49,7 @@ struct predicate_validator
 void assert_operation::validate()const
 {
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
    for( const auto& item : predicates )
       item.visit( predicate_validator() );
 }

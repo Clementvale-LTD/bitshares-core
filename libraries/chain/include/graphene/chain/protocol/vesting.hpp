@@ -82,6 +82,7 @@ namespace graphene { namespace chain {
       void              validate()const
       {
          FC_ASSERT( fee.amount >= 0 );
+         FC_ASSERT( ufee.amount >= 0 );
          FC_ASSERT( amount.amount > 0 );
       }
    };
@@ -113,6 +114,7 @@ namespace graphene { namespace chain {
       void              validate()const
       {
          FC_ASSERT( fee.amount >= 0 );
+         FC_ASSERT( ufee.amount >= 0 );
          FC_ASSERT( amount.amount > 0 );
       }
    };

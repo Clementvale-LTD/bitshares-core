@@ -196,6 +196,8 @@ struct fee_pay_operation : public base_operation
   asset               fee;
   asset               ufee = asset( 0, GRAPHENE_SDR_ASSET_ID );
 
+  int                 optype;   
+
   asset               paid_fee;
   asset               paid_ufee;
   /** must be bid->owner */
@@ -239,4 +241,4 @@ FC_REFLECT( graphene::chain::bid_cancel_operation::fee_parameters_type, (fee)(uf
 FC_REFLECT( graphene::chain::bid_cancel_operation,(fee)(ufee)(fee_paying_account)(bid_id) )
 
 FC_REFLECT( graphene::chain::fee_pay_operation::fee_parameters_type, )
-FC_REFLECT( graphene::chain::fee_pay_operation,(fee)(ufee)(paid_fee)(paid_ufee)(fee_from_account)(fee_to_account) )
+FC_REFLECT( graphene::chain::fee_pay_operation,(fee)(ufee)(optype)(paid_fee)(paid_ufee)(fee_from_account)(fee_to_account) )

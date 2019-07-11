@@ -347,7 +347,7 @@ bool database::fill_order( const limit_order_object& order
    {
       modify( seller.statistics(*this), [&]( account_statistics_object& statistics )
       {
-         statistics.pay_fee( order.seller, asset(), pay_ufee, *this);
+         statistics.pay_fee( order.seller, operation::tag<fill_order_operation>::value, asset(), pay_ufee, *this);
       } );
    }
 

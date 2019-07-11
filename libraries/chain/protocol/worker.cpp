@@ -55,33 +55,39 @@ void  service_create_operation::validate()const
 {
    FC_ASSERT( is_valid_srv_name( name) );
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
 }
   
 void  service_update_operation::validate()const
 {
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
 }
 
 void  bid_request_create_operation::validate()const
 {
    FC_ASSERT( is_valid_srv_name( name) );
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
 }
 
 void  bid_request_cancel_operation::validate()const
 {
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
 }
 
 void  bid_create_operation::validate()const
 {
    FC_ASSERT( is_valid_srv_name( name) );
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
 }
 
 void  bid_cancel_operation::validate()const
 {
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
 }
 
 dualfee service_create_operation::calculate_fee(const fee_parameters_type& k)const

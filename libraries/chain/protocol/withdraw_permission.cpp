@@ -29,6 +29,7 @@ void withdraw_permission_update_operation::validate()const
 {
    FC_ASSERT( withdrawal_limit.amount > 0 );
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
    FC_ASSERT( withdrawal_period_sec > 0 );
    FC_ASSERT( withdraw_from_account != authorized_account );
    FC_ASSERT( periods_until_expiration > 0 );
@@ -39,6 +40,7 @@ void withdraw_permission_claim_operation::validate()const
    FC_ASSERT( withdraw_to_account != withdraw_from_account );
    FC_ASSERT( amount_to_withdraw.amount > 0 );
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
 }
 
 dualfee withdraw_permission_claim_operation::calculate_fee(const fee_parameters_type& k)const
@@ -57,6 +59,7 @@ dualfee withdraw_permission_claim_operation::calculate_fee(const fee_parameters_
 void withdraw_permission_create_operation::validate() const
 {
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
    FC_ASSERT( withdraw_from_account != authorized_account );
    FC_ASSERT( withdrawal_limit.amount > 0 );
    //TODO: better bounds checking on these values
@@ -67,6 +70,7 @@ void withdraw_permission_create_operation::validate() const
 void withdraw_permission_delete_operation::validate() const
 {
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
    FC_ASSERT( withdraw_from_account != authorized_account );
 }
 

@@ -191,7 +191,17 @@ static void get_relevant_accounts( const object* obj, flat_set<account_id_type>&
            assert( aobj != nullptr );
            accounts.insert( aobj->owner );
            break;
-        } case asset_object_type:{
+        }case bid_request_object_type:{
+           const auto& aobj = dynamic_cast<const bid_request_object*>(obj);
+           assert( aobj != nullptr );
+           accounts.insert( aobj->owner );
+           break;
+        }case bid_object_type:{
+           const auto& aobj = dynamic_cast<const bid_object*>(obj);
+           assert( aobj != nullptr );
+           accounts.insert( aobj->owner );
+           break;
+        }case asset_object_type:{
            const auto& aobj = dynamic_cast<const asset_object*>(obj);
            assert( aobj != nullptr );
            accounts.insert( aobj->issuer );

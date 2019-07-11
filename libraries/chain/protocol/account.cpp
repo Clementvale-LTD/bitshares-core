@@ -187,6 +187,7 @@ dualfee account_create_operation::calculate_fee( const fee_parameters_type& k )c
 void account_create_operation::validate()const
 {
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
    FC_ASSERT( is_valid_name( name ) );
    FC_ASSERT( owner.num_auths() != 0 );
    FC_ASSERT( owner.address_auths.size() == 0 );
@@ -214,6 +215,7 @@ void account_update_operation::validate()const
 {
    FC_ASSERT( account != GRAPHENE_TEMP_ACCOUNT );
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
    FC_ASSERT( account != account_id_type() );
 
    bool has_action = (
@@ -258,6 +260,7 @@ dualfee account_upgrade_operation::calculate_fee(const fee_parameters_type& k) c
 void account_upgrade_operation::validate() const
 {
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
 }
 
 } } // graphene::chain

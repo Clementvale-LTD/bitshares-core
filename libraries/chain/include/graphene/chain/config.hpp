@@ -177,5 +177,3 @@
 #define GRAPHENE_SDR_SYMBOL              "SDRT"
 #define GRAPHENE_SDR_PRECISION_DIGITS    4
 #define GRAPHENE_SDR_ASSET_ID            (graphene::chain::asset_id_type(1))
-
-#define GRAPHENE_DEFAULT_UMT_STAKEHOLDER_PERCENT_FEE     (2*GRAPHENE_1_PERCENT)

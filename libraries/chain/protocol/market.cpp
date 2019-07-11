@@ -44,6 +44,7 @@ void limit_order_create_operation::validate()const
 {
    FC_ASSERT( amount_to_sell.asset_id != min_to_receive.asset_id );
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
    FC_ASSERT( amount_to_sell.amount > 0 );
    FC_ASSERT( min_to_receive.amount > 0 );
 }
@@ -52,11 +53,13 @@ void limit_order_accept_operation::validate()const
 {
    FC_ASSERT( asset_id_to_sell != asset_id_to_receive );
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
 }
 
 void limit_order_cancel_operation::validate()const
 {
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
 }
 
 uint64_t  limit_order_create_operation::get_sales_ufee_percent(const fee_parameters_type& k)const

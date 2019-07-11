@@ -83,7 +83,7 @@ namespace graphene { namespace chain {
          /**
           * Fees paid are  registred in the account_statistics_object by this method
           */
-         void pay_fee( account_id_type from, asset fee, asset ufee, database& d );
+         void pay_fee( account_id_type from, int optype, asset fee, asset ufee, database& d );
    };
 
    /**

@@ -102,6 +102,7 @@ dualfee asset_create_operation::calculate_fee(const asset_create_operation::fee_
 void  asset_create_operation::validate()const
 {
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
    FC_ASSERT( is_valid_symbol(symbol) );
    common_options.validate();
 
@@ -111,6 +112,7 @@ void  asset_create_operation::validate()const
 void asset_update_operation::validate()const
 {
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
    if( new_issuer )
       FC_ASSERT(issuer != *new_issuer);
    new_options.validate();
@@ -125,6 +127,7 @@ dualfee asset_update_operation::calculate_fee(const asset_update_operation::fee_
 void asset_reserve_operation::validate()const
 {
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
    FC_ASSERT( amount_to_reserve.amount.value <= GRAPHENE_MAX_SHARE_SUPPLY );
    FC_ASSERT( amount_to_reserve.amount.value > 0 );
 }
@@ -132,6 +135,7 @@ void asset_reserve_operation::validate()const
 void asset_issue_operation::validate()const
 {
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
    FC_ASSERT( asset_to_issue.amount.value <= GRAPHENE_MAX_SHARE_SUPPLY );
    FC_ASSERT( asset_to_issue.amount.value > 0 );
    FC_ASSERT( asset_to_issue.asset_id != asset_id_type(0) );

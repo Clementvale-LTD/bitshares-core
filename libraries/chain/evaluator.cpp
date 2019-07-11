@@ -76,7 +76,7 @@ database& generic_evaluator::db()const { return trx_state->db(); }
          /// TODO: db().pay_fee( account_id, core_fee );
          d.modify(*fee_paying_account_statistics, [&](account_statistics_object& s)
          {
-            s.pay_fee( fee_paying_account->get_id(), fee_from_account, ufee_from_account, d);
+            s.pay_fee( fee_paying_account->get_id(), get_type(), fee_from_account, ufee_from_account, d);
          });
       }
    } FC_CAPTURE_AND_RETHROW() }

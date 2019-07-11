@@ -34,6 +34,7 @@ namespace graphene { namespace chain {
 void transfer_to_blind_operation::validate()const
 {
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
    FC_ASSERT( amount.amount > 0 );
 
    vector<commitment_type> in;
@@ -73,6 +74,7 @@ void transfer_from_blind_operation::validate()const
 {
    FC_ASSERT( amount.amount > 0 );
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
    FC_ASSERT( inputs.size() > 0 );
    FC_ASSERT( amount.asset_id == fee.asset_id );
 

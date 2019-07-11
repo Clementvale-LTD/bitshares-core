@@ -38,6 +38,8 @@ proposal_create_operation proposal_create_operation::committee_proposal(const ch
 
 void proposal_create_operation::validate() const
 {
+   FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
    FC_ASSERT( !proposed_ops.empty() );
    for( const auto& op : proposed_ops ) operation_validate( op.op );
 }
@@ -50,6 +52,7 @@ dualfee proposal_create_operation::calculate_fee(const fee_parameters_type& k) c
 void proposal_update_operation::validate() const
 {
    FC_ASSERT(fee.amount >= 0);
+   FC_ASSERT( ufee.amount >= 0 );
    FC_ASSERT(!(active_approvals_to_add.empty() && active_approvals_to_remove.empty() &&
                owner_approvals_to_add.empty() && owner_approvals_to_remove.empty() &&
                key_approvals_to_add.empty() && key_approvals_to_remove.empty()));
@@ -73,6 +76,7 @@ void proposal_update_operation::validate() const
 void proposal_delete_operation::validate() const
 {
    FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
 }
 
 dualfee proposal_update_operation::calculate_fee(const fee_parameters_type& k) const

@@ -27,7 +27,8 @@ namespace graphene { namespace chain {
 
 void custom_operation::validate()const
 {
-   FC_ASSERT( fee.amount > 0 );
+   FC_ASSERT( fee.amount >= 0 );
+   FC_ASSERT( ufee.amount >= 0 );
 }
 dualfee custom_operation::calculate_fee(const fee_parameters_type& k)const
 {

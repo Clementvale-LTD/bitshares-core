@@ -281,74 +281,74 @@
   "initial_accounts": [
     {
       "name": "umt-fee-pool",
-      "owner_key": "BTE53hebnewGUN53M9tQ3tEFmY4HY86jHgiGrVDnsWSEXz1iZVfNK",
-      "active_key": "BTE53hebnewGUN53M9tQ3tEFmY4HY86jHgiGrVDnsWSEXz1iZVfNK",
+      "owner_key": "BTE5bqwoZYe31Fhs7ePaUgez7upy3FMvrBicHEz4FBT29hGVry2Qr",
+      "active_key": "BTE5bqwoZYe31Fhs7ePaUgez7upy3FMvrBicHEz4FBT29hGVry2Qr",
       "is_lifetime_member": false
     },
     {
       "name": "init0",
-      "owner_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
-      "active_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
+      "owner_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
+      "active_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
       "is_lifetime_member": true
     },{
       "name": "init1",
-      "owner_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
-      "active_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
+      "owner_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
+      "active_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
       "is_lifetime_member": true
     },{
       "name": "init2",
-      "owner_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
-      "active_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
+      "owner_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
+      "active_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
       "is_lifetime_member": true
     },{
       "name": "init3",
-      "owner_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
-      "active_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
+      "owner_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
+      "active_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
       "is_lifetime_member": true
     },{
       "name": "init4",
-      "owner_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
-      "active_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
+      "owner_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
+      "active_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
       "is_lifetime_member": true
     },{
       "name": "init5",
-      "owner_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
-      "active_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
+      "owner_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
+      "active_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
       "is_lifetime_member": true
     },{
       "name": "init6",
-      "owner_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
-      "active_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
+      "owner_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
+      "active_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
       "is_lifetime_member": true
     },{
       "name": "init7",
-      "owner_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
-      "active_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
+      "owner_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
+      "active_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
       "is_lifetime_member": true
     },{
       "name": "init8",
-      "owner_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
-      "active_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
+      "owner_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
+      "active_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
       "is_lifetime_member": true
     },{
       "name": "init9",
-      "owner_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
-      "active_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
+      "owner_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
+      "active_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
       "is_lifetime_member": true
     },{
       "name": "init10",
-      "owner_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
-      "active_key": "BTE79u9enoyZKzUT55xAo9kdve1MVLSrS6XsdVaRv7xEx9n84VJY6",
+      "owner_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
+      "active_key": "BTE5g5TbMwUmbV7z5KWYhfWsg6U47pQWFsBQZXenJFCWupgKkTerd",
       "is_lifetime_member": true
     },{
       "name": "ptolemy",
-      "owner_key": "BTE7j8tEaenNzdb2oPE5bMxFkXAQWxYmPCVByxjhj3qp4Pq72J9SS",
-      "active_key": "BTE7j8tEaenNzdb2oPE5bMxFkXAQWxYmPCVByxjhj3qp4Pq72J9SS",
+      "owner_key": "BTE7fk2LeDixh7VaPkVJ4Vzo5gfX5E9n8rRe9iQDp97VZf6wkiuTa",
+      "active_key": "BTE7fk2LeDixh7VaPkVJ4Vzo5gfX5E9n8rRe9iQDp97VZf6wkiuTa",
       "is_lifetime_member": false
     },{
       "name": "bank",
-      "owner_key": "BTE5h25EQkux6fjGRduj7saKrhRTTJiZBqrYth3ot6ge7i9fmeWus",
-      "active_key": "BTE5h25EQkux6fjGRduj7saKrhRTTJiZBqrYth3ot6ge7i9fmeWus",
+      "owner_key": "BTE8PZ3f9ETz2633nMrwb5su7Be6jzJXSVsFeW9DbxKpTohxaNUuB",
+      "active_key": "BTE8PZ3f9ETz2633nMrwb5su7Be6jzJXSVsFeW9DbxKpTohxaNUuB",
       "is_lifetime_member": false
     }
   ],
@@ -362,17 +362,17 @@
       "max_supply": "1000000000000000"
     }],
   "initial_balances": [{
-      "owner": "BTE4JgCv9Afc8crrCpJCk5P8Q28XrYapnKnB",
+      "owner": "BTEHvEVBeGndPD4mu453ZUGMhL4WcL3xyxbY",
       "asset_symbol": "BTE",
       "amount": "999999990000000"
     },
     {
-      "owner": "BTEPv8M6ysrEBz6BBmmy5k3dBnvekEdj9Wp6",
+      "owner": "BTEDC73MjiRugV69NTPHnTTsGkRDce47xMn2",
       "asset_symbol": "SDRT",
       "amount": "1000000000000000"
     },
     {
-      "owner": "BTEPv8M6ysrEBz6BBmmy5k3dBnvekEdj9Wp6",
+      "owner": "BTEDC73MjiRugV69NTPHnTTsGkRDce47xMn2",
       "asset_symbol": "BTE",
       "amount": "10000000"
     }
@@ -439,7 +439,7 @@
     }
   ],
   "initial_worker_candidates": [],
-  "initial_chain_id": "e18c1972e0811975e27c2000e08a2007e05320193de42483b94af1a153a04971",
+  "initial_chain_id": "e18c1972e0811975e27c2000e08a2007e05320193de42483b93af1a153a04971",
   "immutable_parameters": {
     "min_committee_member_count": 11,
     "min_witness_count": 11,

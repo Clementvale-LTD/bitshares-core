@@ -439,7 +439,7 @@
     }
   ],
   "initial_worker_candidates": [],
-  "initial_chain_id": "e18c1972e0811975e27c2000e08a2007e05320193de42483b92af1a153a04971",
+  "initial_chain_id": "e18c1972e0811975e27c2000e08a2007e05320193de42483b94af1a153a04971",
   "immutable_parameters": {
     "min_committee_member_count": 11,
     "min_witness_count": 11,

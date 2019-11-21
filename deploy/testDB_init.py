@@ -3,8 +3,8 @@ from node_lib import *
 import json
 import getpass
 
-# set_cli_wallet_url( "http://10.200.0.185:1227/rpc")
-set_cli_wallet_url( "http://127.0.0.1:1227/rpc")
+set_cli_wallet_url( "http://10.200.0.185:1227/rpc")
+# set_cli_wallet_url( "http://127.0.0.1:1227/rpc")
 cli_password="smSecret"
 
 # template for JSON call
@@ -113,6 +113,19 @@ jsonrpc_call["method"] = "import_key"
 jsonrpc_call["params"] = ["t3node", "5J2rJgVbj4VTjo4UAnpshDGYiSGxgMhdVFG32BiZ8snuSf6u6X8"]
 cli_response = call_cli_wallet( jsonrpc_call )
 
+jsonrpc_call["method"] = "register_account"
+jsonrpc_call["params"] = ["countrycom", "BTE8LEYPd6i2ucj2Q8Q21tgtqu5BrmAwTHpkbjpcc1HHjAnSqdXnF", "BTE8LEYPd6i2ucj2Q8Q21tgtqu5BrmAwTHpkbjpcc1HHjAnSqdXnF", 0, "bubbletone", True]
+cli_response = call_cli_wallet( jsonrpc_call )
+
+jsonrpc_call["method"] = "register_account"
+jsonrpc_call["params"] = ["mds", "BTE5NS1nD7cWSkPRj45gqMciu52rYVC9EDXCBwh7PVFZsbMssMn8o", "BTE5NS1nD7cWSkPRj45gqMciu52rYVC9EDXCBwh7PVFZsbMssMn8o", 0, "bubbletone", True]
+cli_response = call_cli_wallet( jsonrpc_call )
+
+jsonrpc_call["method"] = "register_account"
+jsonrpc_call["params"] = ["nexign", "BTE8Grq28pmVgt8NgjjHFgktrTK2tsXkCBqkY2JfyhB8Di3NTRcWE", "BTE8Grq28pmVgt8NgjjHFgktrTK2tsXkCBqkY2JfyhB8Di3NTRcWE", 0, "bubbletone", True]
+cli_response = call_cli_wallet( jsonrpc_call )
+
+
 # jsonrpc_call["method"] = "create_asset"
 # jsonrpc_call["params"] = ["bank", "SDR", 4, { "max_supply": "1000000000000000", "market_fee_percent": 0, "max_market_fee": "1000000000000000", "issuer_permissions": 64, "flags": 0, "whitelist_authorities": [], "blacklist_authorities": [], "whitelist_markets": [], "blacklist_markets": [], "description": "", "extensions": [] }, None, True]
 # cli_response = call_cli_wallet( jsonrpc_call )
@@ -131,6 +144,18 @@ cli_response = call_cli_wallet( jsonrpc_call )
 
 jsonrpc_call["method"] = "transfer"
 jsonrpc_call["params"] = ["bank", "t3node", 50000, "SDRT", "here is some umt", "true"]
+cli_response = call_cli_wallet( jsonrpc_call )
+
+jsonrpc_call["method"] = "transfer"
+jsonrpc_call["params"] = ["bank", "countrycom", 10000, "SDRT", "here is some umt", "true"]
+cli_response = call_cli_wallet( jsonrpc_call )
+
+jsonrpc_call["method"] = "transfer"
+jsonrpc_call["params"] = ["bank", "nexign", 10000, "SDRT", "here is some umt", "true"]
+cli_response = call_cli_wallet( jsonrpc_call )
+
+jsonrpc_call["method"] = "transfer"
+jsonrpc_call["params"] = ["bank", "mds", 10000, "SDRT", "here is some umt", "true"]
 cli_response = call_cli_wallet( jsonrpc_call )
 
 jsonrpc_call["method"] = "vote_for_committee_member"
